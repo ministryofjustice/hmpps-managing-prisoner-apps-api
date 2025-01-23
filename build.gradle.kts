@@ -13,6 +13,8 @@ dependencies {
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+  implementation("org.flywaydb:flyway-core:10.16.0")
+  implementation("org.postgresql:postgresql:42.7.3")
 
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.1.0")
   testImplementation("org.wiremock:wiremock-standalone:3.9.2")
