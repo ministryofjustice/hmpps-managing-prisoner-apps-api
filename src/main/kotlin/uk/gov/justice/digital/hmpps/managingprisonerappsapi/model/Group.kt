@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.model
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity

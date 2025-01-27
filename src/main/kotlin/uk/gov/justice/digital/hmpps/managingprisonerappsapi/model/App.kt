@@ -1,11 +1,10 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.model
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import java.time.LocalDateTime
 import java.util.UUID
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 @Entity
 data class App(

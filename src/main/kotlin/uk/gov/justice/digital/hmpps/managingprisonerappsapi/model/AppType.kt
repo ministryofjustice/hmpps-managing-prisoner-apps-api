@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.model
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 enum class AppType {
   PIN_PHONE_CREDIT_TOP_UP,

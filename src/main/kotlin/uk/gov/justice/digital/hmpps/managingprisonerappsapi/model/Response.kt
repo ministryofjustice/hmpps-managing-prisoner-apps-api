@@ -1,8 +1,9 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.model
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import java.time.LocalDateTime
 import java.util.UUID
 

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.model
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import jakarta.persistence.Id
 import java.time.LocalDateTime
