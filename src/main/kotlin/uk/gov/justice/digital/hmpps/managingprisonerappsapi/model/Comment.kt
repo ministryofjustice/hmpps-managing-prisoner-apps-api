@@ -10,6 +10,6 @@ data class Comment(
   val message: String,
   val createdDate: LocalDateTime,
   val createdBy: UUID,
-  val users: Set<User>,
+  val users: Set<UUID>,
   val app: UUID
   )

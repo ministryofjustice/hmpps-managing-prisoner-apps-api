@@ -11,18 +11,18 @@ spring:
   jpa:
     defer-datasource-initialization: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
   datasource:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     url: jdbc:postgresql://${DB_ENDPOINT}/${DB_NAME}?sslmode=${DB_SSL_MODE}
-  flyway:
-    enabled: true
-    url: jdbc:postgresql://${DB_ENDPOINT}/${DB_NAME}?sslmode=${DB_SSL_MODE}
-    user: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    locations: classpath:db/migration/default
-    baseline-on-migrate: true
+  #flyway:
+    #enabled: true
+    #url: jdbc:postgresql://${DB_ENDPOINT}/${DB_NAME}?sslmode=${DB_SSL_MODE}
+    #user: ${DB_USERNAME}
+    #password: ${DB_PASSWORD}
+    #locations: classpath:db/migration/default
+    #baseline-on-migrate: true
 
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss"
