@@ -14,5 +14,4 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 @EnableJpaRepositories(basePackages = ["uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository"])
 @EntityScan("uk.gov.justice.digital.hmpps.managingprisonerappsapi.model")
 @ExtendWith(SpringExtension::class)
-class StaffRepositoryTest(@Autowired val staffRepository: StaffRepository) {
-}
+class StaffRepositoryTest(@Autowired val staffRepository: StaffRepository)

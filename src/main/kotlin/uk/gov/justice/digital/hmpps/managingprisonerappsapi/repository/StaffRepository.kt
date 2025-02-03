@@ -6,5 +6,4 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import java.util.UUID
 
 @Repository
-interface StaffRepository: JpaRepository<Staff, UUID> {
-}
+interface StaffRepository : JpaRepository<Staff, UUID>

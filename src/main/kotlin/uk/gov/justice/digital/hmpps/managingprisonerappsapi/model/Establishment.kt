@@ -10,13 +10,18 @@ import java.util.UUID
 data class Establishment(
   @Id
   val id: UUID,
-  val name: String
+  val name: String,
 ) {
   override fun equals(other: Any?): Boolean {
-    return super.equals(other)
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Establishment
+
+    return id == other.id
   }
 
   override fun hashCode(): Int {
-    return super.hashCode()
+    return id.hashCode()
   }
 }

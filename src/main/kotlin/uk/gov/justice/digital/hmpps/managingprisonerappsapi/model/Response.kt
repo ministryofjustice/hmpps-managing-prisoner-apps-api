@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -15,5 +14,18 @@ data class Response(
   val reason: String,
   val decision: Decision,
   val createdDate: LocalDateTime,
-  val createdBy: UUID
-  )
+  val createdBy: UUID,
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Response
+
+    return id == other.id
+  }
+
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+}

@@ -18,8 +18,21 @@ data class App(
   val lastModifiedBy: UUID,
   @ElementCollection
   val comments: List<UUID>,
-  //@ElementCollection
-  //val requests: List<Map<String, JvmType.Object>>,
+  // @ElementCollection
+  // val requests: List<Map<String, JvmType.Object>>,
   val requestedDateTime: LocalDateTime,
-  val requestedBy: UUID
-)
+  val requestedBy: UUID,
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as App
+
+    return id == other.id
+  }
+
+  override fun hashCode(): Int {
+    return id.hashCode()
+  }
+}
