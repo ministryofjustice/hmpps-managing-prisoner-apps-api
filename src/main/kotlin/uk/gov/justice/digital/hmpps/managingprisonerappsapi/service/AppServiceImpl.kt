@@ -1,18 +1,98 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDto
+import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import java.time.LocalDateTime
 import java.util.*
 
-class AppServiceImpl : AppService {
-  override fun submitApp(appDto: AppDto): AppDto {
+@Service
+class AppServiceImpl(
+  var appRepository: AppRepository,
+  var prisonerService: PrisonerService,
+  var staffService: StaffService,
+) : AppService {
+
+  fun saveApp(app: App): App {
+    return appRepository.save(app)
+  }
+
+  fun updateApp(app: App): App {
+    return appRepository.save(app)
+  }
+
+  fun getAppByID(id: UUID): Optional<App> {
+    return appRepository.findById(id)
+  }
+
+  fun deleteAppById(id: UUID) {
+    appRepository.deleteById(id)
+  }
+
+  fun getAppByRequestedBy(): List<App> {
     TODO("Not yet implemented")
   }
 
-  override fun getAppsById(id: UUID): AppDto {
+  fun getAppsByEstablishment() {
     TODO("Not yet implemented")
   }
 
-  override fun getAppsByEstablishment(name: String): AppDto {
+  fun getAppsByGroup() {
+
+  }
+
+  override fun submitApp(prisonerId: String, staffId: String, appRequestDto: AppRequestDto): AppResponseDto {
     TODO("Not yet implemented")
+    // validate prisoner
+    val prisoner = prisonerService.getPrisonerById(prisonerId)
+    val staff = staffService.getStaffById(staffId)
+  }
+
+  override fun getAppsById(id: UUID): AppResponseDto {
+    TODO("Not yet implemented")
+  }
+
+  override fun getAppsByEstablishment(name: String): AppResponseDto {
+    TODO("Not yet implemented")
+  }
+
+  private fun ConvertAppRequestToAppEntity(prisoner: Prisoner, staff: Staff, appRequest: AppRequestDto): App {
+    TODO("Not yet implemented")
+    val localDateTime = LocalDateTime.now()
+    return App(
+      UUID.randomUUID(),
+      appRequest.reference,
+      UUID.randomUUID(),
+      AppType.PIN_PHONE_ADD_NEW_CONTACT,
+      localDateTime,
+      localDateTime,
+      staff.id,
+      arrayListOf(),
+      localDateTime,
+      staff.id,
+      UUID.randomUUID()
+    )
+  }
+
+  private fun ConvertAppToAppResponeDto(app: App): AppResponseDto {
+    TODO("Not yet implemented")
+    return AppResponseDto(
+      app.id,
+      app.reference,
+      UUID.randomUUID(),
+      app.appType,
+      app.createdDate,
+      app.lastModifiedDateTime,
+      app.lastModifiedBy,
+      app.comments,
+      app.requests,
+      app.requestedDateTime,
+      app.requestedBy
+    )
   }
 }

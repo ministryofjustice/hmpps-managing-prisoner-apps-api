@@ -56,6 +56,7 @@ class DataGenerator {
         arrayListOf(UUID.randomUUID()),
         LocalDateTime.now(),
         UUID.randomUUID(),
+        UUID.randomUUID()
       )
     }
   }

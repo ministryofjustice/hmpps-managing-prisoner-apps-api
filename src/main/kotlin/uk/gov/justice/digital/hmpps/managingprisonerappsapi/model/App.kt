@@ -3,6 +3,8 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -18,10 +20,11 @@ data class App(
   val lastModifiedBy: UUID,
   @ElementCollection
   val comments: List<UUID>,
-  // @ElementCollection
-  // val requests: List<Map<String, JvmType.Object>>,
+  @JdbcTypeCode(SqlTypes.JSON)
+  val requests: List<Map<String, Any>>,
   val requestedDateTime: LocalDateTime,
   val requestedBy: UUID,
+  val establishment: UUID
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
