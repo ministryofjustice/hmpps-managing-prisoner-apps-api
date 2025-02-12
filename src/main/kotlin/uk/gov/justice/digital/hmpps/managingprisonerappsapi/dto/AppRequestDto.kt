@@ -8,5 +8,5 @@ data class AppRequestDto(
   val reference: String,
   val type: String,
   val requestedDate: LocalDateTime,
-  val requests: List<Map<String, Any>>?,
+  val requests: List<Map<String, Any>>,
 )
