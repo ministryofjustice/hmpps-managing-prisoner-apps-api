@@ -1,0 +1,30 @@
+[
+  {
+    "appType": "PIN_PHONE_CREDIT_TOP_UP",
+    "dataFields" : [
+        {
+          "id" : "1",
+          "name": "",
+          "display": "",
+          "type": "string",
+          "value": "",
+          "values": [],
+          "required": false
+        },
+      {
+        "id" : "2",
+        "name": "",
+        "display": "",
+        "type": "integer",
+        "value": ""
+      },
+      {
+        "id" : "3",
+        "name": "",
+        "display": "",
+        "type": "string",
+        "value": ""
+      }
+    ]
+  }
+  ]

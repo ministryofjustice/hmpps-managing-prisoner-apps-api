@@ -33,13 +33,13 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: ${hmpps-auth.url}/.well-known/jwks.json
+          jwk-set-uri: ${HMPPS_AUTH_URL}/.well-known/jwks.json
 
       # TODO: This client section can be removed if your service doesn't call out to other services
       client:
         provider:
           hmpps-auth:
-            token-uri: ${hmpps-auth.url}/oauth/token
+            token-uri: ${HMPPS_AUTH_URL}/oauth/token
 
         registration:
           # example client registration for calling out to other services

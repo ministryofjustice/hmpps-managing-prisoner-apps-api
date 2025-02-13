@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.collections.HashMap
 
 class DataGenerator {
   companion object {
@@ -54,8 +55,10 @@ class DataGenerator {
         LocalDateTime.now(),
         UUID.randomUUID(),
         arrayListOf(UUID.randomUUID()),
+        listOf(HashMap<String, Any>()),
         LocalDateTime.now(),
         UUID.randomUUID(),
+        UUID.randomUUID()
       )
     }
   }
