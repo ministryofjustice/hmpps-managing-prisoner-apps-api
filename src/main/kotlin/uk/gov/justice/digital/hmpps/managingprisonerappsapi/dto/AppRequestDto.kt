@@ -9,4 +9,5 @@ data class AppRequestDto(
   val type: String,
   val requestedDate: LocalDateTime,
   val requests: List<Map<String, Any>>,
+  val createdBy: String
 )

@@ -15,5 +15,5 @@ data class AppResponseDto(
   val comments: List<UUID>?,
   val requests: List<Map<String, Any>>?,
   val requestedDateTime: LocalDateTime,
-  val requestedBy: UUID,
+  val requestedBy: String,
 )

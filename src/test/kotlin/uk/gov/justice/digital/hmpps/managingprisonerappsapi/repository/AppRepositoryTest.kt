@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.util.*
+import kotlin.collections.HashMap
 
 @SpringBootTest(classes = [AppRepository::class])
 @EnableAutoConfiguration
@@ -39,8 +40,10 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       createdApp.lastModifiedDateTime,
       createdApp.lastModifiedBy,
       createdApp.comments,
+      listOf(HashMap<String, Any>()),
       createdApp.requestedDateTime,
       createdApp.requestedBy,
+      UUID.randomUUID(),
     )
     app = appRepository.save(app)
     Assertions.assertEquals("new reference 123", app.reference)

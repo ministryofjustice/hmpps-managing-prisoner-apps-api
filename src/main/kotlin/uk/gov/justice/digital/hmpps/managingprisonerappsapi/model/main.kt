@@ -5,7 +5,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 
 
 class main
-fun main(args: Array<String>) {
+fun main1(args: Array<String>) {
   val mapper = Jackson2ObjectMapperBuilder().build<ObjectMapper>()
   val map1 = HashMap<String, Any>()
   map1.put("amount", 5)
@@ -66,5 +66,7 @@ fun main(args: Array<String>) {
   println(formsString)
   val forms1 = mapper.readValue(formsString, Forms::class.java)
   println(forms1)
+
+  println(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS)
 
 }

@@ -1,4 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions
 
-class ApiExceptions(override val message: String): RuntimeException(message) {
+import org.springframework.http.HttpStatus
+
+class ApiExceptions(override val message: String, status: HttpStatus): RuntimeException(message) {
 }

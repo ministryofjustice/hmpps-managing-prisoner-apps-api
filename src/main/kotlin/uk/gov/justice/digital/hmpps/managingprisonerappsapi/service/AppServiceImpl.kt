@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
@@ -58,7 +59,7 @@ class AppServiceImpl(
   }
 
   override fun getAppsById(id: UUID): AppResponseDto {
-    val app = appRepository.findById(id).orElseThrow<ApiExceptions>(throw ApiExceptions("No app exist with id $id"))
+    val app = appRepository.findById(id).orElseThrow<ApiExceptions>(throw ApiExceptions("No app exist with id $id", HttpStatus.NOT_FOUND))
     return convertAppToAppResponseDto(app)
   }
 
@@ -73,7 +74,7 @@ class AppServiceImpl(
       UUID.randomUUID(),
       appRequest.reference,
       UUID.randomUUID(),
-      AppType.PIN_PHONE_ADD_NEW_CONTACT,
+      AppType.getAppType(appRequest.type),
       localDateTime,
       localDateTime,
       staff.id,
@@ -98,7 +99,7 @@ class AppServiceImpl(
       app.comments,
       app.requests,
       app.requestedDateTime,
-      app.requestedBy
+      app.requestedBy.toString()
     )
   }
 }

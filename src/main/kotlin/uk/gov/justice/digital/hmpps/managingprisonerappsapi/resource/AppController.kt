@@ -25,7 +25,7 @@ class AppController(var appService: AppService) {
     produces = [MediaType.APPLICATION_JSON_VALUE],
     consumes = [MediaType.APPLICATION_JSON_VALUE]
     )
-  @PreAuthorize("hasAnyRole('ROLE_VIEW_PRISONER_DATA')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun submitApp(
     @PathVariable("prisoner-id") prisonerId: String,
     @RequestBody appRequestDto: AppRequestDto): ResponseEntity<AppResponseDto> {
@@ -38,9 +38,11 @@ class AppController(var appService: AppService) {
 
   }
 
-  @GetMapping("")
-  fun getAppById(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> {
-    return ResponseEntity.status(HttpStatus.OK).build()
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @GetMapping("/prisoners/{prisoner-id}/apps/{id}")
+  fun getAppById(@PathVariable("prisoner-id") prisonerId: String, @PathVariable("id") id: UUID): ResponseEntity<AppResponseDto> {
+    val appResponseDto = appService.getAppsById(id)
+    return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
   fun getAppsByEstablishment(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> {
