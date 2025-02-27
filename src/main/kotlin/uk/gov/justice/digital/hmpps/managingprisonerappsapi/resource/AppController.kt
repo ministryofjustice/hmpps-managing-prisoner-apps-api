@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -28,9 +30,13 @@ class AppController(var appService: AppService) {
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun submitApp(
     @PathVariable("prisoner-id") prisonerId: String,
-    @RequestBody appRequestDto: AppRequestDto): ResponseEntity<AppResponseDto> {
-    val appResponseDto = appService.submitApp(prisonerId, UUID.randomUUID().toString(), appRequestDto)
-    return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
+    @RequestBody appRequestDto: AppRequestDto,
+    authentication: Authentication,
+    ): ResponseEntity<AppResponseDto> {
+    val principal = authentication.principal as Jwt
+    val staffId = principal.claims["username"] as String
+    val appResponseDto = appService.submitApp(prisonerId, staffId, appRequestDto)
+    return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }
 
   fun updateApp(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> {
@@ -40,8 +46,12 @@ class AppController(var appService: AppService) {
 
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/prisoners/{prisoner-id}/apps/{id}")
-  fun getAppById(@PathVariable("prisoner-id") prisonerId: String, @PathVariable("id") id: UUID): ResponseEntity<AppResponseDto> {
-    val appResponseDto = appService.getAppsById(id)
+  fun getAppById(@PathVariable("prisoner-id") prisonerId: String,
+                 @PathVariable("id") id: UUID,
+                 @RequestParam(required = false) requestedBy: Boolean,
+                 @RequestParam(required = false) assignedGroup: Boolean,
+                 ): ResponseEntity<AppResponseDto> {
+    val appResponseDto = appService.getAppsById(prisonerId, id, requestedBy, assignedGroup)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 

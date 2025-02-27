@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import org.springframework.http.HttpStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExceptions
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 
 enum class AppType {
   PIN_PHONE_CREDIT_TOP_UP,
@@ -28,7 +28,7 @@ enum class AppType {
       if (type == PIN_PHONE_REMOVE_CONTACT.toString()) {
         return PIN_PHONE_REMOVE_CONTACT
       }
-      throw ApiExceptions("$type do not match with any app type", HttpStatus.BAD_REQUEST)
+      throw ApiException("$type do not match with any app type", HttpStatus.BAD_REQUEST)
     }
   }
 }

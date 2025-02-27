@@ -7,7 +7,7 @@ import java.util.*
 data class AppResponseDto(
   val id: UUID?,
   val reference: String,
-  val assignedGroup: UUID,
+  val assignedGroup: AssignedGroupDto,
   val appType: AppType,
   val createdDate: LocalDateTime,
   val lastModifiedDateTime: LocalDateTime,
@@ -15,5 +15,5 @@ data class AppResponseDto(
   val comments: List<UUID>?,
   val requests: List<Map<String, Any>>?,
   val requestedDateTime: LocalDateTime,
-  val requestedBy: String,
+  val requestedBy: Any,
 )

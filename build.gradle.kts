@@ -20,6 +20,12 @@ dependencies {
 
   // runtimeOnly("org.flywaydb:flyway-database-postgresql:10.16.0")
 
+  implementation("org.springframework.security:spring-security-crypto:6.2.4")
+  implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+  implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
+  implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+  implementation("org.json:json:20231013")
+
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.1.0")

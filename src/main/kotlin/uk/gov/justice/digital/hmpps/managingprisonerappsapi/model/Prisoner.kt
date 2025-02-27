@@ -7,11 +7,12 @@ import java.util.UUID
 @Entity
 data class Prisoner(
   @Id
-  val id: UUID,
+  val id: String,
   val firstName: String,
   val lastName: String,
   val category: UserCategory,
   val location: String,
+  val iep: String,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

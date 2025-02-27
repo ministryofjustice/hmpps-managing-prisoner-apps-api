@@ -4,7 +4,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExceptions
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AssignedGroupDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.EstablishmentDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
@@ -55,12 +57,25 @@ class AppServiceImpl(
     val staff = staffService.getStaffById(staffId)
     var app = convertAppRequestToAppEntity(prisoner.get(), staff.get(), appRequestDto)
     app = appRepository.save(app)
-    return convertAppToAppResponseDto(app)
+    val assignedGroup = AssignedGroupDto(
+      null,  EstablishmentDto("k","kk"), null, null, null
+    )
+    return convertAppToAppResponseDto(prisonerId, app, prisonerId, assignedGroup)
   }
 
-  override fun getAppsById(id: UUID): AppResponseDto {
-    val app = appRepository.findById(id).orElseThrow<ApiExceptions>(throw ApiExceptions("No app exist with id $id", HttpStatus.NOT_FOUND))
-    return convertAppToAppResponseDto(app)
+  override fun getAppsById(prisonerId: String, id: UUID, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto {
+    val app = appRepository.findById(id).orElseThrow<ApiException>{throw ApiException("No app exist with id $id", HttpStatus.NOT_FOUND)}
+    val assignedGroup = AssignedGroupDto(
+      null,  EstablishmentDto("k","kk"), null, null, null
+    )
+    val prisoner:Any
+    if(requestedBy) {
+      prisoner = prisonerService.getPrisonerById(prisonerId).orElseThrow { throw ApiException("No prisoner exist with id $prisonerId", HttpStatus.NOT_FOUND) }
+    } else {
+      prisoner = prisonerId
+    }
+
+    return convertAppToAppResponseDto(prisonerId, app, prisoner, assignedGroup)
   }
 
   override fun getAppsByEstablishment(name: String): AppResponseDto {
@@ -86,12 +101,13 @@ class AppServiceImpl(
     )
   }
 
-  private fun convertAppToAppResponseDto(app: App): AppResponseDto {
+  private fun convertAppToAppResponseDto(prisonerId: String, app: App, prisoner: Any, assignedGroup: AssignedGroupDto): AppResponseDto {
     // TODO("Not yet implemented")
+
     return AppResponseDto(
       app.id,
       app.reference,
-      UUID.randomUUID(),
+      assignedGroup,
       app.appType,
       app.createdDate,
       app.lastModifiedDateTime,
@@ -99,7 +115,7 @@ class AppServiceImpl(
       app.comments,
       app.requests,
       app.requestedDateTime,
-      app.requestedBy.toString()
+      prisoner,
     )
   }
 }
