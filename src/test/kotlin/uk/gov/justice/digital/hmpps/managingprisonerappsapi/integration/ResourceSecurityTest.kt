@@ -21,7 +21,7 @@ class ResourceSecurityTest : IntegrationTestBase() {
     " /error",
   )
 
-  // @Test
+  @Test
   fun `Ensure all endpoints protected with PreAuthorize`() {
     // need to exclude any that are forbidden in helm configuration
     val exclusions = File("helm_deploy").walk().filter { it.name.equals("values.yaml") }.flatMap { file ->

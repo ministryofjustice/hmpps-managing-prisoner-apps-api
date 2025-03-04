@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Role
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import java.util.*
@@ -16,7 +15,7 @@ class StaffServiceImpl : StaffService {
       "Staff",
       UserCategory.STAFF,
       setOf(UUID.randomUUID()),
-      "Establishment Warden"
+      "Establishment Warden",
     )
     return Optional.of(staff)
   }

@@ -47,30 +47,39 @@ class AppServiceImpl(
   }
 
   fun getAppsByGroup() {
-
   }
 
   override fun submitApp(prisonerId: String, staffId: String, appRequestDto: AppRequestDto): AppResponseDto {
- //   TODO("Not yet implemented")
+    //   TODO("Not yet implemented")
     // validate prisoner
     val prisoner = prisonerService.getPrisonerById(prisonerId)
     val staff = staffService.getStaffById(staffId)
     var app = convertAppRequestToAppEntity(prisoner.get(), staff.get(), appRequestDto)
     app = appRepository.save(app)
     val assignedGroup = AssignedGroupDto(
-      null,  EstablishmentDto("k","kk"), null, null, null
+      null,
+      EstablishmentDto("k", "kk"),
+      null,
+      null,
+      null,
     )
     return convertAppToAppResponseDto(prisonerId, app, prisonerId, assignedGroup)
   }
 
   override fun getAppsById(prisonerId: String, id: UUID, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto {
-    val app = appRepository.findById(id).orElseThrow<ApiException>{throw ApiException("No app exist with id $id", HttpStatus.NOT_FOUND)}
+    val app = appRepository.findById(id)
+      .orElseThrow<ApiException> { throw ApiException("No app exist with id $id", HttpStatus.NOT_FOUND) }
     val assignedGroup = AssignedGroupDto(
-      null,  EstablishmentDto("k","kk"), null, null, null
+      null,
+      EstablishmentDto("k", "kk"),
+      null,
+      null,
+      null,
     )
-    val prisoner:Any
-    if(requestedBy) {
-      prisoner = prisonerService.getPrisonerById(prisonerId).orElseThrow { throw ApiException("No prisoner exist with id $prisonerId", HttpStatus.NOT_FOUND) }
+    val prisoner: Any
+    if (requestedBy) {
+      prisoner = prisonerService.getPrisonerById(prisonerId)
+        .orElseThrow { throw ApiException("No prisoner exist with id $prisonerId", HttpStatus.NOT_FOUND) }
     } else {
       prisoner = prisonerId
     }
@@ -97,11 +106,16 @@ class AppServiceImpl(
       appRequest.requests,
       localDateTime,
       staff.id,
-      UUID.randomUUID()
+      UUID.randomUUID(),
     )
   }
 
-  private fun convertAppToAppResponseDto(prisonerId: String, app: App, prisoner: Any, assignedGroup: AssignedGroupDto): AppResponseDto {
+  private fun convertAppToAppResponseDto(
+    prisonerId: String,
+    app: App,
+    prisoner: Any,
+    assignedGroup: AssignedGroupDto,
+  ): AppResponseDto {
     // TODO("Not yet implemented")
 
     return AppResponseDto(

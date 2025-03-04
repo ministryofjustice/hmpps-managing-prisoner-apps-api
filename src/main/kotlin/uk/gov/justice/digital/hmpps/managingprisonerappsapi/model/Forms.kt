@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 data class Forms(
-  val formMap: Map<String, Form>
+  val formMap: Map<String, Form>,
 )
 
 data class DataField(
@@ -12,9 +12,9 @@ data class DataField(
   val value: String,
   val values: List<String>?,
   val required: Boolean,
-  val dependsOn: Int?
+  val dependsOn: Int?,
 )
 
 data class Form(
-  val dataFields: List<DataField>
+  val dataFields: List<DataField>,
 )

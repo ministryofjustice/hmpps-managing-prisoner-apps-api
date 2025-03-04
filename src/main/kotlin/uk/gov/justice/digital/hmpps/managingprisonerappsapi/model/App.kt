@@ -24,7 +24,7 @@ data class App(
   val requests: List<Map<String, Any>>,
   val requestedDateTime: LocalDateTime,
   val requestedBy: UUID,
-  val establishment: UUID
+  val establishment: UUID,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

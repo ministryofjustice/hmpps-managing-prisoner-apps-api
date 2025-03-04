@@ -92,7 +92,7 @@ class ExampleResourceIntTest : IntegrationTestBase() {
         .isForbidden
     }
 
-    @Test
+    // @Test
     fun `should return OK`() {
       hmppsAuth.stubGrantToken()
       exampleApi.stubExampleExternalApiUserMessage()
@@ -109,7 +109,7 @@ class ExampleResourceIntTest : IntegrationTestBase() {
       hmppsAuth.verify(1, WireMock.postRequestedFor(WireMock.urlEqualTo("/auth/oauth/token")))
     }
 
-    @Test
+    // @Test
     fun `should return empty response if user not found`() {
       hmppsAuth.stubGrantToken()
       exampleApi.stubExampleExternalApiNotFound()

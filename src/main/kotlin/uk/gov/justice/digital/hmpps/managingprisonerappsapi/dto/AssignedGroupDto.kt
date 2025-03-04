@@ -8,7 +8,7 @@ data class AssignedGroupDto(
   val establishment: EstablishmentDto,
   val initialApp: AppType?,
   val type: GroupType?,
-  val email: String?
+  val email: String?,
 )
 
 data class EstablishmentDto(
