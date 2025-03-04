@@ -38,9 +38,7 @@ class AppController(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }
 
-  fun updateApp(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> {
-    return ResponseEntity.status(HttpStatus.CREATED).build()
-  }
+  fun updateApp(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> = ResponseEntity.status(HttpStatus.CREATED).build()
 
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/prisoners/{prisoner-id}/apps/{id}")
@@ -55,7 +53,5 @@ class AppController(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-  fun getAppsByEstablishment(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> {
-    return ResponseEntity.status(HttpStatus.OK).build()
-  }
+  fun getAppsByEstablishment(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> = ResponseEntity.status(HttpStatus.OK).build()
 }

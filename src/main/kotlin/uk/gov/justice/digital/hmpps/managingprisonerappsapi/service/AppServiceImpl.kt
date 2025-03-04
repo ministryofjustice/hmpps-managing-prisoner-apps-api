@@ -22,17 +22,11 @@ class AppServiceImpl(
   var staffService: StaffService,
 ) : AppService {
 
-  fun saveApp(app: App): App {
-    return appRepository.save(app)
-  }
+  fun saveApp(app: App): App = appRepository.save(app)
 
-  fun updateApp(app: App): App {
-    return appRepository.save(app)
-  }
+  fun updateApp(app: App): App = appRepository.save(app)
 
-  fun getAppByID(id: UUID): Optional<App> {
-    return appRepository.findById(id)
-  }
+  fun getAppByID(id: UUID): Optional<App> = appRepository.findById(id)
 
   fun deleteAppById(id: UUID) {
     appRepository.deleteById(id)

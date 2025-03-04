@@ -22,13 +22,11 @@ class PrisonerServiceImpl : PrisonerService {
     return Optional.of(prisoner)
   }
 
-  fun convertPrisonerToRequestByDto(prisoner: Prisoner): RequestedByDto {
-    return RequestedByDto(
-      prisoner.id,
-      prisoner.firstName,
-      prisoner.lastName,
-      prisoner.location,
-      prisoner.iep,
-    )
-  }
+  fun convertPrisonerToRequestByDto(prisoner: Prisoner): RequestedByDto = RequestedByDto(
+    prisoner.id,
+    prisoner.firstName,
+    prisoner.lastName,
+    prisoner.location,
+    prisoner.iep,
+  )
 }
