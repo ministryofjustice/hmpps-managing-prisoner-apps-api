@@ -13,6 +13,8 @@ services:
   hmpps-managing-prisoner-apps-api:
     build:
       context: .
+    #networks:
+      #- hmpps
     network_mode: "bridge"
     container_name: hmpps-managing-prisoner-apps-api
     ports:
@@ -22,7 +24,7 @@ services:
     depends_on: [managing-apps-postgres]
     environment:
       - SERVER_PORT=8080
-      - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
+      #- HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
       # TODO: Remove this URL and replace with outgoing service URLs
       #- EXAMPLE_URL=http://hmpps-managing-prisoner-apps-api:8080
       - SPRING_PROFILES_ACTIVE=dev
@@ -47,3 +49,6 @@ services:
       #- SERVER_PORT=8080
       #- SPRING_PROFILES_ACTIVE=dev
       #- APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
+
+#networks:
+#  hmpps:
