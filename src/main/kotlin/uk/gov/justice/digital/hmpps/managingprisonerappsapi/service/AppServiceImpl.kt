@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppRequestDto
@@ -12,6 +13,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource.AppController
 import java.time.LocalDateTime
 import java.util.*
 
@@ -21,6 +23,10 @@ class AppServiceImpl(
   var prisonerService: PrisonerService,
   var staffService: StaffService,
 ) : AppService {
+
+  companion object {
+    private val logger = LoggerFactory.getLogger(AppController::class.java)
+  }
 
   fun saveApp(app: App): App = appRepository.save(app)
 
@@ -57,6 +63,7 @@ class AppServiceImpl(
       null,
       null,
     )
+    logger.info("App created for $prisonerId for app type ${app.appType}")
     return convertAppToAppResponseDto(prisonerId, app, prisonerId, assignedGroup)
   }
 

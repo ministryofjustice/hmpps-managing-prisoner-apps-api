@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -22,6 +23,10 @@ import java.util.*
 @RequestMapping("v1")
 class AppController(var appService: AppService) {
 
+  companion object {
+    private val logger = LoggerFactory.getLogger(AppController::class.java)
+  }
+
   @PostMapping(
     "prisoners/{prisoner-id}/apps",
     produces = [MediaType.APPLICATION_JSON_VALUE],
@@ -34,6 +39,7 @@ class AppController(var appService: AppService) {
     authentication: Authentication,
   ): ResponseEntity<AppResponseDto> {
     authentication as AuthAwareAuthenticationToken
+    logger.info("Request received for submitting app for $prisonerId by ${authentication.principal}")
     val appResponseDto = appService.submitApp(prisonerId, authentication.principal, appRequestDto)
     return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }
@@ -49,6 +55,8 @@ class AppController(var appService: AppService) {
     @RequestParam(required = false) assignedGroup: Boolean,
     authentication: Authentication,
   ): ResponseEntity<AppResponseDto> {
+    authentication as AuthAwareAuthenticationToken
+    logger.info("Request received for get app for $prisonerId by ${authentication.principal}")
     val appResponseDto = appService.getAppsById(prisonerId, id, requestedBy, assignedGroup)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
