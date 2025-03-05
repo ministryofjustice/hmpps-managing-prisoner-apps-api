@@ -1,35 +1,54 @@
 version: "3"
 services:
+  managing-apps-postgres:
+    image: postgres:16.2
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./init-for-dev-only.sql:/docker-entrypoint-initdb.d/init-for-dev-only.sql
+    network_mode: "bridge"
   hmpps-managing-prisoner-apps-api:
     build:
       context: .
-    networks:
-      - hmpps
+    #networks:
+      #- hmpps
+    network_mode: "bridge"
     container_name: hmpps-managing-prisoner-apps-api
     ports:
       - "8080:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/ping"]
+    depends_on: [managing-apps-postgres]
     environment:
       - SERVER_PORT=8080
-      - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
+      #- HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
       # TODO: Remove this URL and replace with outgoing service URLs
-      - EXAMPLE_URL=http://hmpps-managing-prisoner-apps-api:8080
+      #- EXAMPLE_URL=http://hmpps-managing-prisoner-apps-api:8080
       - SPRING_PROFILES_ACTIVE=dev
+      - DB_ENDPOINT=docker.for.mac.localhost:5432
+      - DB_USERNAME=postgres
+      - DB_NAME=managingapps
+      - DB_PASSWORD=password
+      - DB_SSL_MODE=prefer
+      - DB_URL=docker.for.mac.localhost:5432
+      - HMPPS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
 
-  hmpps-auth:
-    image: quay.io/hmpps/hmpps-auth:latest
-    networks:
-      - hmpps
-    container_name: hmpps-auth
-    ports:
-      - "8090:8080"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
-    environment:
-      - SERVER_PORT=8080
-      - SPRING_PROFILES_ACTIVE=dev
-      - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
+  #hmpps-auth:
+    #image: quay.io/hmpps/hmpps-auth:latest
+    #networks:
+     # - hmpps
+    #container_name: hmpps-auth
+    #ports:
+      #- "8090:8080"
+    #healthcheck:
+      #test: ["CMD", "curl", "-f", "http://localhost:8080/auth/health"]
+    #environment:
+      #- SERVER_PORT=8080
+      #- SPRING_PROFILES_ACTIVE=dev
+      #- APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
 
-networks:
-  hmpps:
+#networks:
+#  hmpps:

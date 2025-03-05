@@ -11,6 +11,7 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.resource.NoResourceFoundException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestControllerAdvice
@@ -58,6 +59,20 @@ class ManagingPrisonerAppsApiExceptionHandler {
         developerMessage = e.message,
       ),
     ).also { log.error("Unexpected exception", e) }
+
+  @ExceptionHandler(ApiException::class)
+  fun handleApiException(e: ApiException): ResponseEntity<ErrorResponse> {
+    log.error("Api Exception: {}", e.message)
+    return ResponseEntity
+      .status(e.status)
+      .body(
+        ErrorResponse(
+          status = e.status.value(),
+          userMessage = "Unexpected error: ${e.message}",
+          developerMessage = e.message,
+        ),
+      )
+  }
 
   private companion object {
     private val log = LoggerFactory.getLogger(this::class.java)

@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
-enum class UserCategory {
-  STAFF,
-  PRISONER,
-}
+data class Requests(
+  val request: List<Map<String, Any>>,
+)
