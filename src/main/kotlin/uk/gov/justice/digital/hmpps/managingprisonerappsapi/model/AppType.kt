@@ -25,8 +25,8 @@ enum class AppType {
       if (type == PIN_PHONE_REMOVE_CONTACT.toString()) {
         return PIN_PHONE_REMOVE_CONTACT
       }
-      if (type == PIN_PHONE_REMOVE_CONTACT.toString()) {
-        return PIN_PHONE_REMOVE_CONTACT
+      if (type == PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS.toString()) {
+        return PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS
       }
       throw ApiException("$type do not match with any app type", HttpStatus.BAD_REQUEST)
     }

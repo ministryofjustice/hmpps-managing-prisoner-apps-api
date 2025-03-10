@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import java.time.LocalDateTime
 import java.util.*
@@ -9,11 +10,15 @@ data class AppResponseDto(
   val reference: String,
   val assignedGroup: AssignedGroupDto,
   val appType: AppType,
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+  val requestedDate: LocalDateTime,
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val createdDate: LocalDateTime,
-  val lastModifiedDateTime: LocalDateTime,
-  val lastModifiedBy: UUID,
+  val createdBy: String,
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+  val lastModifiedDate: LocalDateTime?,
+  val lastModifiedBy: String?,
   val comments: List<UUID>?,
   val requests: List<Map<String, Any>>?,
-  val requestedDateTime: LocalDateTime,
   val requestedBy: Any,
 )

@@ -10,7 +10,8 @@ class StaffServiceImpl : StaffService {
   override fun getStaffById(id: String): Optional<Staff> {
     // TODO("Not yet implemented")
     val staff = Staff(
-      UUID.randomUUID(),
+      id,
+      UUID.randomUUID().toString(),
       "Test",
       "Staff",
       UserCategory.STAFF,

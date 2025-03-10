@@ -31,7 +31,8 @@ class DataGenerator {
     )
 
     fun generateStaff(): Staff = Staff(
-      UUID.randomUUID(),
+      "TEST_USER",
+      "Test",
       "Test",
       "Staff",
       UserCategory.STAFF,
@@ -46,12 +47,12 @@ class DataGenerator {
       AppType.PIN_PHONE_ADD_NEW_CONTACT,
       LocalDateTime.now(),
       LocalDateTime.now(),
-      UUID.randomUUID(),
+      "testStaaf@moj",
+      LocalDateTime.now(),
+      "testStaaf@moj",
       arrayListOf(UUID.randomUUID()),
       listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
-      LocalDateTime.now(),
-      UUID.randomUUID(),
-      UUID.randomUUID(),
+      "testprisoner@moj",
     )
 
     fun generateAppRequestDto(): AppRequestDto = AppRequestDto(

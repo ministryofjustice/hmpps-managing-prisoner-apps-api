@@ -15,16 +15,16 @@ data class App(
   val reference: String,
   val assignedGroup: UUID,
   val appType: AppType,
+  val requestedDate: LocalDateTime,
   val createdDate: LocalDateTime,
-  val lastModifiedDateTime: LocalDateTime,
-  val lastModifiedBy: UUID,
+  val createdBy: String,
+  val lastModifiedDate: LocalDateTime?,
+  val lastModifiedBy: String?,
   @ElementCollection
   val comments: List<UUID>,
   @JdbcTypeCode(SqlTypes.JSON)
   val requests: List<Map<String, Any>>,
-  val requestedDateTime: LocalDateTime,
-  val requestedBy: UUID,
-  val establishment: UUID,
+  val requestedBy: String,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

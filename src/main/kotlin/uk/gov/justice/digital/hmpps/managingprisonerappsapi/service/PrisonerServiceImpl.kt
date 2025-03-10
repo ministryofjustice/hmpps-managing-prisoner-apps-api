@@ -13,6 +13,7 @@ class PrisonerServiceImpl : PrisonerService {
     // Implement it later just adding placeholder for returning a prisoner
     val prisoner = Prisoner(
       id,
+      UUID.randomUUID().toString(),
       "Test",
       "Prisoner",
       UserCategory.PRISONER,
@@ -23,7 +24,7 @@ class PrisonerServiceImpl : PrisonerService {
   }
 
   fun convertPrisonerToRequestByDto(prisoner: Prisoner): RequestedByDto = RequestedByDto(
-    prisoner.id,
+    prisoner.username,
     prisoner.firstName,
     prisoner.lastName,
     prisoner.location,
