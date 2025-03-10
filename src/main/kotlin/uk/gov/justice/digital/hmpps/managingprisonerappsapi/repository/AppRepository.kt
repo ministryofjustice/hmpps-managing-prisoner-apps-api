@@ -7,7 +7,7 @@ import java.util.UUID
 
 @Repository
 interface AppRepository : JpaRepository<App, UUID> {
-  fun findAppsByRequestedBy(id: UUID): List<App>
+  // fun findAppsByRequestedBy(id: UUID): List<App>
 
-  fun findAppByEstablishment(id: UUID): List<App>
+  // fun findAppByEstablishment(id: UUID): List<App>
 }

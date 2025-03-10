@@ -36,14 +36,14 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       "new reference 123",
       createdApp.assignedGroup,
       createdApp.appType,
+      createdApp.requestedDate,
       createdApp.createdDate,
-      createdApp.lastModifiedDateTime,
+      createdApp.createdBy,
+      createdApp.lastModifiedDate,
       createdApp.lastModifiedBy,
       createdApp.comments,
       listOf(HashMap<String, Any>()),
-      createdApp.requestedDateTime,
       createdApp.requestedBy,
-      UUID.randomUUID(),
     )
     app = appRepository.save(app)
     Assertions.assertEquals("new reference 123", app.reference)

@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource.AppController
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 @Service
@@ -94,20 +95,20 @@ class AppServiceImpl(
 
   private fun convertAppRequestToAppEntity(prisoner: Prisoner, staff: Staff, appRequest: AppRequestDto): App {
     // TODO("Not yet implemented")
-    val localDateTime = LocalDateTime.now()
+    val localDateTime = LocalDateTime.now(ZoneOffset.UTC)
     return App(
-      UUID.randomUUID(),
-      appRequest.reference,
-      UUID.randomUUID(),
+      UUID.randomUUID(), // id
+      appRequest.reference, // reference
+      UUID.randomUUID(), // group id
       AppType.getAppType(appRequest.type),
-      localDateTime,
-      localDateTime,
-      staff.id,
+      appRequest.requestedDate,
+      localDateTime, // created date
+      staff.username,
+      localDateTime, // last modified date
+      staff.username, // created by
       arrayListOf(),
       appRequest.requests,
-      localDateTime,
-      staff.id,
-      UUID.randomUUID(),
+      prisoner.username,
     )
   }
 
@@ -124,12 +125,13 @@ class AppServiceImpl(
       app.reference,
       assignedGroup,
       app.appType,
+      app.requestedDate,
       app.createdDate,
-      app.lastModifiedDateTime,
+      app.createdBy,
+      app.lastModifiedDate,
       app.lastModifiedBy,
       app.comments,
       app.requests,
-      app.requestedDateTime,
       prisoner,
     )
   }
