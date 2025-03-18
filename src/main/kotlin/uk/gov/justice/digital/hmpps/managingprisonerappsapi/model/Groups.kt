@@ -12,9 +12,7 @@ data class Groups(
   @Id
   val id: UUID,
   val name: String,
-  val establishment: UUID,
-  @ElementCollection
-  val staffs: Set<UUID>,
+  val establishmentId: String,
   @ElementCollection
   val initialsApps: List<AppType>,
   val type: GroupType,

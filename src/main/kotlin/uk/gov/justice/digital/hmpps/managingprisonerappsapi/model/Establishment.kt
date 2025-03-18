@@ -9,7 +9,7 @@ import java.util.UUID
 @Table(name = "establishment")
 data class Establishment(
   @Id
-  val id: UUID,
+  val id: String,
   val name: String,
 ) {
   override fun equals(other: Any?): Boolean {

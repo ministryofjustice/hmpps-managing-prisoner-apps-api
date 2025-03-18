@@ -10,4 +10,6 @@ interface AppService {
   fun getAppsById(prisonerId: String, id: UUID, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto
 
   fun getAppsByEstablishment(name: String): AppResponseDto
+
+  fun forwardAppToGroup(groupId: UUID, appId: UUID):  AppResponseDto
 }

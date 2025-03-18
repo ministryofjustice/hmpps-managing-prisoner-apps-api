@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import java.util.*
@@ -32,7 +34,7 @@ class AppController(var appService: AppService) {
     produces = [MediaType.APPLICATION_JSON_VALUE],
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('SAR_DATA_ACCESS')")
   fun submitApp(
     @PathVariable("prisoner-id") prisonerId: String,
     @RequestBody appRequestDto: AppRequestDto,
@@ -46,7 +48,7 @@ class AppController(var appService: AppService) {
 
   fun updateApp(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> = ResponseEntity.status(HttpStatus.CREATED).build()
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('SAR_DATA_ACCESS')")
   @GetMapping("/prisoners/{prisoner-id}/apps/{id}")
   fun getAppById(
     @PathVariable("prisoner-id") prisonerId: String,
@@ -61,5 +63,25 @@ class AppController(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-  fun getAppsByEstablishment(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> = ResponseEntity.status(HttpStatus.OK).build()
+  @PreAuthorize("hasAnyRole('SAR_DATA_ACCESS')")
+  @GetMapping("/apps/{appId}/groups/{groupId}")
+  fun forwardAppToGroup(groupId: UUID, appId: UUID, authentication: Authentication): ResponseEntity<AppResponseDto> {
+    authentication as AuthAwareAuthenticationToken
+    logger.info("Request received for to forward app to $groupId by ${authentication.principal}")
+    val app = appService.forwardAppToGroup(groupId, appId)
+    return ResponseEntity.status(HttpStatus.OK).body(app)
+  }
+
+  fun getAppsBySearchFilter(
+    @RequestParam(required = false) prisonerId: String?,
+    @RequestParam(required = false) groupId: UUID?,
+    @RequestParam(required = false) appType: AppType?,
+    @RequestParam(required = true) status: String?,
+  ): ResponseEntity<AppResponseDto> {
+    if (status != "pending" && status != "closed") {
+      throw ApiException("Status can be either pending or closed", HttpStatus.BAD_REQUEST)
+    }
+    return ResponseEntity.status(HttpStatus.OK).build()
+  }
+
 }
