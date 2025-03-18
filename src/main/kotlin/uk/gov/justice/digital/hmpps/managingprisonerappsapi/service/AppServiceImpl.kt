@@ -9,6 +9,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
@@ -23,6 +24,8 @@ class AppServiceImpl(
   var appRepository: AppRepository,
   var prisonerService: PrisonerService,
   var staffService: StaffService,
+  var groupsService: GroupService,
+  var establishmentService: EstablishmentService
 ) : AppService {
 
   companion object {
@@ -57,27 +60,21 @@ class AppServiceImpl(
     val staff = staffService.getStaffById(staffId)
     var app = convertAppRequestToAppEntity(prisoner.get(), staff.get(), appRequestDto)
     app = appRepository.save(app)
-    val assignedGroup = AssignedGroupDto(
-      null,
-      EstablishmentDto("k", "kk"),
-      null,
-      null,
-      null,
-    )
+    val assignedGroup = groupsService.getGroupByInitialAppType(app.appType)
     logger.info("App created for $prisonerId for app type ${app.appType}")
-    return convertAppToAppResponseDto(prisonerId, app, prisonerId, assignedGroup)
+    return convertAppToAppResponseDto(app, prisonerId, assignedGroup)
   }
 
   override fun getAppsById(prisonerId: String, id: UUID, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto {
     val app = appRepository.findById(id)
       .orElseThrow<ApiException> { throw ApiException("No app exist with id $id", HttpStatus.NOT_FOUND) }
-    val assignedGroup = AssignedGroupDto(
-      null,
-      EstablishmentDto("k", "kk"),
-      null,
-      null,
-      null,
-    )
+    val groups = groupsService.getGroupById(app.id)
+    val groupsDto: Any
+    if(assignedGroup) {
+      groupsDto = groups
+    } else {
+      groupsDto = groups.establishment.id
+    }
     val prisoner: Any
     if (requestedBy) {
       prisoner = prisonerService.getPrisonerById(prisonerId)
@@ -85,16 +82,21 @@ class AppServiceImpl(
     } else {
       prisoner = prisonerId
     }
-
-    return convertAppToAppResponseDto(prisonerId, app, prisoner, assignedGroup)
+    return convertAppToAppResponseDto(app, prisoner, groupsDto)
   }
 
   override fun getAppsByEstablishment(name: String): AppResponseDto {
     TODO("Not yet implemented")
   }
 
+  override fun forwardAppToGroup(groupId: UUID, appId: UUID):  AppResponseDto {
+    val app = appRepository.findById(appId).orElseThrow {  throw ApiException("No app found with id $appId", HttpStatus.NOT_FOUND) }
+    app.assignedGroup = groupId
+    appRepository.save(app)
+    return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup)
+  }
+
   private fun convertAppRequestToAppEntity(prisoner: Prisoner, staff: Staff, appRequest: AppRequestDto): App {
-    // TODO("Not yet implemented")
     val localDateTime = LocalDateTime.now(ZoneOffset.UTC)
     return App(
       UUID.randomUUID(), // id
@@ -109,14 +111,14 @@ class AppServiceImpl(
       arrayListOf(),
       appRequest.requests,
       prisoner.username,
+      AppStatus.PENDING,
     )
   }
 
   private fun convertAppToAppResponseDto(
-    prisonerId: String,
     app: App,
     prisoner: Any,
-    assignedGroup: AssignedGroupDto,
+    assignedGroup: Any,
   ): AppResponseDto {
     // TODO("Not yet implemented")
 
@@ -133,6 +135,7 @@ class AppServiceImpl(
       app.comments,
       app.requests,
       prisoner,
+      app.status
     )
   }
 }

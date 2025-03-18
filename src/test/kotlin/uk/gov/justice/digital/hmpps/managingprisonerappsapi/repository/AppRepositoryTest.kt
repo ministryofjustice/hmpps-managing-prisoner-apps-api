@@ -44,6 +44,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       createdApp.comments,
       listOf(HashMap<String, Any>()),
       createdApp.requestedBy,
+      createdApp.status,
     )
     app = appRepository.save(app)
     Assertions.assertEquals("new reference 123", app.reference)

@@ -1,0 +1,101 @@
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
+
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AssignedGroupDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.EstablishmentDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.GroupsRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
+import java.util.*
+import kotlin.collections.ArrayList
+
+@Service
+class GroupsServiceImpl(private var groupRepository: GroupRepository, private val establishmentService: EstablishmentService): GroupService {
+  override fun createGroup(groupRequestDto: GroupsRequestDto): AssignedGroupDto {
+    // TODO("Not yet implemented")
+    val establishment = establishmentService.getEstablishmentById(groupRequestDto.establishmentId).orElseThrow {
+      ApiException("Establishment with id ${groupRequestDto.establishmentId} not found", HttpStatus.BAD_REQUEST)
+    }
+    var groups = convertGroupsRequestDtoToGroups(groupRequestDto)
+    groups = groupRepository.save(groups)
+    return convertGroupsToAssignedGroupsDto(groups, establishment)
+  }
+
+  override fun updateGroup(groupRequestDto: GroupsRequestDto): AssignedGroupDto {
+    // TODO("Not yet implemented")
+    val establishment = establishmentService.getEstablishmentById(groupRequestDto.establishmentId).orElseThrow {
+      ApiException("Establishment with id ${groupRequestDto.establishmentId} not found", HttpStatus.BAD_REQUEST)
+    }
+    groupRepository.findById(groupRequestDto.id).orElseThrow {
+      ApiException("Group with id ${groupRequestDto.id} not found", HttpStatus.NOT_FOUND)
+    }
+    var groups = convertGroupsRequestDtoToGroups(groupRequestDto)
+    groups = groupRepository.save(groups)
+    return convertGroupsToAssignedGroupsDto(groups, establishment)
+  }
+
+  override fun getGroupsByEstablishment(establishmentId: UUID, name: String) {
+    TODO("Not yet implemented")
+  }
+
+  override fun getGroupById(id: UUID): AssignedGroupDto {
+    // TODO("Not yet implemented")
+    val groups = groupRepository.findById(id).orElseThrow {
+      ApiException("Group with id $id not found", HttpStatus.NOT_FOUND)
+    }
+    val establishment = establishmentService.getEstablishmentById(groups.establishmentId).orElseThrow {
+      ApiException("Establishment with id ${groups.establishmentId} not found", HttpStatus.NOT_FOUND) }
+    return convertGroupsToAssignedGroupsDto(groups,establishment)
+  }
+
+  override fun deleteGroupById(id: UUID) {
+    // TODO("Not yet implemented")
+    groupRepository.deleteById(id)
+  }
+
+  override fun getGroupsByEstablishmentId(id: String): List<AssignedGroupDto> {
+    val groups = groupRepository.getGroupsByEstablishmentId(id)
+    val assignedGroupDto = ArrayList<AssignedGroupDto>()
+    groups.forEach { g ->
+      val establishment = establishmentService.getEstablishmentById(g.establishmentId)
+        .orElseThrow { ApiException("Establishment with $g.id not found", HttpStatus.NOT_FOUND) }
+      assignedGroupDto.add(convertGroupsToAssignedGroupsDto(g, establishment)) }
+    return assignedGroupDto
+  }
+
+  override fun convertGroupsToAssignedGroupsDto(groups: Groups, establishment: Establishment): AssignedGroupDto {
+    return AssignedGroupDto(
+      groups.id,
+      groups.name,
+      EstablishmentDto(
+        establishment.id,
+        establishment.name,
+        ),
+      groups.initialsApps.first(),
+      groups.type,
+    )
+  }
+
+  fun convertGroupsRequestDtoToGroups(groupsRequestDto: GroupsRequestDto): Groups {
+    return Groups(
+      UUID.randomUUID(),
+      groupsRequestDto.name,
+      groupsRequestDto.establishmentId,
+      groupsRequestDto.initialsApps,
+      groupsRequestDto.type,
+    )
+  }
+
+  override fun getGroupByInitialAppType(appType: AppType): Groups {
+    val groupList = groupRepository.getGroupsByInitialsApps(listOf(appType))
+    if (groupList.isEmpty()) {
+      throw ApiException("Groups list is empty", HttpStatus.BAD_REQUEST)
+    } else {
+      return groupList.first()
+    }
+  }
+}

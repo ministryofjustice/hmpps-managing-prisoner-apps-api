@@ -2,9 +2,13 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
@@ -53,7 +57,19 @@ class DataGenerator {
       arrayListOf(UUID.randomUUID()),
       listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
       "testprisoner@moj",
+      AppStatus.PENDING,
     )
+
+    fun generateEstablishment(): Establishment = Establishment("HST", "Test Establishment")
+
+    fun generateGroups(establishmentId: String, initialApps:List<AppType>, groupType: GroupType): Groups =
+      Groups(
+        UUID.randomUUID(),
+        "Test Business Hub",
+        establishmentId,
+        initialApps,
+        groupType,
+        )
 
     fun generateAppRequestDto(): AppRequestDto = AppRequestDto(
       "Testing",
