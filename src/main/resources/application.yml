@@ -42,6 +42,13 @@ spring:
             token-uri: ${HMPPS_AUTH_URL}/oauth/token
 
         registration:
+          other-hmpps-apis:
+            provider: hmpps-auth
+            client-id: ${system.client.id}
+            client-secret: ${system.client.secret}
+            authorization-grant-type: client_credentials
+            scope: read
+
           # example client registration for calling out to other services
           # TODO: Remove / replace this registration
           example-api:
@@ -82,3 +89,15 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+prison:
+  api:
+    timeout: 10s
+
+prisoner:
+  search:
+    timeout: 10s
+
+hmpps:
+  auth:
+    timeout: 10s

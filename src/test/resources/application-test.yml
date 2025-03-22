@@ -7,6 +7,12 @@ management.endpoint:
 
 hmpps-auth:
   url: "http://localhost:8090/auth"
+prisoner:
+  search:
+    url: http://localhost:8094
+    timeout: 10s
+
+manage-users.api.url: http://localhost:8097
 
 # example client configuration for calling out to other services
 # TODO: Remove / replace this configuration
