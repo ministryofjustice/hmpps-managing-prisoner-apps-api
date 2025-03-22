@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto
+package uk.gov.justice.digital.hmpps.hmppsmanageprisonvisitsorchestration.dto.prisoner.search
 
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
@@ -30,4 +30,7 @@ data class PrisonerDto(
 
   @Schema(description = "current prison or outside with last movement information.", example = "Outside - released from Leeds")
   val locationDescription: String? = null,
+
+  @Schema(description = "Convicted Status", example = "Convicted", allowableValues = ["Convicted", "Remand"])
+  val convictedStatus: String? = null,
 )
