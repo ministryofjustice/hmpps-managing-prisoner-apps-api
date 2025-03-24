@@ -7,10 +7,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import java.util.UUID
 
 @Repository
-interface GroupRepository: JpaRepository<Groups, UUID> {
+interface GroupRepository : JpaRepository<Groups, UUID> {
 
-  fun getGroupsByInitialsApps(initialsApps: List<AppType>): List<Groups>
+  fun findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentId: String, initialsApp: AppType): List<Groups>
 
   fun getGroupsByEstablishmentId(id: String): List<Groups>
 }
-

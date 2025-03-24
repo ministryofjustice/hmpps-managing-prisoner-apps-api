@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AssignedGroupDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.GroupsRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
-import java.util.UUID
+import java.util.*
 
 interface GroupService {
 
@@ -21,7 +21,7 @@ interface GroupService {
 
   fun getGroupsByEstablishmentId(id: String): List<AssignedGroupDto>
 
-  fun getGroupByInitialAppType(appType: AppType): Groups
+  fun getGroupByInitialAppType(establishmentId: String, appType: AppType): Groups
 
-  fun convertGroupsToAssignedGroupsDto(groups: Groups, establishment: Establishment): AssignedGroupDto
+  fun convertGroupsToAssignedGroupsDto(groups: Groups, establishmentDto: EstablishmentDto): AssignedGroupDto
 }

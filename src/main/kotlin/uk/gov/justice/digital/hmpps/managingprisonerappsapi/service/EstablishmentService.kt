@@ -11,19 +11,27 @@ import java.util.*
 @Service
 class EstablishmentService(private val establishmentRepository: EstablishmentRepository) {
 
-  fun saveEstablishment(establishment: Establishment): Establishment {
-    return establishmentRepository.save(establishment)
+  fun saveEstablishment(establishmentDto: EstablishmentDto): EstablishmentDto {
+    val establishment = convertEstablishmentDtoToEstablishment(establishmentDto)
+    val entity = establishmentRepository.save(establishment)
+    return convertEstablishmentToEstablishmentDto(entity)
   }
 
-  fun updateEstablishment(establishment: Establishment): Establishment {
-    val findEstablishment = establishmentRepository.findById(establishment.id).orElseThrow {
-      ApiException("No existing establishment with id ${establishment.id}", HttpStatus.BAD_REQUEST)
+  fun updateEstablishment(establishmentDto: EstablishmentDto): EstablishmentDto {
+    val findEstablishment = establishmentRepository.findById(establishmentDto.id).orElseThrow {
+      ApiException("No existing establishment with id ${establishmentDto.id}", HttpStatus.BAD_REQUEST)
     }
-    return establishmentRepository.save(findEstablishment)
+    val establishment = establishmentRepository.save(convertEstablishmentDtoToEstablishment(establishmentDto))
+    return convertEstablishmentToEstablishmentDto(establishment)
   }
 
-  fun getEstablishmentById(id: String): Optional<Establishment> {
-    return establishmentRepository.findById(id)
+  fun getEstablishmentById(id: String): Optional<EstablishmentDto> {
+    val establishment = establishmentRepository.findById(id)
+    if (establishment.isPresent) {
+      return Optional.of(convertEstablishmentToEstablishmentDto(establishment.get()))
+    } else {
+      return Optional.empty()
+    }
   }
 
   fun deleteEstablishmentById(id: String) {
@@ -35,5 +43,11 @@ class EstablishmentService(private val establishmentRepository: EstablishmentRep
       id = establishment.id,
       name = establishment.name,
       )
+
+  fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment
+    = Establishment(
+    id = establishmentDto.id,
+    name = establishmentDto.name,
+  )
 
 }

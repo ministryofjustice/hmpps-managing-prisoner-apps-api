@@ -22,5 +22,6 @@ data class AppResponseDto(
   val comments: List<UUID>?,
   val requests: List<Map<String, Any>>?,
   val requestedBy: Any,
+  val requestedByFullName: String,
   val status: AppStatus,
 )

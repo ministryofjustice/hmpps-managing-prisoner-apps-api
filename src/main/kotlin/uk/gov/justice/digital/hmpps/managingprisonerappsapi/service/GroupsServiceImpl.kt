@@ -7,16 +7,16 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.GroupsRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Service
-class GroupsServiceImpl(private var groupRepository: GroupRepository, private val establishmentService: EstablishmentService): GroupService {
+class GroupsServiceImpl(
+  private var groupRepository: GroupRepository,
+  private val establishmentService: EstablishmentService,
+) : GroupService {
   override fun createGroup(groupRequestDto: GroupsRequestDto): AssignedGroupDto {
-    // TODO("Not yet implemented")
     val establishment = establishmentService.getEstablishmentById(groupRequestDto.establishmentId).orElseThrow {
       ApiException("Establishment with id ${groupRequestDto.establishmentId} not found", HttpStatus.BAD_REQUEST)
     }
@@ -26,7 +26,6 @@ class GroupsServiceImpl(private var groupRepository: GroupRepository, private va
   }
 
   override fun updateGroup(groupRequestDto: GroupsRequestDto): AssignedGroupDto {
-    // TODO("Not yet implemented")
     val establishment = establishmentService.getEstablishmentById(groupRequestDto.establishmentId).orElseThrow {
       ApiException("Establishment with id ${groupRequestDto.establishmentId} not found", HttpStatus.BAD_REQUEST)
     }
@@ -43,17 +42,16 @@ class GroupsServiceImpl(private var groupRepository: GroupRepository, private va
   }
 
   override fun getGroupById(id: UUID): AssignedGroupDto {
-    // TODO("Not yet implemented")
     val groups = groupRepository.findById(id).orElseThrow {
       ApiException("Group with id $id not found", HttpStatus.NOT_FOUND)
     }
     val establishment = establishmentService.getEstablishmentById(groups.establishmentId).orElseThrow {
-      ApiException("Establishment with id ${groups.establishmentId} not found", HttpStatus.NOT_FOUND) }
-    return convertGroupsToAssignedGroupsDto(groups,establishment)
+      ApiException("Establishment with id ${groups.establishmentId} not found", HttpStatus.NOT_FOUND)
+    }
+    return convertGroupsToAssignedGroupsDto(groups, establishment)
   }
 
   override fun deleteGroupById(id: UUID) {
-    // TODO("Not yet implemented")
     groupRepository.deleteById(id)
   }
 
@@ -63,18 +61,16 @@ class GroupsServiceImpl(private var groupRepository: GroupRepository, private va
     groups.forEach { g ->
       val establishment = establishmentService.getEstablishmentById(g.establishmentId)
         .orElseThrow { ApiException("Establishment with $g.id not found", HttpStatus.NOT_FOUND) }
-      assignedGroupDto.add(convertGroupsToAssignedGroupsDto(g, establishment)) }
+      assignedGroupDto.add(convertGroupsToAssignedGroupsDto(g, establishment))
+    }
     return assignedGroupDto
   }
 
-  override fun convertGroupsToAssignedGroupsDto(groups: Groups, establishment: Establishment): AssignedGroupDto {
+  override fun convertGroupsToAssignedGroupsDto(groups: Groups, establishmentDto: EstablishmentDto): AssignedGroupDto {
     return AssignedGroupDto(
       groups.id,
       groups.name,
-      EstablishmentDto(
-        establishment.id,
-        establishment.name,
-        ),
+      establishmentDto,
       groups.initialsApps.first(),
       groups.type,
     )
@@ -90,8 +86,8 @@ class GroupsServiceImpl(private var groupRepository: GroupRepository, private va
     )
   }
 
-  override fun getGroupByInitialAppType(appType: AppType): Groups {
-    val groupList = groupRepository.getGroupsByInitialsApps(listOf(appType))
+  override fun getGroupByInitialAppType(establishmentId: String, appType: AppType): Groups {
+    val groupList = groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentId, appType)
     if (groupList.isEmpty()) {
       throw ApiException("Groups list is empty", HttpStatus.BAD_REQUEST)
     } else {

@@ -1,25 +1,31 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto
 
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
+import com.fasterxml.jackson.annotation.JsonFormat
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 data class AppResponseListDto(
- val appTypeList: List<AppTypeDto>,
-  val apps: List<AppSearchDto>,
+    val page: Int,
+    val totalRecords: Long,
+    val exhausted: Boolean,
+    val appTypes: Map<AppType, Int>,
+    val apps: List<AppListViewDto>,
 )
 
-data class AppTypeDto(
-  val number: Int,
-  val appType: AppType,
+data class GroupAppListViewDto(
+    val id: UUID,
+    val name: String,
 )
 
-data class AppSearchDto(
-  val id: UUID,
-  val requestedDate: LocalDateTime,
-  val group: AssignedGroupDto,
-  val status: AppStatus,
+data class AppListViewDto(
+    val id: UUID,
+    val establishmentId: String,
+    val status: String,
+    val appType: String,
+    val requestedBy: String,
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    val requestedDate: LocalDateTime,
+    val assignedGroup: Any,
 )
-
 

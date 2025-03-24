@@ -15,6 +15,7 @@ class StaffServiceImpl : StaffService {
       "Test",
       "Staff",
       UserCategory.STAFF,
+      "TEST_ESTABLISHMENT_FIRST",
       setOf(UUID.randomUUID()),
       "Establishment Warden",
     )

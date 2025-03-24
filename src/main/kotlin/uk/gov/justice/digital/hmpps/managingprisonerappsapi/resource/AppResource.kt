@@ -15,18 +15,20 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseListDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import java.util.*
 
 @RestController
 @RequestMapping("v1")
-class AppController(var appService: AppService) {
+class AppResource(var appService: AppService) {
 
   companion object {
-    private val logger = LoggerFactory.getLogger(AppController::class.java)
+    private val logger = LoggerFactory.getLogger(AppResource::class.java)
   }
 
   @PostMapping(
@@ -34,7 +36,7 @@ class AppController(var appService: AppService) {
     produces = [MediaType.APPLICATION_JSON_VALUE],
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('SAR_DATA_ACCESS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun submitApp(
     @PathVariable("prisoner-id") prisonerId: String,
     @RequestBody appRequestDto: AppRequestDto,
@@ -46,9 +48,10 @@ class AppController(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }
 
-  fun updateApp(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> = ResponseEntity.status(HttpStatus.CREATED).build()
+  fun updateApp(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> =
+    ResponseEntity.status(HttpStatus.CREATED).build()
 
-  @PreAuthorize("hasAnyRole('SAR_DATA_ACCESS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/prisoners/{prisoner-id}/apps/{id}")
   fun getAppById(
     @PathVariable("prisoner-id") prisonerId: String,
@@ -63,25 +66,64 @@ class AppController(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-  @PreAuthorize("hasAnyRole('SAR_DATA_ACCESS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/apps/{appId}/groups/{groupId}")
-  fun forwardAppToGroup(groupId: UUID, appId: UUID, authentication: Authentication): ResponseEntity<AppResponseDto> {
+  fun forwardAppToGroup(
+    @PathVariable groupId: UUID,
+    @PathVariable appId: UUID,
+    authentication: Authentication,
+  ): ResponseEntity<AppResponseDto> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for to forward app to $groupId by ${authentication.principal}")
     val app = appService.forwardAppToGroup(groupId, appId)
     return ResponseEntity.status(HttpStatus.OK).body(app)
   }
 
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PostMapping(
+    "/prisoners/apps/search",
+    consumes = [MediaType.APPLICATION_JSON_VALUE],
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+  )
   fun getAppsBySearchFilter(
-    @RequestParam(required = false) prisonerId: String?,
-    @RequestParam(required = false) groupId: UUID?,
-    @RequestParam(required = false) appType: AppType?,
-    @RequestParam(required = true) status: String?,
-  ): ResponseEntity<AppResponseDto> {
-    if (status != "pending" && status != "closed") {
-      throw ApiException("Status can be either pending or closed", HttpStatus.BAD_REQUEST)
+    @RequestBody appsSearchQueryDto: AppsSearchQueryDto,
+    authentication: Authentication,
+  ): ResponseEntity<AppResponseListDto> {
+    authentication as AuthAwareAuthenticationToken
+    if (appsSearchQueryDto.appTypes != null && appsSearchQueryDto.appTypes!!.isEmpty()) {
+      appsSearchQueryDto.appTypes = null
     }
-    return ResponseEntity.status(HttpStatus.OK).build()
+    if (appsSearchQueryDto.status.isEmpty()) {
+      throw ApiException("Staus cannot be empty", HttpStatus.BAD_REQUEST)
+    }
+    if (appsSearchQueryDto.assignedGroups != null && appsSearchQueryDto.assignedGroups!!.isEmpty()) {
+      appsSearchQueryDto.assignedGroups = null
+    }
+    val appResponseDto = appService.searchAppsByColumnsFilter(
+      authentication.principal,
+      appsSearchQueryDto.status,
+      appsSearchQueryDto.appTypes,
+      appsSearchQueryDto.requestedBy,
+      appsSearchQueryDto.assignedGroups,
+      appsSearchQueryDto.page,
+      appsSearchQueryDto.size,
+    )
+    return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
+  }
+
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @GetMapping(
+    "/prisoners/search",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+  )
+  fun getRequestedByTextSearch(
+    @RequestParam text: String,
+    authentication: Authentication,
+  ): ResponseEntity<List<RequestedByNameSearchResult>> {
+    authentication as AuthAwareAuthenticationToken
+    val searchResult = appService.searchRequestedByTextSearch(authentication.principal, text)
+    return ResponseEntity.status(HttpStatus.OK).body(searchResult)
   }
 
 }
+

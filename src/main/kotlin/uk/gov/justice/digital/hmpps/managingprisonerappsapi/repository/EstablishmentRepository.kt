@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 
 @Repository
-interface EstablishmentRepository: JpaRepository<Establishment, String> {
-}
+interface EstablishmentRepository : JpaRepository<Establishment, String>

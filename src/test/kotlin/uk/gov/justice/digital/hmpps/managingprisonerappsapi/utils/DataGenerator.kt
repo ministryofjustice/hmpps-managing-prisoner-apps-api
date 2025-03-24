@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 class DataGenerator {
@@ -40,6 +41,7 @@ class DataGenerator {
       "Test",
       "Staff",
       UserCategory.STAFF,
+      "TEST_ESTABLISHMENT",
       setOf(UUID.randomUUID()),
       "Prison Warden",
     )
@@ -57,31 +59,56 @@ class DataGenerator {
       arrayListOf(UUID.randomUUID()),
       listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
       "testprisoner@moj",
+      "Test Prisoner",
       AppStatus.PENDING,
+      UUID.randomUUID().toString()
+    )
+
+    fun generateApp(establishmentId: String, appType: AppType, requestedBy: String, requestedByFullName: String, appStatus: AppStatus, groupId: UUID): App = App(
+      UUID.randomUUID(),
+      UUID.randomUUID().toString(),
+      groupId,
+      appType,
+      LocalDateTime.now(ZoneOffset.UTC),
+      LocalDateTime.now(ZoneOffset.UTC),
+      "testStaaf@moj",
+      LocalDateTime.now(ZoneOffset.UTC),
+      "testStaaf@moj",
+      arrayListOf(UUID.randomUUID()),
+      listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
+      requestedBy,
+      requestedByFullName,
+      appStatus,
+      establishmentId,
     )
 
     fun generateEstablishment(): Establishment = Establishment("HST", "Test Establishment")
 
-    fun generateGroups(establishmentId: String, initialApps:List<AppType>, groupType: GroupType): Groups =
-      Groups(
-        UUID.randomUUID(),
-        "Test Business Hub",
-        establishmentId,
-        initialApps,
-        groupType,
-        )
+    fun generateGroups(
+      id: UUID,
+      establishmentId: String,
+      groupName: String,
+      initialApps: List<AppType>,
+      groupType: GroupType
+    ): Groups = Groups(
+      id,
+      groupName,
+      establishmentId,
+      initialApps,
+      groupType,
+    )
 
-    fun generateAppRequestDto(): AppRequestDto = AppRequestDto(
+    fun generateAppRequestDto(appType: AppType): AppRequestDto = AppRequestDto(
       "Testing",
-      AppType.PIN_PHONE_ADD_NEW_CONTACT.toString(),
+      appType.toString(),
       LocalDateTime.now(),
       listOf(
         HashMap<String, Any>()
           .apply {
-            put("amount", 10)
+            // put("amount", 10)
             put("contact-number", "234567")
-            put("firstName", "John")
-            put("lastName", "Smith")
+            // put("firstName", "John")
+            // put("lastName", "Smith")
           },
       ),
     )
