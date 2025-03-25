@@ -32,12 +32,12 @@ class DataGenerator {
 
     fun generateStaff(): Staff = Staff(
       "TEST_USER",
+      1234,
       "Test",
-      "Test",
-      "Staff",
       UserCategory.STAFF,
       setOf(UUID.randomUUID()),
       "Prison Warden",
+      UUID.randomUUID(),
     )
 
     fun generateApp(): App = App(

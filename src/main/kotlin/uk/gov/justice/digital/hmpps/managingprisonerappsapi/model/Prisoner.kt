@@ -6,6 +6,6 @@ data class Prisoner(
   val firstName: String,
   val lastName: String,
   val category: UserCategory,
-  val location: String,
-  val iep: String,
+  val location: String?,
+  val iep: String?,
 )

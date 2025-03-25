@@ -8,6 +8,13 @@ management.endpoint:
 hmpps-auth:
   url: "http://localhost:8090/auth"
 
+prisoner:
+  search:
+    url: https://localhost:9080/prisoner-search
+    timeout: 10s
+
+manage-users.api.url: https://localhost:9085/staff
+
 # example client configuration for calling out to other services
 # TODO: Remove / replace this configuration
 example-api:
@@ -41,8 +48,13 @@ spring:
             token-uri: http://localhost:8090/auth/token
 
         registration:
-          # example client registration for calling out to other services
-          # TODO: Remove / replace this registration
+          other-hmpps-apis:
+            provider: hmpps-auth
+            client-id: "client-id"
+            client-secret: "client-secret"
+            authorization-grant-type: client_credentials
+            scope: read
+
           example-api:
             provider: hmpps-auth
             client-id: ${example-api.client.id}

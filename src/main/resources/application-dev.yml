@@ -1,10 +1,43 @@
-hmpps-auth:
-  url: "http://localhost:8090/auth"
+hmpps-auth.url: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+
+example-api:
+  url: "http://localhost:8090/example"
+
+manage-users.api.url: https://manage-users-api-dev.hmpps.service.justice.gov.uk
+prisoner.search.url: https://prisoner-search-dev.prison.service.justice.gov.uk
 
 # example client configuration for calling out to other services
 # TODO: Remove / replace this configuration
-example-api:
-  url: "http://localhost:8080"
-  client:
-    id: "example-api-client"
-    secret: "example-api-client-secret"
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${HMPPS_AUTH_URL}/.well-known/jwks.json
+
+      # TODO: This client section can be removed if your service doesn't call out to other services
+      client:
+        provider:
+          hmpps-auth:
+            token-uri: ${HMPPS_AUTH_URL}/oauth/token
+
+      # For dev local testing comment/uncomment clientId and client secrets
+
+        registration:
+          other-hmpps-apis:
+            provider: hmpps-auth
+            client-id: ${system.client.id}
+            client-secret: ${system.client.secret}
+            authorization-grant-type: client_credentials
+            scope: read
+
+
+          # example client registration for calling out to other services
+          # TODO: Remove / replace this registration
+          example-api:
+            provider: hmpps-auth
+            client-id: "example-api-client"
+            client-secret: "example-api-client-secret"
+            authorization-grant-type: client_credentials
+            scope: read
