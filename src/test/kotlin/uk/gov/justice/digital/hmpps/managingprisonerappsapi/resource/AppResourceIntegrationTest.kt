@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
@@ -28,30 +28,14 @@ class AppResourceIntegrationTest(@Autowired private var appRepository: AppReposi
 
   private val baseUrl = "http://localhost"
 
-  private val stubPrisoner = Prisoner(
-    "prisonerId",
-    "123",
-    "PrisonerfirstName",
-    "PrisonerlastName",
-    UserCategory.PRISONER,
-    "PrisonerlocationDescription",
-    "iep",
-  )
+  private val stubPrisoner = Prisoner("prisonerId", "123", "PrisonerfirstName", "PrisonerlastName", UserCategory.PRISONER, "PrisonerlocationDescription", "iep")
 
-  private val stubStaff = Staff(
-    "staffusername",
-    123,
-    "stafffullName",
-    UserCategory.STAFF,
-    setOf(UUID.randomUUID()),
-    "activeCaseLoadId",
-    UUID.randomUUID(),
-  )
+  private val stubStaff = Staff("staffusername", 123, "stafffullName", UserCategory.STAFF, setOf(UUID.randomUUID()), "activeCaseLoadId", UUID.randomUUID())
 
-  @MockBean
+  @MockitoBean
   lateinit var prisonerServiceImpl: PrisonerServiceImpl
 
-  @MockBean
+  @MockitoBean
   lateinit var staffServiceImpl: StaffServiceImpl
 
   @BeforeEach
