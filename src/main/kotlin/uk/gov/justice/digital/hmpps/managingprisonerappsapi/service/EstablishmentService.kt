@@ -34,20 +34,17 @@ class EstablishmentService(private val establishmentRepository: EstablishmentRep
     }
   }
 
-  fun deleteEstablishmentById(id: String) {
+  /*fun deleteEstablishmentById(id: String) {
     return establishmentRepository.deleteById(id)
-  }
+  }*/
 
-  fun convertEstablishmentToEstablishmentDto(establishment: Establishment): EstablishmentDto
-    = EstablishmentDto(
-      id = establishment.id,
-      name = establishment.name,
-      )
+  fun convertEstablishmentToEstablishmentDto(establishment: Establishment): EstablishmentDto = EstablishmentDto(
+    id = establishment.id,
+    name = establishment.name,
+  )
 
-  fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment
-    = Establishment(
+  fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment = Establishment(
     id = establishmentDto.id,
     name = establishmentDto.name,
   )
-
 }

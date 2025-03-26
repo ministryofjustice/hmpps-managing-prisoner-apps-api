@@ -66,25 +66,24 @@ class GroupsServiceImpl(
     return assignedGroupDto
   }
 
-  override fun convertGroupsToAssignedGroupsDto(groups: Groups, establishmentDto: EstablishmentDto): AssignedGroupDto {
-    return AssignedGroupDto(
-      groups.id,
-      groups.name,
-      establishmentDto,
-      groups.initialsApps.first(),
-      groups.type,
-    )
-  }
+  override fun convertGroupsToAssignedGroupsDto(
+    groups: Groups,
+    establishmentDto: EstablishmentDto,
+  ): AssignedGroupDto = AssignedGroupDto(
+    groups.id,
+    groups.name,
+    establishmentDto,
+    groups.initialsApps.first(),
+    groups.type,
+  )
 
-  fun convertGroupsRequestDtoToGroups(groupsRequestDto: GroupsRequestDto): Groups {
-    return Groups(
-      UUID.randomUUID(),
-      groupsRequestDto.name,
-      groupsRequestDto.establishmentId,
-      groupsRequestDto.initialsApps,
-      groupsRequestDto.type,
-    )
-  }
+  fun convertGroupsRequestDtoToGroups(groupsRequestDto: GroupsRequestDto): Groups = Groups(
+    UUID.randomUUID(),
+    groupsRequestDto.name,
+    groupsRequestDto.establishmentId,
+    groupsRequestDto.initialsApps,
+    groupsRequestDto.type,
+  )
 
   override fun getGroupByInitialAppType(establishmentId: String, appType: AppType): Groups {
     val groupList = groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentId, appType)

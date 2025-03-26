@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository
 
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +17,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 @SpringBootTest(classes = [AppRepository::class])
@@ -24,6 +28,17 @@ import java.util.*
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("test")
 class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
+
+  @BeforeEach
+  fun setUp() {
+    appRepository.deleteAll()
+  }
+
+  @AfterEach
+  fun tearDown() {
+    appRepository.deleteAll()
+  }
+
   @Test
   fun `save app`() {
     val response = appRepository.save(DataGenerator.generateApp())
@@ -46,7 +61,8 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       createdApp.comments,
       listOf(HashMap<String, Any>()),
       createdApp.requestedBy,
-      createdApp.requestedByFullName,
+      createdApp.requestedByFirstName,
+      createdApp.requestedByLastName,
       createdApp.status,
       UUID.randomUUID().toString(),
     )
@@ -77,17 +93,22 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     val assignedGroupFirst = UUID.randomUUID()
     val assignedGroupSecond = UUID.randomUUID()
     val requestedByFirst = "A12345"
-    val requestedByFirstFullName= "John Smith"
-    val requestedBySecondFullName= "John Butler"
+    val requestedByFirstMainName = "John"
+    val requestedByFirstSurname = "Smith"
+    val requestedBySecondMainName = "John"
+    val requestedBySecondSurname = "Butler"
     val requestedBySecond = "B12345"
     val requestedByThird = "C12345"
-    val requestedByThirdFullName = "Test User"
+    val requestedByThirdMainName = "Test"
+    val requestedByThirdSurname = "User"
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
         AppType.PIN_PHONE_ADD_NEW_CONTACT,
         requestedByFirst,
-        requestedByFirstFullName,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
       ),
@@ -97,7 +118,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         establishmentIdFirst,
         AppType.PIN_PHONE_ADD_NEW_CONTACT,
         requestedByFirst,
-        requestedByFirstFullName,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
       ),
@@ -107,7 +130,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         establishmentIdFirst,
         AppType.PIN_PHONE_ADD_NEW_CONTACT,
         requestedByFirst,
-        requestedByFirstFullName,
+        LocalDateTime.now(ZoneOffset.UTC).minusDays(1),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
       ),
@@ -117,7 +142,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         establishmentIdFirst,
         AppType.PIN_PHONE_REMOVE_CONTACT,
         requestedBySecond,
-        requestedBySecondFullName,
+        LocalDateTime.now(ZoneOffset.UTC).minusDays(2),
+        requestedBySecondMainName,
+        requestedBySecondSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
       ),
@@ -127,7 +154,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         establishmentIdSecond,
         AppType.PIN_PHONE_REMOVE_CONTACT,
         requestedByThird,
-        requestedByThirdFullName,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
       ),
@@ -137,7 +166,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         establishmentIdSecond,
         AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
         requestedByThird,
-        requestedByThirdFullName,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByThirdMainName,
+        requestedByThirdSurname,
         AppStatus.PENDING,
         assignedGroupSecond,
       ),
@@ -147,7 +178,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         establishmentIdSecond,
         AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
         requestedByThird,
-        requestedByThirdFullName,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByThirdMainName,
+        requestedByThirdSurname,
         AppStatus.PENDING,
         assignedGroupSecond,
       ),
@@ -157,14 +190,16 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         establishmentIdThird,
         AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
         requestedByThird,
-        requestedByThirdFullName,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByThirdMainName,
+        requestedByThirdSurname,
         AppStatus.PENDING,
         assignedGroupSecond,
       ),
     )
 
     // By establishment Id and status
-    var countResult = appRepository.countBySearchFilter(
+    var countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdFirst,
       setOf(AppStatus.PENDING),
       null,
@@ -177,6 +212,17 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, countResult.get(0).getAppType())
     Assertions.assertEquals(AppType.PIN_PHONE_REMOVE_CONTACT, countResult.get(1).getAppType())
 
+    var countResultByAssignedGroup = appRepository.countBySearchFilterGroupByAssignedGroup(
+      establishmentIdFirst,
+      setOf(AppStatus.PENDING),
+      null,
+      null,
+      null,
+    )
+    println("size by assignedgroup ${countResultByAssignedGroup.size}")
+    println(countResultByAssignedGroup.get(0).getCount())
+    println(countResultByAssignedGroup.get(0).getAssignedGroup())
+
     var pageResult = appRepository.appsBySearchFilter(
       establishmentIdFirst,
       setOf(AppStatus.PENDING),
@@ -188,7 +234,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     Assertions.assertEquals(pageResult.totalElements, 4)
 
     // By establishment and status and appType
-    countResult = appRepository.countBySearchFilter(
+    countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdSecond,
       setOf(AppStatus.PENDING),
       setOf(AppType.PIN_PHONE_REMOVE_CONTACT),
@@ -210,7 +256,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     Assertions.assertEquals(pageResult.totalElements, 1)
 
     // By EstablishmentId AND status and requestedBy
-    countResult = appRepository.countBySearchFilter(
+    countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdFirst,
       setOf(AppStatus.PENDING),
       null,
@@ -231,9 +277,8 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     )
     Assertions.assertEquals(pageResult.totalElements, 3)
 
-
     // By EstablishmentId and Status and assignedGroup
-    countResult = appRepository.countBySearchFilter(
+    countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdFirst,
       setOf(AppStatus.PENDING),
       null,
@@ -252,13 +297,13 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     Assertions.assertEquals(pageResult.totalElements, 4)
 
     // By establishment id and status and appType and requestedBy and assignedGroup
-    countResult = appRepository.countBySearchFilter(
+    countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdSecond,
       setOf(AppStatus.PENDING),
       setOf(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
       requestedByThird,
       setOf(assignedGroupSecond),
-      )
+    )
     Assertions.assertEquals(countResult.size, 1)
     Assertions.assertEquals(2, countResult.get(0).getCount())
     Assertions.assertEquals(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS, countResult.get(0).getAppType())
@@ -269,12 +314,12 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       setOf(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
       requestedByThird,
       setOf(assignedGroupSecond),
-      PageRequest.of(0, 4)
+      PageRequest.of(0, 4),
     )
     Assertions.assertEquals(2, pageResult1.totalElements)
-    val userSearchResult = appRepository.searchRequestedByFullName(establishmentIdFirst, "john")
+    val userSearchResult = appRepository.searchRequestedByFirstOrLastName(establishmentIdFirst, "john")
     Assertions.assertEquals(2, userSearchResult.size)
-    Assertions.assertEquals("John Butler", userSearchResult.get(0).getFullName())
-    Assertions.assertEquals("John Smith", userSearchResult.get(1).getFullName())
+    Assertions.assertEquals("John", userSearchResult.get(0).getFirstName())
+    Assertions.assertEquals("John", userSearchResult.get(1).getFirstName())
   }
 }

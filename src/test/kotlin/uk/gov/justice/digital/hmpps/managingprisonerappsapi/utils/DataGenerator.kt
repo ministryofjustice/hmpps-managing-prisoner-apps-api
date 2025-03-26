@@ -59,17 +59,27 @@ class DataGenerator {
       arrayListOf(UUID.randomUUID()),
       listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
       "testprisoner@moj",
-      "Test Prisoner",
+      "Test",
+      "Prisoner",
       AppStatus.PENDING,
-      UUID.randomUUID().toString()
+      UUID.randomUUID().toString(),
     )
 
-    fun generateApp(establishmentId: String, appType: AppType, requestedBy: String, requestedByFullName: String, appStatus: AppStatus, groupId: UUID): App = App(
+    fun generateApp(
+      establishmentId: String,
+      appType: AppType,
+      requestedBy: String,
+      requestedDate: LocalDateTime,
+      requestedByFirstName: String,
+      requestedByLastName: String,
+      appStatus: AppStatus,
+      groupId: UUID,
+    ): App = App(
       UUID.randomUUID(),
       UUID.randomUUID().toString(),
       groupId,
       appType,
-      LocalDateTime.now(ZoneOffset.UTC),
+      requestedDate,
       LocalDateTime.now(ZoneOffset.UTC),
       "testStaaf@moj",
       LocalDateTime.now(ZoneOffset.UTC),
@@ -77,7 +87,8 @@ class DataGenerator {
       arrayListOf(UUID.randomUUID()),
       listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
       requestedBy,
-      requestedByFullName,
+      requestedByFirstName,
+      requestedByLastName,
       appStatus,
       establishmentId,
     )
@@ -89,7 +100,7 @@ class DataGenerator {
       establishmentId: String,
       groupName: String,
       initialApps: List<AppType>,
-      groupType: GroupType
+      groupType: GroupType,
     ): Groups = Groups(
       id,
       groupName,
@@ -98,10 +109,17 @@ class DataGenerator {
       groupType,
     )
 
-    fun generateAppRequestDto(appType: AppType): AppRequestDto = AppRequestDto(
+    fun generateAppRequestDto(
+      appType: AppType,
+      requestedDate: LocalDateTime,
+      requestedByFirstName: String,
+      requestedByLastName: String,
+    ): AppRequestDto = AppRequestDto(
       "Testing",
       appType.toString(),
-      LocalDateTime.now(),
+      requestedDate,
+      requestedByFirstName,
+      requestedByLastName,
       listOf(
         HashMap<String, Any>()
           .apply {

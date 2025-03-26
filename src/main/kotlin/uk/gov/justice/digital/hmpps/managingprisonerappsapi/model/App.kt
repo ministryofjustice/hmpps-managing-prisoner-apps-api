@@ -30,7 +30,8 @@ data class App(
   @JdbcTypeCode(SqlTypes.JSON)
   val requests: List<Map<String, Any>>,
   val requestedBy: String,
-  val requestedByFullName: String,
+  val requestedByFirstName: String,
+  val requestedByLastName: String,
   @Enumerated(EnumType.STRING)
   val status: AppStatus,
   val establishmentId: String,

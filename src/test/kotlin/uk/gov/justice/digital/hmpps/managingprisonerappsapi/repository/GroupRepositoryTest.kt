@@ -26,7 +26,7 @@ import java.util.*
 class GroupRepositoryTest(
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
-  ) {
+) {
 
   @BeforeEach
   fun setUp() {
@@ -37,13 +37,15 @@ class GroupRepositoryTest(
   fun `save groups`() {
     val establishmentId = "HTS"
     val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT)
-    val groups = groupRepository.save(DataGenerator.generateGroups(
-      UUID.randomUUID(),
-      establishmentId,
-      "Business Hub",
-      initialApps,
-      GroupType.WING
-    ))
+    val groups = groupRepository.save(
+      DataGenerator.generateGroups(
+        UUID.randomUUID(),
+        establishmentId,
+        "Business Hub",
+        initialApps,
+        GroupType.WING,
+      ),
+    )
     assertGroups(groups)
   }
 
@@ -51,13 +53,15 @@ class GroupRepositoryTest(
   fun `update groups`() {
     val establishmentId = "HTS"
     val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT)
-    val groups = groupRepository.save(DataGenerator.generateGroups(
-      UUID.randomUUID(),
-      establishmentId,
-      "Business Hub",
-      initialApps,
-      GroupType.WING
-    ))
+    val groups = groupRepository.save(
+      DataGenerator.generateGroups(
+        UUID.randomUUID(),
+        establishmentId,
+        "Business Hub",
+        initialApps,
+        GroupType.WING,
+      ),
+    )
     assertGroups(groups)
   }
 
@@ -65,13 +69,15 @@ class GroupRepositoryTest(
   fun `delete groups`() {
     val establishmentId = "HTS"
     val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT)
-    val groups = groupRepository.save(DataGenerator.generateGroups(
-      UUID.randomUUID(),
-      establishmentId,
-      "Business Hub",
-      initialApps,
-      GroupType.WING
-    ))
+    val groups = groupRepository.save(
+      DataGenerator.generateGroups(
+        UUID.randomUUID(),
+        establishmentId,
+        "Business Hub",
+        initialApps,
+        GroupType.WING,
+      ),
+    )
     assertGroups(groups)
     groupRepository.deleteById(groups.id)
     val findGroups = groupRepository.findById(groups.id)
@@ -82,13 +88,15 @@ class GroupRepositoryTest(
   fun `get group by id`() {
     val establishmentId = "HTS"
     val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT)
-    val groups = groupRepository.save(DataGenerator.generateGroups(
-      UUID.randomUUID(),
-      establishmentId,
-      "Business Hub",
-      initialApps,
-      GroupType.WING
-    ))
+    val groups = groupRepository.save(
+      DataGenerator.generateGroups(
+        UUID.randomUUID(),
+        establishmentId,
+        "Business Hub",
+        initialApps,
+        GroupType.WING,
+      ),
+    )
     assertGroups(groups)
     val findGroups = groupRepository.findById(groups.id)
     Assertions.assertTrue(findGroups.isPresent)
@@ -98,35 +106,46 @@ class GroupRepositoryTest(
   fun `get groups by initial apps`() {
     val establishmentIdOne = "HTS"
     val establishmentIdTwo = "YTS"
-    groupRepository.save(DataGenerator.generateGroups(
-      UUID.randomUUID(),
+    groupRepository.save(
+      DataGenerator.generateGroups(
+        UUID.randomUUID(),
+        establishmentIdOne,
+        "Business Hub",
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
+        GroupType.WING,
+      ),
+    )
+    groupRepository.save(
+      DataGenerator.generateGroups(
+        UUID.randomUUID(),
+        establishmentIdOne,
+        "Business Hub",
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        GroupType.WING,
+      ),
+    )
+    groupRepository.save(
+      DataGenerator.generateGroups(
+        UUID.randomUUID(),
+        establishmentIdOne,
+        "Business Hub",
+        listOf(AppType.PIN_PHONE_CREDIT_TOP_UP, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        GroupType.WING,
+      ),
+    )
+    groupRepository.save(
+      DataGenerator.generateGroups(
+        UUID.randomUUID(),
+        establishmentIdTwo,
+        "Business Hub",
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        GroupType.WING,
+      ),
+    )
+    val findGroups = groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(
       establishmentIdOne,
-      "Business Hub",
-      listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
-      GroupType.WING
-    ))
-    groupRepository.save(DataGenerator.generateGroups(
-      UUID.randomUUID(),
-      establishmentIdOne,
-      "Business Hub",
-      listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
-      GroupType.WING
-    ))
-    groupRepository.save(DataGenerator.generateGroups(
-      UUID.randomUUID(),
-      establishmentIdOne,
-      "Business Hub",
-      listOf(AppType.PIN_PHONE_CREDIT_TOP_UP, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
-      GroupType.WING
-    ))
-    groupRepository.save(DataGenerator.generateGroups(
-      UUID.randomUUID(),
-      establishmentIdTwo,
-      "Business Hub",
-      listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
-      GroupType.WING
-    ))
-    val findGroups = groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentIdOne, AppType.PIN_PHONE_ADD_NEW_CONTACT,)
+      AppType.PIN_PHONE_ADD_NEW_CONTACT,
+    )
     Assertions.assertEquals(2, findGroups.size)
   }
 

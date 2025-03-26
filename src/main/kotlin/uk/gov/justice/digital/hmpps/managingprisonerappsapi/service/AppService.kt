@@ -9,13 +9,11 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNam
 import java.util.UUID
 
 interface AppService {
-  fun submitApp(prisonerId: String, staffId: String, appRequestDto: AppRequestDto): AppResponseDto
+  fun submitApp(prisonerId: String, staffId: String, appRequestDto: AppRequestDto): AppResponseDto<Any, Any>
 
-  fun getAppsById(prisonerId: String, id: UUID, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto
+  fun getAppsById(prisonerId: String, id: UUID, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto<Any, Any>
 
-  fun getAppsByEstablishment(name: String): AppResponseDto
-
-  fun forwardAppToGroup(groupId: UUID, appId: UUID): AppResponseDto
+  fun forwardAppToGroup(groupId: UUID, appId: UUID): AppResponseDto<Any, Any>
 
   fun searchAppsByColumnsFilter(
     staffId: String,
@@ -25,7 +23,7 @@ interface AppService {
     assignedGroups: Set<UUID>?,
     pageNumber: Long,
     pageSize: Long,
-    ): AppResponseListDto
+  ): AppResponseListDto
 
   fun searchRequestedByTextSearch(
     staffId: String,

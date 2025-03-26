@@ -41,15 +41,15 @@ class AppResource(var appService: AppService) {
     @PathVariable("prisoner-id") prisonerId: String,
     @RequestBody appRequestDto: AppRequestDto,
     authentication: Authentication,
-  ): ResponseEntity<AppResponseDto> {
+  ): ResponseEntity<AppResponseDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for submitting app for $prisonerId by ${authentication.principal}")
     val appResponseDto = appService.submitApp(prisonerId, authentication.principal, appRequestDto)
     return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }
 
-  fun updateApp(@RequestBody appResponseDto: AppResponseDto): ResponseEntity<AppResponseDto> =
-    ResponseEntity.status(HttpStatus.CREATED).build()
+  /*fun updateApp(@RequestBody appResponseDto: AppResponseDto<>): ResponseEntity<AppResponseDto<Any, Any>> =
+    ResponseEntity.status(HttpStatus.CREATED).build()*/
 
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/prisoners/{prisoner-id}/apps/{id}")
@@ -59,7 +59,7 @@ class AppResource(var appService: AppService) {
     @RequestParam(required = false) requestedBy: Boolean,
     @RequestParam(required = false) assignedGroup: Boolean,
     authentication: Authentication,
-  ): ResponseEntity<AppResponseDto> {
+  ): ResponseEntity<AppResponseDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for get app for $prisonerId by ${authentication.principal}")
     val appResponseDto = appService.getAppsById(prisonerId, id, requestedBy, assignedGroup)
@@ -72,7 +72,7 @@ class AppResource(var appService: AppService) {
     @PathVariable groupId: UUID,
     @PathVariable appId: UUID,
     authentication: Authentication,
-  ): ResponseEntity<AppResponseDto> {
+  ): ResponseEntity<AppResponseDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for to forward app to $groupId by ${authentication.principal}")
     val app = appService.forwardAppToGroup(groupId, appId)
@@ -90,8 +90,8 @@ class AppResource(var appService: AppService) {
     authentication: Authentication,
   ): ResponseEntity<AppResponseListDto> {
     authentication as AuthAwareAuthenticationToken
-    if (appsSearchQueryDto.appTypes != null && appsSearchQueryDto.appTypes!!.isEmpty()) {
-      appsSearchQueryDto.appTypes = null
+    if (appsSearchQueryDto.types != null && appsSearchQueryDto.types!!.isEmpty()) {
+      appsSearchQueryDto.types = null
     }
     if (appsSearchQueryDto.status.isEmpty()) {
       throw ApiException("Staus cannot be empty", HttpStatus.BAD_REQUEST)
@@ -102,7 +102,7 @@ class AppResource(var appService: AppService) {
     val appResponseDto = appService.searchAppsByColumnsFilter(
       authentication.principal,
       appsSearchQueryDto.status,
-      appsSearchQueryDto.appTypes,
+      appsSearchQueryDto.types,
       appsSearchQueryDto.requestedBy,
       appsSearchQueryDto.assignedGroups,
       appsSearchQueryDto.page,
@@ -117,13 +117,11 @@ class AppResource(var appService: AppService) {
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
   fun getRequestedByTextSearch(
-    @RequestParam text: String,
+    @RequestParam name: String,
     authentication: Authentication,
   ): ResponseEntity<List<RequestedByNameSearchResult>> {
     authentication as AuthAwareAuthenticationToken
-    val searchResult = appService.searchRequestedByTextSearch(authentication.principal, text)
+    val searchResult = appService.searchRequestedByTextSearch(authentication.principal, name)
     return ResponseEntity.status(HttpStatus.OK).body(searchResult)
   }
-
 }
-

@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Value
 
 interface RequestedByNameSearchResult {
   @Value("#{target.requestedBy}")
-  fun getUsername(): String
+  fun getPrisonerId(): String
 
-  @Value("#{target.requestedByFullName}")
-  fun getFullName(): String
+  @Value("#{target.requestedByFirstName}")
+  fun getFirstName(): String
+
+  @Value("#{target.requestedByLastName}")
+  fun getLastName(): String
 }
