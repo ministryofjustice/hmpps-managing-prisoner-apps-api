@@ -189,8 +189,9 @@ class AppServiceImpl(
       arrayListOf(),
       appRequest.requests,
       prisoner.username,
-      appRequest.requestedByFirstName,
-      appRequest.requestedByLastName,
+      // random firstname just for ui  in dev env if it is not in request payload
+      if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomfirstname",
+      if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomlasttname",
       AppStatus.PENDING,
       staff.establishmentId,
     )

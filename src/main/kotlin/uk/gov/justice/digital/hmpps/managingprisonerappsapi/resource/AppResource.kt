@@ -67,7 +67,7 @@ class AppResource(var appService: AppService) {
   }
 
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
-  @GetMapping("/apps/{appId}/groups/{groupId}")
+  @GetMapping("/apps/{appId}/forward/groups/{groupId}")
   fun forwardAppToGroup(
     @PathVariable groupId: UUID,
     @PathVariable appId: UUID,

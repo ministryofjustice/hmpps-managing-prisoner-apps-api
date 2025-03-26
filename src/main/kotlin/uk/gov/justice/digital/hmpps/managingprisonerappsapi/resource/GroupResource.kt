@@ -61,9 +61,9 @@ class GroupResource(private val groupService: GroupService) {
   }
 
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
-  @GetMapping("groups/{establishmentId}", produces = [MediaType.APPLICATION_JSON_VALUE])
-  fun getGroupsByEstablishment(@PathVariable establishmentId: String): ResponseEntity<List<AssignedGroupDto>> {
-    val groups = groupService.getGroupsByEstablishmentId(establishmentId)
+  @GetMapping("/groups", produces = [MediaType.APPLICATION_JSON_VALUE])
+  fun getGroupsByEstablishment(): ResponseEntity<List<AssignedGroupDto>> {
+    val groups = groupService.getGroupsByEstablishmentId("TEST_ESTABLISHMENT_FIRST")
     return ResponseEntity.status(HttpStatus.OK).body(groups)
   }
 }

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -33,10 +32,10 @@ class AppResourceIntegrationTest(
   @Autowired private val establishmentRepository: EstablishmentRepository,
 ) : IntegrationTestBase() {
 
-  @LocalServerPort
+  /*@LocalServerPort
   private val port = 0
 
-  private val baseUrl = "http://localhost"
+  private val baseUrl = "http://localhost"*/
 
   val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
   val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
@@ -166,7 +165,7 @@ class AppResourceIntegrationTest(
   fun `forward app request to other group`() {
     // groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentIdFirst)
     val response = webTestClient.get()
-      .uri("/v1/apps/$appIdFirst/groups/$assignedGroupSecond")
+      .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupSecond")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)

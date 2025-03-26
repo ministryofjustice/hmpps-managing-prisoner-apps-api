@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.util.UUID
@@ -15,6 +17,7 @@ data class Groups(
   val establishmentId: String,
   @ElementCollection
   val initialsApps: List<AppType>,
+  @Enumerated(EnumType.STRING)
   val type: GroupType,
 ) {
   override fun equals(other: Any?): Boolean {

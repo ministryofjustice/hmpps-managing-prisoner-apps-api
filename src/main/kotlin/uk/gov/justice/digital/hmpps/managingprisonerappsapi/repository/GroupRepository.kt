@@ -11,5 +11,5 @@ interface GroupRepository : JpaRepository<Groups, UUID> {
 
   fun findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentId: String, initialsApp: AppType): List<Groups>
 
-  fun getGroupsByEstablishmentId(id: String): List<Groups>
+  fun getGroupsByEstablishmentIdOrderByName(id: String): List<Groups>
 }

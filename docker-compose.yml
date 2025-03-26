@@ -1,4 +1,4 @@
-version: "3"
+#version: "3.1"
 services:
   managing-apps-postgres:
     image: postgres:16.2

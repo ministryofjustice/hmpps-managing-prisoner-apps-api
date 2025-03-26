@@ -56,11 +56,11 @@ class GroupsServiceImpl(
   }
 
   override fun getGroupsByEstablishmentId(id: String): List<AssignedGroupDto> {
-    val groups = groupRepository.getGroupsByEstablishmentId(id)
+    val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(id)
     val assignedGroupDto = ArrayList<AssignedGroupDto>()
     groups.forEach { g ->
       val establishment = establishmentService.getEstablishmentById(g.establishmentId)
-        .orElseThrow { ApiException("Establishment with $g.id not found", HttpStatus.NOT_FOUND) }
+        .orElseThrow { ApiException("Establishment with ${g.id} not found", HttpStatus.NOT_FOUND) }
       assignedGroupDto.add(convertGroupsToAssignedGroupsDto(g, establishment))
     }
     return assignedGroupDto
