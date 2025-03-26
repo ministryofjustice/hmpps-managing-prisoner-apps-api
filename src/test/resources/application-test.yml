@@ -10,7 +10,7 @@ hmpps-auth:
 
 prisoner:
   search:
-    url: https://localhost:9080/prisoner-search
+    url: http://localhost:8093
     timeout: 10s
 
 manage-users.api.url: https://localhost:9085/staff
