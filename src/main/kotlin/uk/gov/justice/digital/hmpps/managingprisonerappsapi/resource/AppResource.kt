@@ -32,13 +32,13 @@ class AppResource(var appService: AppService) {
   }
 
   @PostMapping(
-    "prisoners/{prisoner-id}/apps",
+    "prisoners/{prisonerId}/apps",
     produces = [MediaType.APPLICATION_JSON_VALUE],
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun submitApp(
-    @PathVariable("prisoner-id") prisonerId: String,
+    @PathVariable("prisonerId") prisonerId: String,
     @RequestBody appRequestDto: AppRequestDto,
     authentication: Authentication,
   ): ResponseEntity<AppResponseDto<Any, Any>> {
@@ -52,9 +52,9 @@ class AppResource(var appService: AppService) {
     ResponseEntity.status(HttpStatus.CREATED).build()*/
 
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
-  @GetMapping("/prisoners/{prisoner-id}/apps/{id}")
+  @GetMapping("/prisoners/{prisonerId}/apps/{id}")
   fun getAppById(
-    @PathVariable("prisoner-id") prisonerId: String,
+    @PathVariable("prisonerId") prisonerId: String,
     @PathVariable("id") id: UUID,
     @RequestParam(required = false) requestedBy: Boolean,
     @RequestParam(required = false) assignedGroup: Boolean,
@@ -94,7 +94,7 @@ class AppResource(var appService: AppService) {
       appsSearchQueryDto.types = null
     }
     if (appsSearchQueryDto.status.isEmpty()) {
-      throw ApiException("Staus cannot be empty", HttpStatus.BAD_REQUEST)
+      throw ApiException("Status cannot be empty", HttpStatus.BAD_REQUEST)
     }
     if (appsSearchQueryDto.assignedGroups != null && appsSearchQueryDto.assignedGroups!!.isEmpty()) {
       appsSearchQueryDto.assignedGroups = null
