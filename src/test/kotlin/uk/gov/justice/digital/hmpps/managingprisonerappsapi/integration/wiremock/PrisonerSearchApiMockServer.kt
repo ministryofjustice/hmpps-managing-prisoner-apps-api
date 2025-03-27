@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
+import org.springframework.core.io.ClassPathResource
+import uk.gov.justice.digital.hmpps.hmppsmanageprisonvisitsorchestration.dto.prisoner.search.PrisonerDto
 
 class PrisonerSearchApiMockServer : WireMockServer(8093) {
   fun stubHealthPing(status: Int) {
@@ -21,13 +24,15 @@ class PrisonerSearchApiMockServer : WireMockServer(8093) {
     )
   }
 
-  fun stubPrisonerSearchFound() {
+  fun stubPrisonerSearchFound(objectMapper: ObjectMapper) {
     stubFor(
       get(urlPathMatching("/prisoner/[a-zA-Z0-9]*"))
         .willReturn(
           aResponse()
             .withHeader("Content-Type", "application/json")
-            .withBody("{\"prisonerNumber\":\"A7795DY\",\"croNumber\":\"03/123113113\",\"bookingId\":\"1204755\",\"bookNumber\":\"41758A\",\"title\":\"Dr\",\"firstName\":\"JOHN\",\"middleNames\":\"BLOB\",\"lastName\":\"WILLIS\",\"dateOfBirth\":\"1991-02-28\",\"gender\":\"Male\",\"ethnicity\":\"White : Irish\",\"raceCode\":\"W2\",\"youthOffender\":false,\"status\":\"ACTIVE IN\",\"lastMovementTypeCode\":\"ADM\",\"lastMovementReasonCode\":\"N\",\"inOutStatus\":\"IN\",\"prisonId\":\"MDI\",\"lastPrisonId\":\"MDI\",\"prisonName\":\"Moorland (HMP & YOI)\",\"cellLocation\":\"RECV\",\"aliases\":[],\"alerts\":[],\"legalStatus\":\"SENTENCED\",\"imprisonmentStatus\":\"SENT03\",\"imprisonmentStatusDescription\":\"Adult Imprisonment Without Option CJA03\",\"convictedStatus\":\"Convicted\",\"recall\":false,\"indeterminateSentence\":false,\"receptionDate\":\"2023-02-07\",\"locationDescription\":\"Moorland (HMP & YOI)\",\"restrictedPatient\":false,\"currentIncentive\":{\"level\":{\"code\":\"ENH\",\"description\":\"Enhanced\"},\"dateTime\":\"2023-02-07T10:43:44\",\"nextReviewDate\":\"2023-05-07\"},\"leftEyeColour\":\"Clouded\",\"addresses\":[],\"emailAddresses\":[],\"phoneNumbers\":[],\"identifiers\":[{\"type\":\"CRO\",\"value\":\"03/123113113\",\"issuedDate\":\"2021-01-18\",\"createdDateTime\":\"2021-01-18T12:15:14\"}],\"allConvictedOffences\":[]}"),
+            .withBody(
+              objectMapper.writer().writeValueAsString(objectMapper.readValue(ClassPathResource("JsonStub/prisoner/search/prisonerSearch.json").inputStream, PrisonerDto::class.java)),
+            ),
         ),
     )
   }

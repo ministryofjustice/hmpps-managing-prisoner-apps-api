@@ -29,7 +29,7 @@ class AppResourceIntegrationTest(@Autowired private var appRepository: AppReposi
   fun setUp() {
     hmppsAuth.stubGrantToken()
     prisonerSearchApi.start()
-    prisonerSearchApi.stubPrisonerSearchFound()
+    prisonerSearchApi.stubPrisonerSearchFound(objectMapper)
     webTestClient = webTestClient
       .mutate()
       .responseTimeout(Duration.ofMillis(30000))
