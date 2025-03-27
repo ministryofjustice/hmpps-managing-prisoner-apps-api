@@ -6,6 +6,8 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.util.UUID
 
 @Entity
@@ -16,6 +18,8 @@ data class Groups(
   val name: String,
   val establishmentId: String,
   @ElementCollection
+  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.JSON)
   val initialsApps: List<AppType>,
   @Enumerated(EnumType.STRING)
   val type: GroupType,
