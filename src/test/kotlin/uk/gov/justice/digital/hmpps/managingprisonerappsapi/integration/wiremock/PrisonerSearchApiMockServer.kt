@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import com.github.tomakehurst.wiremock.client.WireMock.get
@@ -9,8 +8,7 @@ import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
-import org.springframework.core.io.ClassPathResource
-import uk.gov.justice.digital.hmpps.hmppsmanageprisonvisitsorchestration.dto.prisoner.search.PrisonerDto
+import java.io.File
 
 class PrisonerSearchApiMockServer : WireMockServer(8093) {
   fun stubHealthPing(status: Int) {
@@ -24,15 +22,13 @@ class PrisonerSearchApiMockServer : WireMockServer(8093) {
     )
   }
 
-  fun stubPrisonerSearchFound(objectMapper: ObjectMapper) {
+  fun stubPrisonerSearchFound() {
     stubFor(
       get(urlPathMatching("/prisoner/[a-zA-Z0-9]*"))
         .willReturn(
           aResponse()
             .withHeader("Content-Type", "application/json")
-            .withBody(
-              objectMapper.writer().writeValueAsString(objectMapper.readValue(ClassPathResource("JsonStub/prisoner/search/prisonerSearch.json").inputStream, PrisonerDto::class.java)),
-            ),
+            .withBody(File("src/test/resources/JsonStub/prisoner/search/prisonerSearch.json").readText(Charsets.UTF_8)),
         ),
     )
   }
