@@ -18,33 +18,3 @@ hmpps:
     api:
       url: https://prisoner-search.prison.service.justice.gov.uk
       timeout: 10s
-
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${hmpps.auth.base-url}/.well-known/jwks.json
-
-      # TODO: This client section can be removed if your service doesn't call out to other services
-      client:
-        provider:
-          hmpps-auth:
-            token-uri: ${hmpps.auth.base-url}/oauth/token
-
-        registration:
-          other-hmpps-apis:
-            provider: hmpps-auth
-            client-id: ${system.client.id}
-            client-secret: ${system.client.secret}
-            authorization-grant-type: client_credentials
-            scope: read
-
-          # example client registration for calling out to other services
-          # TODO: Remove / replace this registration
-          example-api:
-            provider: hmpps-auth
-            client-id: ${example-api.client.id}
-            client-secret: ${example-api.client.secret}
-            authorization-grant-type: client_credentials
-            scope: read
