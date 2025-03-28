@@ -13,12 +13,12 @@ import java.util.*
 data class Comment(
   @Id
   val id: UUID,
-  @Column(name = "message")
+  @Column(name = "message", length = 1000)
   val message: String,
   @Column(name = "created_date")
   val createdDate: LocalDateTime,
   @Column(name = "created_by")
-  val createdBy: UUID,
+  val createdBy: String,
   @ElementCollection
   val users: Set<UUID>,
   @Column(name = "app")

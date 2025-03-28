@@ -12,6 +12,10 @@ example-api:
 hmpps:
   auth:
     base-url: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+  prison-api:
+
+  staff-api:
+
 spring:
   security:
     oauth2:
