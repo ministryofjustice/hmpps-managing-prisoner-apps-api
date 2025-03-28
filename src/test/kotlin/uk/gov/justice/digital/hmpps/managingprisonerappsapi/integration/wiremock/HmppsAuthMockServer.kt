@@ -25,6 +25,7 @@ class HmppsAuthApiExtension :
 
   override fun beforeAll(context: ExtensionContext) {
     hmppsAuth.start()
+    hmppsAuth.stubGrantToken()
   }
 
   override fun beforeEach(context: ExtensionContext) {
@@ -43,7 +44,7 @@ class HmppsAuthMockServer : WireMockServer(WIREMOCK_PORT) {
 
   fun stubGrantToken() {
     stubFor(
-      post(urlEqualTo("/auth/oauth/token"))
+      post(urlEqualTo("/auth/token"))
         .willReturn(
           aResponse()
             .withHeaders(HttpHeaders(HttpHeader("Content-Type", "application/json")))

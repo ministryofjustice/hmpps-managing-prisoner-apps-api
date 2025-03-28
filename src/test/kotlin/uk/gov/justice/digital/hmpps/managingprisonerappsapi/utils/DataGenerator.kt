@@ -35,16 +35,7 @@ class DataGenerator {
       staffId,
     )
 
-    fun generateStaff(): Staff = Staff(
-      "TEST_USER",
-      "Test",
-      "Test",
-      "Staff",
-      UserCategory.STAFF,
-      "TEST_ESTABLISHMENT",
-      setOf(UUID.randomUUID()),
-      "Prison Warden",
-    )
+    fun generateStaff(): Staff = Staff("staffusername", "staffUserId", "staffFirstName", "staffLastName", UserCategory.STAFF, "activeCaseLoadId", setOf(UUID.randomUUID()), "jobTitle", UUID.randomUUID())
 
     fun generateApp(): App = App(
       UUID.randomUUID(),

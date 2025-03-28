@@ -6,7 +6,6 @@ generic-service:
     host: managing-prisoner-apps-api.hmpps.service.justice.gov.uk
 
   env:
-    HMPPS_AUTH_URL: "https://sign-in.hmpps.service.justice.gov.uk/auth"
     # Template kotlin calls out to itself to provide an example of a service call
     # TODO: This should be replaced by a call to a different service, or removed
     EXAMPLE_API_URL: "https://managing-prisoner-apps-api.hmpps.service.justice.gov.uk"
