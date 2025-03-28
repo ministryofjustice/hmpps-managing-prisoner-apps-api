@@ -2,8 +2,12 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.util.UUID
 
 @Entity
@@ -12,11 +16,12 @@ data class Groups(
   @Id
   val id: UUID,
   val name: String,
-  val establishment: UUID,
+  val establishmentId: String,
   @ElementCollection
-  val staffs: Set<UUID>,
-  @ElementCollection
+  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.JSON)
   val initialsApps: List<AppType>,
+  @Enumerated(EnumType.STRING)
   val type: GroupType,
 ) {
   override fun equals(other: Any?): Boolean {

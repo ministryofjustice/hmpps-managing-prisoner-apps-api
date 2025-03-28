@@ -11,12 +11,12 @@ import java.time.Duration
 @Configuration
 class WebClientConfiguration(
   @Value("\${example-api.url}") val exampleApiBaseUri: String,
-  @Value("\${hmpps-auth.url}") val hmppsAuthBaseUri: String,
+  @Value("\${hmpps.auth.base-url}") val hmppsAuthBaseUri: String,
   @Value("\${api.health-timeout:2s}") val healthTimeout: Duration,
   @Value("\${api.timeout:10s}") val apiTimeout: Duration,
-  @Value("\${prisoner.search.url}")
+  @Value("\${hmpps.prisoner-search.api.url}")
   private val prisonSearchBaseUrl: String,
-  @Value("\${manage-users.api.url}")
+  @Value("\${hmpps.manage-users.api.url}")
   private val manageUsersApiBaseUrl: String,
 ) {
   private enum class HmppsAuthClientRegistrationId(val clientRegistrationId: String) {

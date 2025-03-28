@@ -8,7 +8,7 @@ import java.util.*
 @Service
 class StaffServiceImpl : StaffService {
   override fun getStaffById(id: String): Optional<Staff> {
-    val staff = Staff("staffusername", 123, "stafffullName", UserCategory.STAFF, setOf(UUID.randomUUID()), "activeCaseLoadId", UUID.randomUUID())
+    val staff = Staff("staffusername", "staffUserId", "staffFirstName", "staffLastName", UserCategory.STAFF, "TEST_ESTABLISHMENT_FIRST", setOf(UUID.randomUUID()), "jobTitle", UUID.randomUUID())
     return Optional.of(staff)
   }
 }

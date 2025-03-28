@@ -5,15 +5,17 @@ management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
 
-hmpps-auth:
-  url: "http://localhost:8090/auth"
-
-prisoner:
-  search:
-    url: http://localhost:8093
-    timeout: 10s
-
-manage-users.api.url: https://localhost:9085/staff
+hmpps:
+  auth:
+    base-url: "http://localhost:8090/auth"
+  manage-users:
+    api:
+      url: https://localhost:9085/staff
+      timeout: 10s
+  prisoner-search:
+    api:
+      url: http://localhost:8093
+      timeout: 10s
 
 # example client configuration for calling out to other services
 # TODO: Remove / replace this configuration
@@ -39,13 +41,13 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:8090/auth/.well-known/jwks.json
+          jwk-set-uri: ${hmpps.auth.base-url}/.well-known/jwks.json
 
       # TODO: This client section can be removed if your service doesn't call out to other services
       client:
         provider:
           hmpps-auth:
-            token-uri: http://localhost:8090/auth/token
+            token-uri: ${hmpps.auth.base-url}/token
 
         registration:
           other-hmpps-apis:
