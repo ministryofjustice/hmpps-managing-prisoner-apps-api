@@ -16,7 +16,7 @@ import java.time.Duration
 @Component
 class PrisonerSearchClient(
   @Qualifier("prisonerSearchWebClient") private val webClient: WebClient,
-  @Value("\${prisoner.search.timeout:10s}") private val apiTimeout: Duration,
+  @Value("\${hmpps.prisoner-search.api.timeout:10s}") private val apiTimeout: Duration,
 ) {
   companion object {
     val logger: Logger = LoggerFactory.getLogger(this::class.java)

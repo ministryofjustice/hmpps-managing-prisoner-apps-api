@@ -89,15 +89,3 @@ management:
     info:
       cache:
         time-to-live: 2000ms
-
-prison:
-  api:
-    timeout: 10s
-
-prisoner:
-  search:
-    timeout: 10s
-
-hmpps:
-  auth:
-    timeout: 10s

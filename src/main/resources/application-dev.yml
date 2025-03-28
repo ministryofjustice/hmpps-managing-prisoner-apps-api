@@ -9,12 +9,15 @@ example-api:
 hmpps:
   auth:
     base-url: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+    timeout: 10s
   manage-users:
     api:
       url: https://manage-users-api-dev.hmpps.service.justice.gov.uk
+      timeout: 10s
   prisoner-search:
     api:
       url: https://prisoner-search-dev.prison.service.justice.gov.uk
+      timeout: 10s
 
 spring:
   security:
