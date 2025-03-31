@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.client
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.integration.client
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -9,8 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import uk.gov.justice.digital.hmpps.hmppsmanageprisonvisitsorchestration.dto.prisoner.search.PrisonerDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.client.ClientUtils.Companion.isNotFoundError
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.NotFoundException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.integration.client.ClientUtils.Companion.isNotFoundError
 import java.time.Duration
 
 @Component

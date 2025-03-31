@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.client
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.integration.client
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.WebClientResponseException
