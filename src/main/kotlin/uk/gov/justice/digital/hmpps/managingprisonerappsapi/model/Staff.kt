@@ -11,4 +11,5 @@ data class Staff(
   val establishmentId: String,
   val roles: Set<UUID>,
   val jobTitle: String,
+  val uuid: UUID?,
 )

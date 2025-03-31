@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
@@ -24,7 +25,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
+import java.util.UUID
 
 class AppResourceIntegrationTest(
   @Autowired private val appRepository: AppRepository,
@@ -66,6 +67,9 @@ class AppResourceIntegrationTest(
     populateEstablishments()
     populateGroups()
     populateApps()
+
+    prisonerSearchApi.start()
+    prisonerSearchApi.stubPrisonerSearchFound()
 
     webTestClient = webTestClient
       .mutate()

@@ -1,0 +1,20 @@
+# example client configuration for calling out to other services
+# TODO: Remove / replace this configuration
+example-api:
+  url: https://managing-prisoner-apps-api-preprod.hmpps.service.justice.gov.uk
+  client:
+    id: ${example-api.client.id}
+    secret: ${example-api.client.secret}
+
+hmpps:
+  auth:
+    base-url: https://sign-in-preprod.hmpps.service.justice.gov.uk/auth
+    timeout: 10s
+  manage-users:
+    api:
+      url: https://manage-users-api-preprod.hmpps.service.justice.gov.uk
+      timeout: 10s
+  prisoner-search:
+    api:
+      url: https://prisoner-search-preprod.prison.service.justice.gov.uk
+      timeout: 10s
