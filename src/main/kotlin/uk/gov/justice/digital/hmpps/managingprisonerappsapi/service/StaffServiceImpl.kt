@@ -18,7 +18,7 @@ class StaffServiceImpl(
       userDetailsDto.userId,
       userDetailsDto.fullName,
       UserCategory.STAFF,
-      userDetailsDto.activeCaseLoadId,
+      userDetailsDto.activeCaseLoadId!!,
       setOf(UUID.randomUUID()),
       "staffJobTitle", // To-Do find endpoint to get job title of the staff
       userDetailsDto.uuid,
