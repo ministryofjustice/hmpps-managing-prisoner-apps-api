@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
@@ -70,6 +71,9 @@ class AppResourceIntegrationTest(
 
     prisonerSearchApi.start()
     prisonerSearchApi.stubPrisonerSearchFound()
+
+    manageUsersApi.start()
+    manageUsersApi.stubStaffDetailsFound()
 
     webTestClient = webTestClient
       .mutate()
