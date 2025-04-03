@@ -79,7 +79,7 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(app)
   }
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('VIEW_PRISONER_DATA')")
   @PostMapping(
     "/prisoners/apps/search",
     consumes = [MediaType.APPLICATION_JSON_VALUE],

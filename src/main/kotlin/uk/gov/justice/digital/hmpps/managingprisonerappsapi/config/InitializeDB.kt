@@ -220,6 +220,7 @@ class InitializeDB {
     requestedByLastName,
     appStatus,
     establishmentId,
+    listOf()
   )
 
   fun generateGroups(

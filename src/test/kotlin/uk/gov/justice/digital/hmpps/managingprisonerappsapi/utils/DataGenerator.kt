@@ -18,16 +18,15 @@ import java.util.*
 
 class DataGenerator {
   companion object {
-    fun generateComment(createdBy: UUID): Comment = Comment(
+    fun generateComment(createdBy: String): Comment = Comment(
       UUID.randomUUID(),
       "Looks good to me to approve",
       LocalDateTime.now(),
       createdBy,
-      setOf(UUID.randomUUID()),
       UUID.randomUUID(),
     )
 
-    fun generateResponse(staffId: UUID): Response = Response(
+    fun generateResponse(staffId: String): Response = Response(
       UUID.randomUUID(),
       "Pass all requirement",
       Decision.APPROVED,
@@ -54,6 +53,7 @@ class DataGenerator {
       "Prisoner",
       AppStatus.PENDING,
       UUID.randomUUID().toString(),
+      listOf(),
     )
 
     fun generateApp(
@@ -82,6 +82,7 @@ class DataGenerator {
       requestedByLastName,
       appStatus,
       establishmentId,
+      listOf()
     )
 
     fun generateEstablishment(): Establishment = Establishment("HST", "Test Establishment")

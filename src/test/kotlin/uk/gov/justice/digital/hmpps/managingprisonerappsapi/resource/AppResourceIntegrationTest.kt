@@ -120,12 +120,10 @@ class AppResourceIntegrationTest(
       5,
       setOf(AppStatus.PENDING),
       setOf(
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
-        AppType.PIN_PHONE_REMOVE_CONTACT,
-        AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
+
       ),
       requestedByFirst,
-      setOf(assignedGroupFirst, assignedGroupSecond),
+      setOf(),
     )
     webTestClient.post()
       .uri("/v1//prisoners/apps/search")

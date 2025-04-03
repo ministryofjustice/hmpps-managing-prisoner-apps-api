@@ -24,13 +24,13 @@ import java.util.*
 class ResponseRepositoryTest(@Autowired var responseRepository: ResponseRepository) {
   @Test
   fun `save response`() {
-    val response = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID()))
+    val response = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID().toString()))
     Assertions.assertNotNull(response)
   }
 
   @Test
   fun `update response`() {
-    val createdResponse = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID()))
+    val createdResponse = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID().toString()))
     var response = Response(
       createdResponse.id,
       "updating reason",
@@ -44,14 +44,14 @@ class ResponseRepositoryTest(@Autowired var responseRepository: ResponseReposito
 
   @Test
   fun `find response by id`() {
-    val createdResponse = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID()))
+    val createdResponse = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID().toString()))
     val response = responseRepository.findById(createdResponse.id)
     Assertions.assertEquals(true, response.isPresent)
   }
 
   @Test
   fun `delete response by id`() {
-    val createdResponse = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID()))
+    val createdResponse = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID().toString()))
     responseRepository.deleteById(createdResponse.id)
     val response = responseRepository.findById(createdResponse.id)
     Assertions.assertEquals(false, response.isPresent)

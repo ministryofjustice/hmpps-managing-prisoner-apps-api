@@ -24,6 +24,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource.AppResource
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 @Service
 class AppServiceImpl(
@@ -38,11 +41,11 @@ class AppServiceImpl(
     private val logger = LoggerFactory.getLogger(AppResource::class.java)
   }
 
-  fun saveApp(app: App): App = appRepository.save(app)
+  override fun saveApp(app: App): App = appRepository.save(app)
 
   fun updateApp(app: App): App = appRepository.save(app)
 
-  fun getAppByID(id: UUID): Optional<App> = appRepository.findById(id)
+
 
   fun deleteAppById(id: UUID) {
     appRepository.deleteById(id)
@@ -58,6 +61,8 @@ class AppServiceImpl(
 
   fun getAppsByGroup() {
   }
+
+  override fun getAppById(appId: UUID): Optional<App> = appRepository.findById(appId)
 
   override fun submitApp(prisonerId: String, staffId: String, appRequestDto: AppRequestDto): AppResponseDto<Any, Any> {
     //   TODO("Not yet implemented")
@@ -187,14 +192,28 @@ class AppServiceImpl(
       localDateTime, // last modified date
       staff.username, // created by
       arrayListOf(),
-      appRequest.requests,
+      convertRequestsToAppRequests(appRequest.requests),
       prisoner.username,
       // random firstname just for ui  in dev env if it is not in request payload
       if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomfirstname",
       if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomlasttname",
       AppStatus.PENDING,
       staff.establishmentId,
+      listOf(),
     )
+  }
+
+  private fun convertRequestsToAppRequests(requests: List<Map<String, Any>>): List<Map<String, Any>> {
+    val appRequests = ArrayList<Map<String, Any>>()
+    requests.forEach { request ->
+      val map = HashMap<String, Any>()
+      map.put("id", UUID.randomUUID().toString())
+      request.keys.forEach() { key ->
+        request.get(key)?.let { map.put(key, it) }
+      }
+      appRequests.add(map)
+    }
+    return appRequests
   }
 
   private fun convertAppToAppResponseDto(
@@ -256,12 +275,14 @@ class AppServiceImpl(
     countByGroups: List<AppByAssignedGroupCounts>,
   ): List<GroupAppListViewDto> {
     val list = ArrayList<GroupAppListViewDto>()
+    val set = HashSet<UUID>()
     groups.forEach { group ->
       countByGroups.forEach { groupCount ->
-        if (groupCount.getAssignedGroup() == group.id) {
+        if (groupCount.getAssignedGroup().equals(group.id) && !set.contains(groupCount.getAssignedGroup())) {
           list.add(
             GroupAppListViewDto(group.id, group.name, groupCount.getCount().toLong()),
           )
+          set.add(group.id)
         } else {
           list.add(
             GroupAppListViewDto(group.id, group.name, 0),
