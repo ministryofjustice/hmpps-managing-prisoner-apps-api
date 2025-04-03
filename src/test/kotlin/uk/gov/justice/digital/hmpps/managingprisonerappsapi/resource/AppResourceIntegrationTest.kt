@@ -117,15 +117,11 @@ class AppResourceIntegrationTest(
   fun `search apps by query filters`() {
     val searchQueryDto = AppsSearchQueryDto(
       1,
-      5,
+      10,
       setOf(AppStatus.PENDING),
-      setOf(
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
-        AppType.PIN_PHONE_REMOVE_CONTACT,
-        AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
-      ),
-      requestedByFirst,
-      setOf(assignedGroupFirst, assignedGroupSecond),
+      setOf(),
+      null,
+      setOf(),
     )
     webTestClient.post()
       .uri("/v1//prisoners/apps/search")
@@ -424,7 +420,7 @@ class AppResourceIntegrationTest(
     )
     appRepository.save(
       DataGenerator.generateApp(
-        establishmentIdSecond,
+        establishmentIdFirst,
         AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),
@@ -436,7 +432,7 @@ class AppResourceIntegrationTest(
     )
     appRepository.save(
       DataGenerator.generateApp(
-        establishmentIdSecond,
+        establishmentIdFirst,
         AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),
