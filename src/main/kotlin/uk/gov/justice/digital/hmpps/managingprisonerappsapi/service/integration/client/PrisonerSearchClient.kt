@@ -37,14 +37,4 @@ class PrisonerSearchClient(
   fun getPrisonerByIdAsMono(prisonerId: String): Mono<PrisonerDto> = webClient.get().uri("/prisoner/$prisonerId")
     .retrieve()
     .bodyToMono()
-
-  fun getPrisonerByIdAsMonoEmptyIfNotFound(prisonerId: String): Mono<PrisonerDto> = getPrisonerByIdAsMono(prisonerId).onErrorResume { e ->
-    if (!isNotFoundError(e)) {
-      logger.error("getPrisonerByIdAsMonoEmptyIfNotFound - Failed to get prisoner with id - $prisonerId on prisoner search")
-      Mono.error(e)
-    } else {
-      logger.error("getPrisonerByIdAsMonoEmptyIfNotFound - Prisoner with id - $prisonerId not found.")
-      Mono.empty()
-    }
-  }
 }
