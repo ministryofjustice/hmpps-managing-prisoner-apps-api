@@ -13,12 +13,13 @@ class PrisonerServiceImpl(
 ) : PrisonerService {
 
   @Value("\${spring.profiles.active:test}")
-  private val activeProfile: String? = null
+  private lateinit var activeProfile: String
+
   override fun getPrisonerById(prisonerId: String): Optional<Prisoner> {
     val prisonerDto = prisonerSearchClient.getPrisonerById(prisonerId)
     val prisoner = Prisoner(
       prisonerId,
-      prisonerId,
+      prisonerDto.prisonerNumber,
       prisonerDto.firstName,
       prisonerDto.lastName,
       UserCategory.PRISONER,

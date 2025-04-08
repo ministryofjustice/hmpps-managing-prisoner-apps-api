@@ -275,19 +275,15 @@ class AppServiceImpl(
     countByGroups: List<AppByAssignedGroupCounts>,
   ): List<GroupAppListViewDto> {
     val list = ArrayList<GroupAppListViewDto>()
-    val set = HashSet<UUID>()
+    val map = HashMap<UUID, Long>()
+    countByGroups.forEach { groupCount ->
+      map.put(groupCount.getAssignedGroup(), groupCount.getCount().toLong())
+    }
     groups.forEach { group ->
-      countByGroups.forEach { groupCount ->
-        if (groupCount.getAssignedGroup().equals(group.id) && !set.contains(groupCount.getAssignedGroup())) {
-          list.add(
-            GroupAppListViewDto(group.id, group.name, groupCount.getCount().toLong()),
-          )
-          set.add(group.id)
-        } else {
-          list.add(
-            GroupAppListViewDto(group.id, group.name, 0),
-          )
-        }
+      if (map.get(group.id) != null) {
+        list.add(GroupAppListViewDto(group.id, group.name, map.get(group.id)))
+      } else {
+        list.add(GroupAppListViewDto(group.id, group.name, 0))
       }
     }
     return list

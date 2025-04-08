@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
@@ -71,6 +72,9 @@ class AppResourceIntegrationTest(
     prisonerSearchApi.start()
     prisonerSearchApi.stubPrisonerSearchFound()
 
+    manageUsersApi.start()
+    manageUsersApi.stubStaffDetailsFound()
+
     webTestClient = webTestClient
       .mutate()
       .responseTimeout(Duration.ofMillis(30000))
@@ -117,16 +121,14 @@ class AppResourceIntegrationTest(
   fun `search apps by query filters`() {
     val searchQueryDto = AppsSearchQueryDto(
       1,
-      5,
+      10,
       setOf(AppStatus.PENDING),
-      setOf(
-
-      ),
+      setOf(),
       requestedByFirst,
       setOf(),
     )
     webTestClient.post()
-      .uri("/v1//prisoners/apps/search")
+      .uri("/v1/prisoners/apps/search")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -422,7 +424,7 @@ class AppResourceIntegrationTest(
     )
     appRepository.save(
       DataGenerator.generateApp(
-        establishmentIdSecond,
+        establishmentIdFirst,
         AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),
@@ -434,7 +436,7 @@ class AppResourceIntegrationTest(
     )
     appRepository.save(
       DataGenerator.generateApp(
-        establishmentIdSecond,
+        establishmentIdFirst,
         AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),

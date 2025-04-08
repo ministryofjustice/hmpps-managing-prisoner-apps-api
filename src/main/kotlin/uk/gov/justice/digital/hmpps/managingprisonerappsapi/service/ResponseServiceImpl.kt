@@ -79,7 +79,7 @@ class ResponseServiceImpl(
             staffDto = StaffDto(
                 staff.username,
                 staff.userId,
-                "${staff.firstName} ${staff.lastName}",
+                "${staff.fullName}",
                 UserCategory.STAFF,
                 establishment,
             )

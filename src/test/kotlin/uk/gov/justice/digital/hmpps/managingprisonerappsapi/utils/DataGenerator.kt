@@ -10,11 +10,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
+import java.util.UUID
 
 class DataGenerator {
   companion object {
@@ -45,8 +43,6 @@ class DataGenerator {
       LocalDateTime.now(),
       staffId,
     )
-
-    fun generateStaff(): Staff = Staff("staffusername", "staffUserId", "staffFirstName", "staffLastName", UserCategory.STAFF, "activeCaseLoadId", setOf(UUID.randomUUID()), "jobTitle", UUID.randomUUID())
 
     fun generateApp(): App = App(
       UUID.randomUUID(),
