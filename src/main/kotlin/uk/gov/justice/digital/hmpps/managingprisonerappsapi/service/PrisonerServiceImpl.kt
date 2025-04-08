@@ -14,7 +14,7 @@ class PrisonerServiceImpl(
     val prisonerDto = prisonerSearchClient.getPrisonerById(prisonerId)
     val prisoner = Prisoner(
       prisonerId,
-      prisonerId,
+      prisonerDto.prisonerNumber,
       prisonerDto.firstName,
       prisonerDto.lastName,
       UserCategory.PRISONER,

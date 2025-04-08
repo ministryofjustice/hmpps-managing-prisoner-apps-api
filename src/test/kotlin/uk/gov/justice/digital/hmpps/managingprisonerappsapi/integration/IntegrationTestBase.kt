@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ExampleApiExtension.Companion.exampleApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.HmppsAuthApiExtension
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.HmppsAuthApiExtension.Companion.hmppsAuth
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.hmpps.test.kotlin.auth.JwtAuthorisationHelper
 
@@ -34,5 +35,6 @@ abstract class IntegrationTestBase {
     hmppsAuth.stubHealthPing(status)
     exampleApi.stubHealthPing(status)
     prisonerSearchApi.stubHealthPing(status)
+    manageUsersApi.stubHealthPing(status)
   }
 }

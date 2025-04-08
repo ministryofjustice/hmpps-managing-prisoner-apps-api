@@ -4,9 +4,8 @@ import java.util.*
 
 data class Staff(
   val username: String,
-  val userId: String,
-  val firstName: String,
-  val lastName: String,
+  val userId: String?,
+  val fullName: String?,
   val category: UserCategory,
   val establishmentId: String,
   val roles: Set<UUID>,
