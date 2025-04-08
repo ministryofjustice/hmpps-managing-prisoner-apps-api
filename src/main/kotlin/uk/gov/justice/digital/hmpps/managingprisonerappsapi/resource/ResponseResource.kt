@@ -19,18 +19,18 @@ import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import java.util.*
 
 @RestController
-@RequestMapping("/api/prisoners")
+@RequestMapping("v1")
 class ResponseResource(val responseService: ResponseService) {
 
   @PostMapping(
-    "/{prisonerId}/apps/{appId}/responses",
+    "prisoners/{prisonerId}/apps/{appId}/responses",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun addResponse(
-    @PathVariable("prisonerId") prisonerId: String,
-    @PathVariable("appId") appId: UUID,
+    @PathVariable prisonerId: String,
+    @PathVariable appId: UUID,
     @RequestBody appDecisionRequestDto: AppDecisionRequestDto,
     authentication: Authentication,
   ): ResponseEntity<AppDecisionResponseDto<Any>> {
@@ -40,19 +40,19 @@ class ResponseResource(val responseService: ResponseService) {
   }
 
   @GetMapping(
-    "/{prisonerId}/apps/{appId}/responses/{responseId}",
+    "prisoners/{prisonerId}/apps/{appId}/responses/{responseId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun getResponseById(
-    @PathVariable("prisonerId") prisonerId: String,
-    @PathVariable("appId") appId: UUID,
-    @PathVariable("responseId") responseId: UUID,
-    @RequestParam("expandCreatedBy", required = false) expandCreatedBy: Boolean = false,
+    @PathVariable prisonerId: String,
+    @PathVariable appId: UUID,
+    @PathVariable responseId: UUID,
+    @RequestParam(required = false) createdBy: Boolean = false,
     authentication: Authentication,
   ): ResponseEntity<AppDecisionResponseDto<Any>> {
     authentication as AuthAwareAuthenticationToken
-    val entity = responseService.getResponseById(prisonerId, appId, authentication.principal, expandCreatedBy, responseId)
-    return ResponseEntity.status(HttpStatus.CREATED).body(entity)
+    val entity = responseService.getResponseById(prisonerId, appId, authentication.principal, createdBy, responseId)
+    return ResponseEntity.status(HttpStatus.OK).body(entity)
   }
 }

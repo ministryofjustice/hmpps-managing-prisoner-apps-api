@@ -19,7 +19,7 @@ data class Comment(
   @Column(name = "created_by")
   val createdBy: String,
   @Column(name = "app")
-  val app: UUID,
+  val appId: UUID,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

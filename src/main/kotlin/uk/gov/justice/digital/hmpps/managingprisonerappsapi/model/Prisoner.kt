@@ -8,4 +8,5 @@ data class Prisoner(
   val category: UserCategory,
   val location: String?,
   val iep: String?,
+  val establishmentId: String?,
 )

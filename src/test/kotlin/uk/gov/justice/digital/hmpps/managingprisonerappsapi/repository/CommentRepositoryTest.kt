@@ -55,7 +55,7 @@ class CommentRepositoryTest(
       "updating message",
       createdComment.createdDate,
       createdComment.createdBy,
-      createdComment.app,
+      createdComment.appId,
     )
     comment = commentRepository.save(comment)
     Assertions.assertEquals("updating message", comment.message)
