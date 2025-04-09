@@ -8,7 +8,7 @@ import java.util.*
 
 data class AppResponseDto<X, Y>(
   val id: UUID?,
-  val reference: String,
+  val reference: String?,
   val assignedGroup: X,
   val appType: AppType,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")

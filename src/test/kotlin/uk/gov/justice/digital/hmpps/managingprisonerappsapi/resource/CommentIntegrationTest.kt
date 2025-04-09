@@ -11,6 +11,7 @@ import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.PageResultComments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.StaffDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
@@ -19,7 +20,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
@@ -152,10 +152,10 @@ class CommentIntegrationTest(
       // .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
       .expectStatus().isOk
-      .expectBody(object : ParameterizedTypeReference<CommentResponseDto<Staff>>() {})
+      .expectBody(object : ParameterizedTypeReference<CommentResponseDto<StaffDto>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as CommentResponseDto<Staff>
+      .responseBody as CommentResponseDto<StaffDto>
 
     Assertions.assertNotNull(message, resp.message)
     Assertions.assertEquals(app.id, resp.appId)
