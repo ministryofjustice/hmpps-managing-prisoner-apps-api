@@ -16,7 +16,7 @@ import java.util.UUID
 data class App(
   @Id
   val id: UUID,
-  val reference: String,
+  val reference: String?,
   var assignedGroup: UUID,
   @Enumerated(EnumType.STRING)
   val appType: AppType,

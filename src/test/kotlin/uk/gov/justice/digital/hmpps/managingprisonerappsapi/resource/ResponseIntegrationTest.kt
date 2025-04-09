@@ -11,6 +11,7 @@ import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.StaffDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
@@ -146,6 +147,21 @@ class ResponseIntegrationTest(
       .responseBody as AppDecisionResponseDto<String>
 
     Assertions.assertEquals(app.id, response.appId)
+    Assertions.assertEquals("G12345", response.prisonerId)
+
+    val resp = webTestClient.get()
+      .uri("/v1/prisoners/G12345/apps/$appId/responses/${response.id}?createdBy=true")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(object : ParameterizedTypeReference<AppDecisionResponseDto<StaffDto>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppDecisionResponseDto<StaffDto>
+
+    Assertions.assertEquals(app.id, resp.appId)
     Assertions.assertEquals("G12345", response.prisonerId)
     //   Assertions.assertEquals(UUID.fromString(app.requests!!.get(0)["id"] as String), response.appliesTo.get(0))
   }

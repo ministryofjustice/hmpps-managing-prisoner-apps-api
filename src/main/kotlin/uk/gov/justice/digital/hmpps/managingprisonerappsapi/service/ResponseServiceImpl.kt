@@ -56,7 +56,7 @@ class ResponseServiceImpl(
     }
     app.requests = reqs
     appService.saveApp(app)
-    return convertResponseToAppDecisionResponse(prisonerId, response.appliesTo, app.id, responseEntity!!)
+    return convertResponseToAppDecisionResponse(prisonerId, staff.username, response.appliesTo, app.id, responseEntity!!)
   }
 
   override fun getResponseById(
@@ -102,11 +102,12 @@ class ResponseServiceImpl(
     val response = responseRepository.findById(responseId).orElseThrow {
       ApiException("No response found for id $responseId", HttpStatus.NOT_FOUND)
     }
-    return convertResponseToAppDecisionResponse(prisonerId, appliesTo, appId, response)
+    return convertResponseToAppDecisionResponse(prisonerId, staffDto, appliesTo, appId, response)
   }
 
   private fun convertResponseToAppDecisionResponse(
     prisonerId: String,
+    staff: Any,
     requestIds: List<UUID>,
     appId: UUID,
     response: Response,
@@ -117,7 +118,7 @@ class ResponseServiceImpl(
     response.reason,
     response.decision,
     response.createdDate,
-    response.createdBy,
+    staff,
     requestIds,
   )
 
