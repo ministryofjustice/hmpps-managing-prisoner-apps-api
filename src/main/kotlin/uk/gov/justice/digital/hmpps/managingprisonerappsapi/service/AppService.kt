@@ -16,9 +16,9 @@ interface AppService {
 
   fun getAppById(appId: UUID): Optional<App>
 
-  fun getAppsById(prisonerId: String, id: UUID, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto<Any, Any>
+  fun getAppsById(prisonerId: String, appId: UUID, staffId: String, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto<Any, Any>
 
-  fun forwardAppToGroup(groupId: UUID, appId: UUID): AppResponseDto<Any, Any>
+  fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID): AppResponseDto<Any, Any>
 
   fun searchAppsByColumnsFilter(
     staffId: String,

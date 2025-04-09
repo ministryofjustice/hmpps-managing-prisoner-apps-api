@@ -24,9 +24,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource.AppResource
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 @Service
 class AppServiceImpl(
@@ -34,7 +31,6 @@ class AppServiceImpl(
   var prisonerService: PrisonerService,
   var staffService: StaffService,
   var groupsService: GroupService,
-  var establishmentService: EstablishmentService,
 ) : AppService {
 
   companion object {
@@ -44,8 +40,6 @@ class AppServiceImpl(
   override fun saveApp(app: App): App = appRepository.save(app)
 
   fun updateApp(app: App): App = appRepository.save(app)
-
-
 
   fun deleteAppById(id: UUID) {
     appRepository.deleteById(id)
@@ -65,14 +59,19 @@ class AppServiceImpl(
   override fun getAppById(appId: UUID): Optional<App> = appRepository.findById(appId)
 
   override fun submitApp(prisonerId: String, staffId: String, appRequestDto: AppRequestDto): AppResponseDto<Any, Any> {
-    //   TODO("Not yet implemented")
     // validate prisoner
-    val prisoner = prisonerService.getPrisonerById(prisonerId)
-    val staff = staffService.getStaffById(staffId)
-
+    val prisoner = prisonerService.getPrisonerById(prisonerId).orElseThrow {
+      ApiException("Prison with id $prisonerId not found", HttpStatus.NOT_FOUND)
+    }
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("Staff with id $staffId not found", HttpStatus.NOT_FOUND)
+    }
+    if (prisoner.establishmentId != staff.establishmentId) {
+      throw ApiException("Staff and prisoner is from two different establishment", HttpStatus.FORBIDDEN)
+    }
     val group =
-      groupsService.getGroupByInitialAppType(staff.get().establishmentId, AppType.getAppType(appRequestDto.type))
-    var app = convertAppRequestToAppEntity(prisoner.get(), staff.get(), group.id, appRequestDto)
+      groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
+    var app = convertAppRequestToAppEntity(prisoner, staff, group.id, appRequestDto)
     val assignedGroup = groupsService.getGroupById(group.id)
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
@@ -81,13 +80,20 @@ class AppServiceImpl(
 
   override fun getAppsById(
     prisonerId: String,
-    id: UUID,
+    appId: UUID,
+    staffId: String,
     requestedBy: Boolean,
     assignedGroup: Boolean,
   ): AppResponseDto<Any, Any> {
-    val app = appRepository.findAppsByIdAndRequestedBy(id, prisonerId)
-      .orElseThrow<ApiException> { throw ApiException("No app exist with id $id", HttpStatus.NOT_FOUND) }
-
+    val app = appRepository.findAppsByIdAndRequestedBy(appId, prisonerId)
+      .orElseThrow<ApiException> { throw ApiException("No app exist with id $appId", HttpStatus.NOT_FOUND) }
+    if (prisonerId != app.requestedBy) {
+      throw ApiException("The app with id $appId is not requested by $prisonerId", HttpStatus.FORBIDDEN)
+    }
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
+    }
+    validateStaffPermission(staff, app)
     val groups = groupsService.getGroupById(app.assignedGroup)
     val groupsDto: Any
     if (assignedGroup) {
@@ -105,9 +111,13 @@ class AppServiceImpl(
     return convertAppToAppResponseDto(app, prisoner, groupsDto)
   }
 
-  override fun forwardAppToGroup(groupId: UUID, appId: UUID): AppResponseDto<Any, Any> {
+  override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID): AppResponseDto<Any, Any> {
     val app = appRepository.findById(appId)
       .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.NOT_FOUND) }
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
+    }
+    validateStaffPermission(staff, app)
     val group = groupsService.getGroupById(groupId)
     app.assignedGroup = groupId
     appRepository.save(app)
@@ -191,7 +201,7 @@ class AppServiceImpl(
       staff.username,
       localDateTime, // last modified date
       staff.username, // created by
-      arrayListOf(),
+      mutableListOf(),
       convertRequestsToAppRequests(appRequest.requests),
       prisoner.username,
       // random firstname just for ui  in dev env if it is not in request payload
@@ -199,7 +209,7 @@ class AppServiceImpl(
       if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomlasttname",
       AppStatus.PENDING,
       staff.establishmentId,
-      listOf(),
+      mutableListOf(),
     )
   }
 
@@ -208,7 +218,7 @@ class AppServiceImpl(
     requests.forEach { request ->
       val map = HashMap<String, Any>()
       map.put("id", UUID.randomUUID().toString())
-      request.keys.forEach() { key ->
+      request.keys.forEach { key ->
         request.get(key)?.let { map.put(key, it) }
       }
       appRequests.add(map)
@@ -287,5 +297,11 @@ class AppServiceImpl(
       }
     }
     return list
+  }
+
+  private fun validateStaffPermission(staff: Staff, app: App) {
+    if (staff.establishmentId != app.establishmentId) {
+      throw ApiException("Staff with id ${staff.username}do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
+    }
   }
 }

@@ -4,5 +4,5 @@ data class PageResultComments(
   val page: Int,
   val totalElements: Long,
   val exhausted: Boolean,
-  val contents: List<CommentResponseDto<Any>>
+  val contents: List<CommentResponseDto<Any>>,
 )

@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.PageResultComments
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import java.util.*
 
 interface CommentService {

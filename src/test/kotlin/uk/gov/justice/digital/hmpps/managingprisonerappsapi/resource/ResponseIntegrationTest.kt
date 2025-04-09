@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionReque
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
@@ -55,8 +56,8 @@ class ResponseIntegrationTest(
     val requestedByThird = "C12345"
     val requestedByThirdMainName = "Test"
     val requestedByThirdSurname = "User"
-
   }
+
   @BeforeEach
   fun setup() {
     appRepository.deleteAll()
@@ -67,6 +68,9 @@ class ResponseIntegrationTest(
 
     prisonerSearchApi.start()
     prisonerSearchApi.stubPrisonerSearchFound()
+
+    manageUsersApi.start()
+    manageUsersApi.stubStaffDetailsFound()
 
     webTestClient = webTestClient
       .mutate()
@@ -84,7 +88,6 @@ class ResponseIntegrationTest(
 
   @Test
   fun `save response for a app and get by id`() {
-
     val app = webTestClient.post()
       .uri("/v1/prisoners/G12345/apps")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
@@ -108,15 +111,17 @@ class ResponseIntegrationTest(
     val id = UUID.fromString(app.requests!!.get(0)["id"] as String)
     val appId = app.id
     var response = webTestClient.post()
-      .uri("/v1/prisoners/G12345/apps/${appId}/responses")
+      .uri("/v1/prisoners/G12345/apps/$appId/responses")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-      .bodyValue(AppDecisionRequestDto(
-        "Approving as all looks OK",
-        Decision.APPROVED,
-        listOf(id)
-      ))
+      .bodyValue(
+        AppDecisionRequestDto(
+          "Approving as all looks OK",
+          Decision.APPROVED,
+          listOf(id),
+        ),
+      )
       .exchange()
       .expectStatus().isCreated
       .expectBody(object : ParameterizedTypeReference<AppDecisionResponseDto<String>>() {})
@@ -129,7 +134,7 @@ class ResponseIntegrationTest(
     Assertions.assertEquals(UUID.fromString(app.requests!!.get(0)["id"] as String), response.appliesTo.get(0))
 
     response = webTestClient.get()
-      .uri("/v1/prisoners/G12345/apps/${appId}/responses/${response.id}")
+      .uri("/v1/prisoners/G12345/apps/$appId/responses/${response.id}")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -142,9 +147,8 @@ class ResponseIntegrationTest(
 
     Assertions.assertEquals(app.id, response.appId)
     Assertions.assertEquals("G12345", response.prisonerId)
- //   Assertions.assertEquals(UUID.fromString(app.requests!!.get(0)["id"] as String), response.appliesTo.get(0))
+    //   Assertions.assertEquals(UUID.fromString(app.requests!!.get(0)["id"] as String), response.appliesTo.get(0))
   }
-
 
   private fun populateEstablishments() {
     establishmentRepository.save(Establishment(establishmentIdFirst, "ESTABLISHMENT_NAME_1"))
@@ -182,7 +186,7 @@ class ResponseIntegrationTest(
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
-      )
+      ),
     )
   }
 }

@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import java.util.*
 
 interface ResponseService {

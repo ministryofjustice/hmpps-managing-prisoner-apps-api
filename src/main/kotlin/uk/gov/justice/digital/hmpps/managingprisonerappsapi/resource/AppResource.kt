@@ -48,21 +48,18 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }
 
-  /*fun updateApp(@RequestBody appResponseDto: AppResponseDto<>): ResponseEntity<AppResponseDto<Any, Any>> =
-    ResponseEntity.status(HttpStatus.CREATED).build()*/
-
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/prisoners/{prisonerId}/apps/{id}")
   fun getAppById(
-    @PathVariable("prisonerId") prisonerId: String,
-    @PathVariable("id") id: UUID,
+    @PathVariable prisonerId: String,
+    @PathVariable id: UUID,
     @RequestParam(required = false) requestedBy: Boolean,
     @RequestParam(required = false) assignedGroup: Boolean,
     authentication: Authentication,
   ): ResponseEntity<AppResponseDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for get app for $prisonerId by ${authentication.principal}")
-    val appResponseDto = appService.getAppsById(prisonerId, id, requestedBy, assignedGroup)
+    val appResponseDto = appService.getAppsById(prisonerId, id, authentication.principal, requestedBy, assignedGroup)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
@@ -75,7 +72,7 @@ class AppResource(var appService: AppService) {
   ): ResponseEntity<AppResponseDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for to forward app to $groupId by ${authentication.principal}")
-    val app = appService.forwardAppToGroup(groupId, appId)
+    val app = appService.forwardAppToGroup(authentication.principal, groupId, appId)
     return ResponseEntity.status(HttpStatus.OK).body(app)
   }
 

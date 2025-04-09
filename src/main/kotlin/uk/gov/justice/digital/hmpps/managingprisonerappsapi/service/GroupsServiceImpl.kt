@@ -15,6 +15,7 @@ import java.util.*
 class GroupsServiceImpl(
   private var groupRepository: GroupRepository,
   private val establishmentService: EstablishmentService,
+  private val staffService: StaffService,
 ) : GroupService {
   override fun createGroup(groupRequestDto: GroupsRequestDto): AssignedGroupDto {
     val establishment = establishmentService.getEstablishmentById(groupRequestDto.establishmentId).orElseThrow {
@@ -55,8 +56,11 @@ class GroupsServiceImpl(
     groupRepository.deleteById(id)
   }
 
-  override fun getGroupsByEstablishmentId(id: String): List<AssignedGroupDto> {
-    val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(id)
+  override fun getGroupsByEstablishmentId(loggedUserId: String): List<AssignedGroupDto> {
+    val staff = staffService.getStaffById(loggedUserId).orElseThrow {
+      ApiException("Staff with id $loggedUserId not found", HttpStatus.NOT_FOUND)
+    }
+    val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(staff.establishmentId)
     val assignedGroupDto = ArrayList<AssignedGroupDto>()
     groups.forEach { g ->
       val establishment = establishmentService.getEstablishmentById(g.establishmentId)

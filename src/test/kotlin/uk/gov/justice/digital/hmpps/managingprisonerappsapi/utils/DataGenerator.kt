@@ -61,7 +61,7 @@ class DataGenerator {
       "Prisoner",
       AppStatus.PENDING,
       UUID.randomUUID().toString(),
-      listOf(),
+      mutableListOf(),
     )
 
     fun generateApp(
@@ -90,7 +90,7 @@ class DataGenerator {
       requestedByLastName,
       appStatus,
       establishmentId,
-      listOf()
+      mutableListOf(),
     )
 
     fun generateEstablishment(): Establishment = Establishment("HST", "Test Establishment")

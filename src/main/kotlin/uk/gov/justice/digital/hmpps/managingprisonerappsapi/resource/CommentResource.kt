@@ -32,9 +32,9 @@ class CommentResource(val commentService: CommentService) {
   fun addComment(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
-    @RequestBody commentRequestDto:CommentRequestDto,
+    @RequestBody commentRequestDto: CommentRequestDto,
     authentication: Authentication,
-    ): ResponseEntity<CommentResponseDto<Any>> {
+  ): ResponseEntity<CommentResponseDto<Any>> {
     authentication as AuthAwareAuthenticationToken
     val comment = commentService.addComment(prisonerId, authentication.principal, appId, commentRequestDto)
     return ResponseEntity.status(HttpStatus.CREATED).body(comment)
@@ -50,10 +50,10 @@ class CommentResource(val commentService: CommentService) {
     @PathVariable appId: UUID,
     @PathVariable commentId: UUID,
     @RequestParam(required = false) createdBy: Boolean,
-    authentication: Authentication
+    authentication: Authentication,
   ): ResponseEntity<CommentResponseDto<Any>> {
     authentication as AuthAwareAuthenticationToken
-    val comment  = commentService.getCommentById(prisonerId, authentication.principal, appId, createdBy, commentId)
+    val comment = commentService.getCommentById(prisonerId, authentication.principal, appId, createdBy, commentId)
     return ResponseEntity.status(HttpStatus.OK).body(comment)
   }
 
@@ -64,13 +64,14 @@ class CommentResource(val commentService: CommentService) {
   fun getCommentsByAppId(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
-    @RequestParam("page", required = true) page: Long,
-    @RequestParam("size", required = true) size: Long,
+    @RequestParam(required = true) page: Long,
+    @RequestParam(required = true) size: Long,
     @RequestParam(required = false) createdBy: Boolean,
-    authentication: Authentication
+    authentication: Authentication,
   ): ResponseEntity<PageResultComments> {
     authentication as AuthAwareAuthenticationToken
-    val comments =  commentService.getCommentsByAppId(prisonerId, authentication.principal, appId, createdBy, page, size)
+    val comments =
+      commentService.getCommentsByAppId(prisonerId, authentication.principal, appId, createdBy, page, size)
     return ResponseEntity.status(HttpStatus.OK).body(comments)
   }
 }

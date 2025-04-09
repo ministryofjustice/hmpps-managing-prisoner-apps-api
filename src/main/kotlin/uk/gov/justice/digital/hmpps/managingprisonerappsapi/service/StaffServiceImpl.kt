@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.client.ManageUsersApiClient
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
-import java.util.Optional
-import java.util.UUID
+import java.util.*
 
 @Service
 class StaffServiceImpl(

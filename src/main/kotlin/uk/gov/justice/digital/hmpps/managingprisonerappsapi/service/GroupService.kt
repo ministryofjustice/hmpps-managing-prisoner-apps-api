@@ -19,7 +19,7 @@ interface GroupService {
 
   fun deleteGroupById(id: UUID)
 
-  fun getGroupsByEstablishmentId(id: String): List<AssignedGroupDto>
+  fun getGroupsByEstablishmentId(loggedUserId: String): List<AssignedGroupDto>
 
   fun getGroupByInitialAppType(establishmentId: String, appType: AppType): Groups
 

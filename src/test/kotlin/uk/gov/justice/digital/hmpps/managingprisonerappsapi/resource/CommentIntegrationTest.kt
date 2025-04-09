@@ -12,7 +12,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentRequestDt
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
@@ -35,7 +37,7 @@ class CommentIntegrationTest(
   @Autowired private val commentRepository: CommentRepository,
 ) : IntegrationTestBase() {
 
-  private lateinit var appId: UUID
+  private lateinit var app: App
 
   companion object {
     val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
@@ -54,7 +56,6 @@ class CommentIntegrationTest(
     val requestedByThird = "C12345"
     val requestedByThirdMainName = "Test"
     val requestedByThirdSurname = "User"
-
   }
 
   @BeforeEach
@@ -69,6 +70,9 @@ class CommentIntegrationTest(
 
     prisonerSearchApi.start()
     prisonerSearchApi.stubPrisonerSearchFound()
+
+    manageUsersApi.start()
+    manageUsersApi.stubStaffDetailsFound()
 
     webTestClient = webTestClient
       .mutate()
@@ -87,11 +91,9 @@ class CommentIntegrationTest(
   @Test
   fun `add a comment for the app`() {
     val message = "This needs to be checked again"
-    val body = CommentRequestDto(
-      message
-    )
+    val body = CommentRequestDto(message)
     val response = webTestClient.post()
-      .uri("/v1/prisoners/G9737VL/apps/$appId/comments")
+      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -104,18 +106,16 @@ class CommentIntegrationTest(
       .responseBody as CommentResponseDto<String>
 
     Assertions.assertNotNull(message, response.message)
-    Assertions.assertEquals(appId, response.appId)
-    Assertions.assertEquals("G9737VL", response.prisonerNumber)
+    Assertions.assertEquals(app.id, response.appId)
+    Assertions.assertEquals(app.requestedBy, response.prisonerNumber)
   }
 
   @Test
   fun `get comment by id`() {
     val message = "This needs to be checked again"
-    val body = CommentRequestDto(
-      message
-    )
+    val body = CommentRequestDto(message)
     val response = webTestClient.post()
-      .uri("/v1/prisoners/G9737VL/apps/$appId/comments")
+      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -126,13 +126,12 @@ class CommentIntegrationTest(
       .consumeWith(System.out::println)
       .returnResult()
       .responseBody as CommentResponseDto<String>
-
     Assertions.assertNotNull(message, response.message)
-    Assertions.assertEquals(appId, response.appId)
-    Assertions.assertEquals("G9737VL", response.prisonerNumber)
+    Assertions.assertEquals(app.id, response.appId)
+    Assertions.assertEquals(app.requestedBy, response.prisonerNumber)
 
     var res = webTestClient.get()
-      .uri("/v1/prisoners/G9737VL/apps/$appId/comments/${response.id}")
+      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments/${response.id}")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
@@ -143,14 +142,14 @@ class CommentIntegrationTest(
       .responseBody as CommentResponseDto<String>
 
     Assertions.assertNotNull(message, res.message)
-    Assertions.assertEquals(appId, res.appId)
-    Assertions.assertEquals("G9737VL", res.prisonerNumber)
+    Assertions.assertEquals(app.id, res.appId)
+    Assertions.assertEquals(app.requestedBy, res.prisonerNumber)
 
-   val resp = webTestClient.get()
-      .uri("/v1/prisoners/G9737VL/apps/$appId/comments/${response.id}?createdBy=true")
+    val resp = webTestClient.get()
+      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments/${response.id}?createdBy=true")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-      //.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      // .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
       .expectStatus().isOk
       .expectBody(object : ParameterizedTypeReference<CommentResponseDto<Staff>>() {})
@@ -159,18 +158,18 @@ class CommentIntegrationTest(
       .responseBody as CommentResponseDto<Staff>
 
     Assertions.assertNotNull(message, resp.message)
-    Assertions.assertEquals(appId, resp.appId)
-    Assertions.assertEquals("G9737VL", resp.prisonerNumber)
+    Assertions.assertEquals(app.id, resp.appId)
+    Assertions.assertEquals(app.requestedBy, resp.prisonerNumber)
   }
 
   @Test
   fun `get comments by app id`() {
     val message = "This needs to be checked again"
     val body = CommentRequestDto(
-      message
+      message,
     )
-    val response = webTestClient.post()
-      .uri("/v1/prisoners/G9737VL/apps/$appId/comments")
+    webTestClient.post()
+      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -183,7 +182,7 @@ class CommentIntegrationTest(
       .responseBody as CommentResponseDto<String>
 
     var res = webTestClient.get()
-      .uri("/v1/prisoners/G9737VL/apps/$appId/comments?page=1&size=10")
+      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments?page=1&size=10")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -198,7 +197,7 @@ class CommentIntegrationTest(
     Assertions.assertEquals(1, res.totalElements)
 
     res = webTestClient.get()
-      .uri("/v1/prisoners/G9737VL/apps/$appId/comments?page=1&size=10")
+      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments?page=1&size=10")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -239,7 +238,7 @@ class CommentIntegrationTest(
   }
 
   private fun populateApps() {
-    appId = appRepository.save(
+    app = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
         AppType.PIN_PHONE_ADD_NEW_CONTACT,
@@ -249,7 +248,7 @@ class CommentIntegrationTest(
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
-      )
-    ).id
+      ),
+    )
   }
 }

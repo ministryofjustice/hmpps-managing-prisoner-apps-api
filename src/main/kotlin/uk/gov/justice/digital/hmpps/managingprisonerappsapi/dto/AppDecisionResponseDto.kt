@@ -12,5 +12,5 @@ data class AppDecisionResponseDto<T>(
   val decision: Decision,
   val createdDate: LocalDateTime,
   val createdBy: T,
-  val appliesTo: List<UUID>
+  val appliesTo: List<UUID>,
 )
