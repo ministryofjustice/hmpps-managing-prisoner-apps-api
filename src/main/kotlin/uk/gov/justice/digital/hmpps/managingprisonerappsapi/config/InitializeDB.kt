@@ -214,12 +214,13 @@ class InitializeDB {
     LocalDateTime.now(ZoneOffset.UTC),
     "testStaaf@moj",
     arrayListOf(UUID.randomUUID()),
-    listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
+    mutableListOf(HashMap<String, Any>().apply { put("contact", 123456) }),
     requestedBy,
     requestedByFirstName,
     requestedByLastName,
     appStatus,
     establishmentId,
+    mutableListOf(),
   )
 
   fun generateGroups(

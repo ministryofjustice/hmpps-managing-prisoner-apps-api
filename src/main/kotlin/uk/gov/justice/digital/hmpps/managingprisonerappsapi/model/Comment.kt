@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import jakarta.persistence.Column
-import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
@@ -13,16 +12,14 @@ import java.util.*
 data class Comment(
   @Id
   val id: UUID,
-  @Column(name = "message")
+  @Column(name = "message", length = 1000)
   val message: String,
   @Column(name = "created_date")
   val createdDate: LocalDateTime,
   @Column(name = "created_by")
-  val createdBy: UUID,
-  @ElementCollection
-  val users: Set<UUID>,
+  val createdBy: String,
   @Column(name = "app")
-  val app: UUID,
+  val appId: UUID,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

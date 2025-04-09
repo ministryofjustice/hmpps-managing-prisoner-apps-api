@@ -26,15 +26,17 @@ data class App(
   val lastModifiedDate: LocalDateTime?,
   val lastModifiedBy: String?,
   @ElementCollection
-  val comments: List<UUID>,
+  var comments: MutableList<UUID>,
   @JdbcTypeCode(SqlTypes.JSON)
-  val requests: List<Map<String, Any>>,
+  var requests: List<Map<String, Any>>,
   val requestedBy: String,
   val requestedByFirstName: String,
   val requestedByLastName: String,
   @Enumerated(EnumType.STRING)
   val status: AppStatus,
   val establishmentId: String,
+  @ElementCollection
+  var responses: MutableList<UUID>,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

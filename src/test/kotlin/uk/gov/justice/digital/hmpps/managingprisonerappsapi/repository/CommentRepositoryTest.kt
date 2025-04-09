@@ -35,28 +35,27 @@ class CommentRepositoryTest(
   @Test
   fun saveComment() {
     val id = UUID.randomUUID()
-    val comment = DataGenerator.generateComment(id)
+    val comment = DataGenerator.generateComment(id.toString())
     val createdComment = commentRepository.save(comment)
     Assertions.assertNotNull(createdComment)
   }
 
   @Test
   fun getCommentBydId() {
-    val createdComment = commentRepository.save(DataGenerator.generateComment(UUID.randomUUID()))
+    val createdComment = commentRepository.save(DataGenerator.generateComment(UUID.randomUUID().toString()))
     val comment = commentRepository.findById(createdComment.id)
     Assertions.assertEquals(true, comment.isPresent)
   }
 
   @Test
   fun `update comment`() {
-    var createdComment = commentRepository.save(DataGenerator.generateComment(UUID.randomUUID()))
+    var createdComment = commentRepository.save(DataGenerator.generateComment(UUID.randomUUID().toString()))
     var comment = Comment(
       createdComment.id,
       "updating message",
       createdComment.createdDate,
       createdComment.createdBy,
-      createdComment.users,
-      createdComment.app,
+      createdComment.appId,
     )
     comment = commentRepository.save(comment)
     Assertions.assertEquals("updating message", comment.message)
@@ -64,7 +63,7 @@ class CommentRepositoryTest(
 
   @Test
   fun deleteCommentById() {
-    val createdComment = commentRepository.save(DataGenerator.generateComment(UUID.randomUUID()))
+    val createdComment = commentRepository.save(DataGenerator.generateComment(UUID.randomUUID().toString()))
     commentRepository.deleteById(createdComment.id)
     val comment = commentRepository.findById(createdComment.id)
     Assertions.assertEquals(false, comment.isPresent)

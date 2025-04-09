@@ -34,30 +34,25 @@ class AppResourceIntegrationTest(
   @Autowired private val establishmentRepository: EstablishmentRepository,
 ) : IntegrationTestBase() {
 
-  /*@LocalServerPort
-  private val port = 0
+  private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
+  private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
+  private val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
+  private val assignedGroupFirst = UUID.randomUUID()
+  private val assignedGroupFirstName = "Business Hub"
+  private val assignedGroupSecond = UUID.randomUUID()
+  private val assignedGroupSecondName = "OMU"
+  private val requestedByFirst = "A12345"
+  private val requestedByFirstMainName = "John"
+  private val requestedByFirstSurname = "Smith"
+  private val requestedBySecondMainName = "John"
+  private val requestedBySecondSurname = "Butler"
+  private val requestedBySecond = "B12345"
+  private val requestedByThird = "C12345"
+  private val requestedByThirdMainName = "Test"
+  private val requestedByThirdSurname = "User"
 
-  private val baseUrl = "http://localhost"*/
-
-  val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
-  val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
-  val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
-  val assignedGroupFirst = UUID.randomUUID()
-  val assignedGroupFirstName = "Business Hub"
-  val assignedGroupSecond = UUID.randomUUID()
-  val assignedGroupSecondName = "OMU"
-  val requestedByFirst = "A12345"
-  val requestedByFirstMainName = "John"
-  val requestedByFirstSurname = "Smith"
-  val requestedBySecondMainName = "John"
-  val requestedBySecondSurname = "Butler"
-  val requestedBySecond = "B12345"
-  val requestedByThird = "C12345"
-  val requestedByThirdMainName = "Test"
-  val requestedByThirdSurname = "User"
-
-  lateinit var appIdFirst: UUID
-  lateinit var appIdSecond: UUID
+  private lateinit var appIdFirst: UUID
+  private lateinit var appIdSecond: UUID
 
   @BeforeEach
   fun setUp() {
@@ -124,11 +119,11 @@ class AppResourceIntegrationTest(
       10,
       setOf(AppStatus.PENDING),
       setOf(),
-      null,
+      requestedByFirst,
       setOf(),
     )
     webTestClient.post()
-      .uri("/v1//prisoners/apps/search")
+      .uri("/v1/prisoners/apps/search")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)

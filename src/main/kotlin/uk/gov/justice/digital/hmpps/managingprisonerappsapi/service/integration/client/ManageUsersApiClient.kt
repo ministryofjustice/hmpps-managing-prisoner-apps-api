@@ -30,7 +30,7 @@ class ManageUsersApiClient(
         e.printStackTrace()
         if (e is WebClientResponseException) {
           LOG.warn("Failed to acquire user information from hmpps-manage-users-api $userName ", e)
-          return@onErrorResume Mono.just(UserDetailsDto(userName))
+          //   return@onErrorResume Mono.just(UserDetailsDto(userName))
         }
         LOG.error("Failed to acquire user information from hmpps-manage-users-api $userName ", e)
         Mono.error(e)

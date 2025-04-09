@@ -5,5 +5,5 @@ import java.util.*
 
 interface StaffService {
 
-  fun getStaffById(id: String): Optional<Staff>
+  fun getStaffById(staffId: String): Optional<Staff>
 }

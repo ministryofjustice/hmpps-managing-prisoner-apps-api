@@ -13,7 +13,7 @@ data class UserDetailsDto(
 
   @Schema(description = "Full name", example = "John Smith", required = false)
   @JsonProperty("name")
-  val fullName: String? = null,
+  val fullName: String,
 
   @Schema(description = "Active", example = "true", required = false)
   @JsonProperty("active")
@@ -29,11 +29,11 @@ data class UserDetailsDto(
 
   @Schema(description = "Active caseload", example = "activeCaseLoadId", required = false)
   @JsonProperty("activeCaseLoadId")
-  val activeCaseLoadId: String? = null,
+  val activeCaseLoadId: String,
 
   @Schema(description = "Staff Id", example = "488028", required = false)
   @JsonProperty("userId")
-  val userId: String? = null,
+  val userId: String,
 
   @Schema(description = "UUId", example = "d6c60208-6508-4823-b664-0674ca06ddea", required = false)
   @JsonProperty("uuid")
