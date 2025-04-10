@@ -10,5 +10,5 @@ data class AppRequestDto(
   val requestedDate: LocalDateTime,
   val requestedByFirstName: String? = null,
   val requestedByLastName: String? = null,
-  val requests: List<Map<String, Any>>,
+  val requests: List<MutableMap<String, Any>>,
 )

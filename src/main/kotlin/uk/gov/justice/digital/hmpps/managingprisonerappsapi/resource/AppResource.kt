@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -44,6 +45,24 @@ class AppResource(var appService: AppService) {
   ): ResponseEntity<AppResponseDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for submitting app for $prisonerId by ${authentication.principal}")
+    val appResponseDto = appService.submitApp(prisonerId, authentication.principal, appRequestDto)
+    return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
+  }
+
+  @PutMapping(
+    "prisoners/{prisonerId}/apps/{appId}",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+    consumes = [MediaType.APPLICATION_JSON_VALUE],
+  )
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  fun updateAppRequestData(
+    @PathVariable("prisonerId") prisonerId: String,
+    @PathVariable("appId") appId: UUID,
+    @RequestBody appRequestDto: AppRequestDto,
+    authentication: Authentication,
+  ): ResponseEntity<AppResponseDto<Any, Any>> {
+    authentication as AuthAwareAuthenticationToken
+    logger.info("Request received for updating app requests data for $prisonerId by ${authentication.principal}")
     val appResponseDto = appService.submitApp(prisonerId, authentication.principal, appRequestDto)
     return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }

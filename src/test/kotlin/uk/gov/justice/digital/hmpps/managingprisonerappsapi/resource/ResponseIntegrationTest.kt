@@ -164,6 +164,19 @@ class ResponseIntegrationTest(
     Assertions.assertEquals(app.id, resp.appId)
     Assertions.assertEquals(requestedByFirst, response.prisonerId)
     //   Assertions.assertEquals(UUID.fromString(app.requests!!.get(0)["id"] as String), response.appliesTo.get(0))
+
+    webTestClient.get()
+      .uri("/v1/prisoners/$requestedByFirst/apps/$appId")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Any, Any>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponseDto<Any, Any>
   }
 
   private fun populateEstablishments() {

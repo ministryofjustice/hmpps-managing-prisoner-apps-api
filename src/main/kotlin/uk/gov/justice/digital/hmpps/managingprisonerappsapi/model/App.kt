@@ -28,7 +28,7 @@ data class App(
   @ElementCollection
   var comments: MutableList<UUID>,
   @JdbcTypeCode(SqlTypes.JSON)
-  var requests: List<Map<String, Any>>,
+  var requests: List<MutableMap<String, Any>>,
   val requestedBy: String,
   val requestedByFirstName: String,
   val requestedByLastName: String,
