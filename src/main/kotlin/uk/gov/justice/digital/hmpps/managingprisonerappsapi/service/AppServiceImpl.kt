@@ -241,8 +241,8 @@ class AppServiceImpl(
       convertRequestsToAppRequests(appRequest.requests),
       prisoner.username,
       // random firstname just for ui  in dev env if it is not in request payload
-      if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomfirstname",
-      if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomlasttname",
+      prisoner.firstName,
+      prisoner.lastName,
       AppStatus.PENDING,
       staff.establishmentId,
       mutableListOf(),

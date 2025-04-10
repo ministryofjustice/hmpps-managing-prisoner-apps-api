@@ -8,7 +8,5 @@ data class AppRequestDto(
   val type: String,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val requestedDate: LocalDateTime,
-  val requestedByFirstName: String? = null,
-  val requestedByLastName: String? = null,
   val requests: List<MutableMap<String, Any>>,
 )
