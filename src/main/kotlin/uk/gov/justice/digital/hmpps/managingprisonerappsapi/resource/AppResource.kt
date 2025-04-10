@@ -28,7 +28,7 @@ import java.util.*
 class AppResource(var appService: AppService) {
 
   companion object {
-    private val logger = LoggerFactory.getLogger(AppResource::class.java)
+    private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
   @PostMapping(

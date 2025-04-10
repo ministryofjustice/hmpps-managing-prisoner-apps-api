@@ -68,10 +68,10 @@ class ResponseIntegrationTest(
     populateApps()
 
     prisonerSearchApi.start()
-    prisonerSearchApi.stubPrisonerSearchFound()
+    prisonerSearchApi.stubPrisonerSearchFound(requestedByFirst)
 
     manageUsersApi.start()
-    manageUsersApi.stubStaffDetailsFound()
+    manageUsersApi.stubStaffDetailsFound(loggedUserId)
 
     webTestClient = webTestClient
       .mutate()
@@ -90,7 +90,7 @@ class ResponseIntegrationTest(
   @Test
   fun `save response for a app and get by id`() {
     val app = webTestClient.post()
-      .uri("/v1/prisoners/G12345/apps")
+      .uri("/v1/prisoners/$requestedByFirst/apps")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -112,7 +112,7 @@ class ResponseIntegrationTest(
     val id = UUID.fromString(app.requests!!.get(0)["id"] as String)
     val appId = app.id
     var response = webTestClient.post()
-      .uri("/v1/prisoners/G12345/apps/$appId/responses")
+      .uri("/v1/prisoners/$requestedByFirst/apps/$appId/responses")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -131,11 +131,11 @@ class ResponseIntegrationTest(
       .responseBody as AppDecisionResponseDto<String>
 
     Assertions.assertEquals(app.id, response.appId)
-    Assertions.assertEquals("G12345", response.prisonerId)
+    Assertions.assertEquals(requestedByFirst, response.prisonerId)
     Assertions.assertEquals(UUID.fromString(app.requests!!.get(0)["id"] as String), response.appliesTo.get(0))
 
     response = webTestClient.get()
-      .uri("/v1/prisoners/G12345/apps/$appId/responses/${response.id}")
+      .uri("/v1/prisoners/$requestedByFirst/apps/$appId/responses/${response.id}")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -147,10 +147,10 @@ class ResponseIntegrationTest(
       .responseBody as AppDecisionResponseDto<String>
 
     Assertions.assertEquals(app.id, response.appId)
-    Assertions.assertEquals("G12345", response.prisonerId)
+    Assertions.assertEquals(requestedByFirst, response.prisonerId)
 
     val resp = webTestClient.get()
-      .uri("/v1/prisoners/G12345/apps/$appId/responses/${response.id}?createdBy=true")
+      .uri("/v1/prisoners/$requestedByFirst/apps/$appId/responses/${response.id}?createdBy=true")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -162,7 +162,7 @@ class ResponseIntegrationTest(
       .responseBody as AppDecisionResponseDto<StaffDto>
 
     Assertions.assertEquals(app.id, resp.appId)
-    Assertions.assertEquals("G12345", response.prisonerId)
+    Assertions.assertEquals(requestedByFirst, response.prisonerId)
     //   Assertions.assertEquals(UUID.fromString(app.requests!!.get(0)["id"] as String), response.appliesTo.get(0))
   }
 

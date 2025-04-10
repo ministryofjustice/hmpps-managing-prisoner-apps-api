@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionRequestDto
@@ -7,6 +8,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionRespo
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.StaffDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
@@ -24,6 +27,10 @@ class ResponseServiceImpl(
   private val establishmentService: EstablishmentService,
 ) : ResponseService {
 
+  companion object {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+  }
+
   override fun addResponse(
     prisonerId: String,
     appId: UUID,
@@ -36,6 +43,9 @@ class ResponseServiceImpl(
     }
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
+    if (response.appliesTo.size > 1) {
+      throw ApiException("Multiple responses is not supported as multiple request is not supported", HttpStatus.FORBIDDEN)
+    }
     val reqs = ArrayList<Map<String, Any>>()
     var responseEntity: Response? = null
     app.requests.forEach { request ->
@@ -51,10 +61,19 @@ class ResponseServiceImpl(
           ),
         )
         req["responseId"] = responseEntity!!.id.toString()
+        app.responses.add(responseEntity!!.id)
       }
       reqs.add(req)
     }
     app.requests = reqs
+    if (app.requests.size == app.responses.size) {
+      if (response.decision == Decision.APPROVED) {
+        app.status = AppStatus.APPROVED
+      }
+      if (response.decision == Decision.DECLINED) {
+        app.status = AppStatus.DECLINED
+      }
+    }
     appService.saveApp(app)
     return convertResponseToAppDecisionResponse(prisonerId, staff.username, response.appliesTo, app.id, responseEntity!!)
   }

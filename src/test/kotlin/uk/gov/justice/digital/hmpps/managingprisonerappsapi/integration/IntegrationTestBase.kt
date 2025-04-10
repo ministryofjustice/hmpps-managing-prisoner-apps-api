@@ -25,8 +25,10 @@ abstract class IntegrationTestBase {
   @Autowired
   protected lateinit var jwtAuthHelper: JwtAuthorisationHelper
 
+  protected val loggedUserId = "AUTH_ADM"
+
   internal fun setAuthorisation(
-    username: String? = "AUTH_ADM",
+    username: String? = loggedUserId,
     roles: List<String> = listOf(),
     scopes: List<String> = listOf("read"),
   ): (HttpHeaders) -> Unit = jwtAuthHelper.setAuthorisationHeader(username = username, scope = scopes, roles = roles)

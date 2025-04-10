@@ -56,18 +56,13 @@ class GroupsServiceImpl(
     groupRepository.deleteById(id)
   }
 
-  override fun getGroupsByEstablishmentId(loggedUserId: String): List<AssignedGroupDto> {
+  override fun getGroupsByEstablishmentId(establishmentId: String): List<AssignedGroupDto> = findGroupsByEstablishmentId(establishmentId)
+
+  override fun getGroupsByLoggedStaffEstablishmentId(loggedUserId: String): List<AssignedGroupDto> {
     val staff = staffService.getStaffById(loggedUserId).orElseThrow {
       ApiException("Staff with id $loggedUserId not found", HttpStatus.NOT_FOUND)
     }
-    val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(staff.establishmentId)
-    val assignedGroupDto = ArrayList<AssignedGroupDto>()
-    groups.forEach { g ->
-      val establishment = establishmentService.getEstablishmentById(g.establishmentId)
-        .orElseThrow { ApiException("Establishment with ${g.id} not found", HttpStatus.NOT_FOUND) }
-      assignedGroupDto.add(convertGroupsToAssignedGroupsDto(g, establishment))
-    }
-    return assignedGroupDto
+    return findGroupsByEstablishmentId(staff.establishmentId)
   }
 
   override fun convertGroupsToAssignedGroupsDto(
@@ -96,5 +91,16 @@ class GroupsServiceImpl(
     } else {
       return groupList.first()
     }
+  }
+
+  private fun findGroupsByEstablishmentId(establishmentId: String): List<AssignedGroupDto> {
+    val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(establishmentId)
+    val assignedGroupDto = ArrayList<AssignedGroupDto>()
+    groups.forEach { g ->
+      val establishment = establishmentService.getEstablishmentById(g.establishmentId)
+        .orElseThrow { ApiException("Establishment with ${g.id} not found", HttpStatus.NOT_FOUND) }
+      assignedGroupDto.add(convertGroupsToAssignedGroupsDto(g, establishment))
+    }
+    return assignedGroupDto
   }
 }
