@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -22,6 +23,10 @@ import java.util.*
 @RequestMapping("v1")
 class ResponseResource(val responseService: ResponseService) {
 
+  companion object {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+  }
+
   @PostMapping(
     "prisoners/{prisonerId}/apps/{appId}/responses",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
@@ -35,6 +40,7 @@ class ResponseResource(val responseService: ResponseService) {
     authentication: Authentication,
   ): ResponseEntity<AppDecisionResponseDto<Any>> {
     authentication as AuthAwareAuthenticationToken
+    logger.info("Request received to add response by ${authentication.principal}")
     val entity = responseService.addResponse(prisonerId, appId, authentication.principal, appDecisionRequestDto)
     return ResponseEntity.status(HttpStatus.CREATED).body(entity)
   }
@@ -51,6 +57,7 @@ class ResponseResource(val responseService: ResponseService) {
     @RequestParam(required = false) createdBy: Boolean = false,
     authentication: Authentication,
   ): ResponseEntity<AppDecisionResponseDto<Any>> {
+    logger.info("Request received to get response for $responseId by ${authentication.principal}")
     authentication as AuthAwareAuthenticationToken
     val entity = responseService.getResponseById(prisonerId, appId, authentication.principal, createdBy, responseId)
     return ResponseEntity.status(HttpStatus.OK).body(entity)

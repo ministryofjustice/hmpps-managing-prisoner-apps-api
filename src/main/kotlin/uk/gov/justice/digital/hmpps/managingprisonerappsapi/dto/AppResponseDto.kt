@@ -25,4 +25,6 @@ data class AppResponseDto<X, Y>(
   val requestedByFirstName: String,
   val requestedByLastName: String,
   val status: AppStatus,
+  val establishmentId: String,
+  val responses: List<UUID>?,
 )

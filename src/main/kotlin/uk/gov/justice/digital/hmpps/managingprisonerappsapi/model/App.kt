@@ -33,7 +33,7 @@ data class App(
   val requestedByFirstName: String,
   val requestedByLastName: String,
   @Enumerated(EnumType.STRING)
-  val status: AppStatus,
+  var status: AppStatus,
   val establishmentId: String,
   @ElementCollection
   var responses: MutableList<UUID>,

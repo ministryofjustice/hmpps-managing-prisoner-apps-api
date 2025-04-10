@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -22,6 +23,10 @@ import java.util.UUID
 @RestController
 @RequestMapping("v1")
 class GroupResource(private val groupService: GroupService) {
+
+  companion object {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+  }
 
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @PostMapping("/groups", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
@@ -68,7 +73,8 @@ class GroupResource(private val groupService: GroupService) {
     authentication: Authentication,
   ): ResponseEntity<List<AssignedGroupDto>> {
     authentication as AuthAwareAuthenticationToken
-    val groups = groupService.getGroupsByEstablishmentId(authentication.principal)
+    logger.info("Request received to get groups by ${authentication.principal}")
+    val groups = groupService.getGroupsByLoggedStaffEstablishmentId(authentication.principal)
     return ResponseEntity.status(HttpStatus.OK).body(groups)
   }
 }

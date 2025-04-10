@@ -69,10 +69,10 @@ class CommentIntegrationTest(
     populateApps()
 
     prisonerSearchApi.start()
-    prisonerSearchApi.stubPrisonerSearchFound()
+    prisonerSearchApi.stubPrisonerSearchFound(requestedByFirst)
 
     manageUsersApi.start()
-    manageUsersApi.stubStaffDetailsFound()
+    manageUsersApi.stubStaffDetailsFound(loggedUserId)
 
     webTestClient = webTestClient
       .mutate()

@@ -65,10 +65,10 @@ class AppResourceIntegrationTest(
     populateApps()
 
     prisonerSearchApi.start()
-    prisonerSearchApi.stubPrisonerSearchFound()
+    prisonerSearchApi.stubPrisonerSearchFound(requestedByFirst)
 
     manageUsersApi.start()
-    manageUsersApi.stubStaffDetailsFound()
+    manageUsersApi.stubStaffDetailsFound(loggedUserId)
 
     webTestClient = webTestClient
       .mutate()
@@ -187,7 +187,7 @@ class AppResourceIntegrationTest(
   @Test
   fun `submit an app with no roles`() {
     webTestClient.post()
-      .uri("/v1/prisoners/G12345/apps")
+      .uri("/v1/prisoners/$requestedByFirst/apps")
       .headers(setAuthorisation())
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)

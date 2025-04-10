@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
-import java.io.File
 
 class ManageUsersApiMockServer : WireMockServer(8094) {
   fun stubHealthPing(status: Int) {
@@ -23,13 +22,24 @@ class ManageUsersApiMockServer : WireMockServer(8094) {
     )
   }
 
-  fun stubStaffDetailsFound() {
+  fun stubStaffDetailsFound(staffUserName: String) {
     stubFor(
-      get(urlPathMatching("/users/[a-zA-Z0-9_@]*"))
+      get(urlPathMatching("/users/$staffUserName"))
         .willReturn(
           aResponse()
             .withHeader("Content-Type", "application/json")
-            .withBody(File("src/test/resources/JsonStub/manage/users/staffDetails.json").readText(Charsets.UTF_8)),
+            .withBody(
+              "{\n" +
+                "  \"username\": \"${staffUserName}\",\n" +
+                "  \"active\": true,\n" +
+                "  \"name\": \"Joe Bloggs\",\n" +
+                "  \"authSource\": \"nomis\",\n" +
+                "  \"staffId\": 401228,\n" +
+                "  \"activeCaseLoadId\": \"TEST_ESTABLISHMENT_FIRST\",\n" +
+                "  \"userId\": \"401228\",\n" +
+                "  \"uuid\": \"d6c60000-0000-0000-b664-0000ca06ddea\"\n" +
+                "}",
+            ),
         ),
     )
   }

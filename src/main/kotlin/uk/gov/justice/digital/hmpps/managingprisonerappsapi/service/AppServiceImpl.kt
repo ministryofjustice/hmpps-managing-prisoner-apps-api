@@ -69,6 +69,9 @@ class AppServiceImpl(
     if (prisoner.establishmentId != staff.establishmentId) {
       throw ApiException("Staff and prisoner is from two different establishment", HttpStatus.FORBIDDEN)
     }
+    if (appRequestDto.requests.size > 1) {
+      throw ApiException("Multiple requests in app is not supported", HttpStatus.FORBIDDEN)
+    }
     val group =
       groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
     var app = convertAppRequestToAppEntity(prisoner, staff, group.id, appRequestDto)
@@ -246,6 +249,8 @@ class AppServiceImpl(
     app.requestedByFirstName,
     app.requestedByLastName,
     app.status,
+    app.establishmentId,
+    app.responses,
   )
 
   private fun convertAppToAppListDto(apps: List<App>): List<AppListViewDto> {
