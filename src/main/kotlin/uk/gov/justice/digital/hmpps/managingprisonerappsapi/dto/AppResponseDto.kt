@@ -20,7 +20,7 @@ data class AppResponseDto<X, Y>(
   val lastModifiedDate: LocalDateTime?,
   val lastModifiedBy: String?,
   val comments: List<UUID>?,
-  val requests: List<Map<String, Any>>?,
+  val requests: List<Map<String, Any>>,
   val requestedBy: Y,
   val requestedByFirstName: String,
   val requestedByLastName: String,

@@ -14,6 +14,8 @@ interface AppService {
 
   fun saveApp(app: App): App
 
+  fun updateAppFormData(prisonerId: String, staffId: String, appId: UUID, requestFormData: List<Map<String, Any>>): AppResponseDto<Any, Any>
+
   fun getAppById(appId: UUID): Optional<App>
 
   fun getAppsById(prisonerId: String, appId: UUID, staffId: String, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto<Any, Any>

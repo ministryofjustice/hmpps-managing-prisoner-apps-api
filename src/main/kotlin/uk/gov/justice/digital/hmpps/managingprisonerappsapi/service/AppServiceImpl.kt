@@ -39,6 +39,40 @@ class AppServiceImpl(
 
   override fun saveApp(app: App): App = appRepository.save(app)
 
+  override fun updateAppFormData(
+    prisonerId: String,
+    staffId: String,
+    appId: UUID,
+    requestFormData: List<Map<String, Any>>,
+  ): AppResponseDto<Any, Any> {
+    if (requestFormData.size > 1 || requestFormData.isEmpty()) {
+      throw ApiException("Multiple or zero requests in app is not supported", HttpStatus.FORBIDDEN)
+    }
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("Staff with id $staffId not found", HttpStatus.NOT_FOUND)
+    }
+    var app = appRepository.findAppsByIdAndRequestedBy(appId, prisonerId)
+      .orElseThrow<ApiException> { throw ApiException("No app exist with id $appId", HttpStatus.NOT_FOUND) }
+    validateStaffPermission(staff, app)
+
+    if (app.status != AppStatus.PENDING) {
+      throw ApiException("App is closed and cannot be updated", HttpStatus.FORBIDDEN)
+    }
+    requestFormData.forEach { l ->
+      app.requests.forEach { req ->
+        if (req["id"] == l["id"] && req["responseId"] == null) {
+          req.keys.forEach { key ->
+            if (key != "id" && l[key] != null) {
+              req[key] = l[key] as Any
+            }
+          }
+        }
+      }
+    }
+    app = appRepository.save(app)
+    return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup)
+  }
+
   fun updateApp(app: App): App = appRepository.save(app)
 
   fun deleteAppById(id: UUID) {
@@ -207,17 +241,16 @@ class AppServiceImpl(
       mutableListOf(),
       convertRequestsToAppRequests(appRequest.requests),
       prisoner.username,
-      // random firstname just for ui  in dev env if it is not in request payload
-      if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomfirstname",
-      if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomlasttname",
+      prisoner.firstName,
+      prisoner.lastName,
       AppStatus.PENDING,
       staff.establishmentId,
       mutableListOf(),
     )
   }
 
-  private fun convertRequestsToAppRequests(requests: List<Map<String, Any>>): List<Map<String, Any>> {
-    val appRequests = ArrayList<Map<String, Any>>()
+  private fun convertRequestsToAppRequests(requests: List<Map<String, Any>>): List<MutableMap<String, Any>> {
+    val appRequests = ArrayList<MutableMap<String, Any>>()
     requests.forEach { request ->
       val map = HashMap<String, Any>()
       map.put("id", UUID.randomUUID().toString())
