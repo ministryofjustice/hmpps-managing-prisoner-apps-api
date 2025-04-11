@@ -28,6 +28,8 @@ class DataGenerator {
       " Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper" +
       " ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget" +
       " condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem swneque sed ipsum."
+
+    val CONTACT_NUMBER = "1234567890"
     fun generateComment(createdBy: String): Comment = Comment(
       UUID.randomUUID(),
       MESSAGE,
@@ -115,18 +117,18 @@ class DataGenerator {
       requestedByFirstName: String,
       requestedByLastName: String,
     ): AppRequestDto = AppRequestDto(
-        "Testing",
-        appType.toString(),
-        requestedDate,
-        listOf(
-          HashMap<String, Any>()
-            .apply {
-              // put("amount", 10)
-              put("contact-number", "234567")
-              // put("firstName", "John")
-              // put("lastName", "Smith")
-            },
-        ),
+      "Testing",
+      appType.toString(),
+      requestedDate,
+      listOf(
+        HashMap<String, Any>()
+          .apply {
+            // put("amount", 10)
+            put("contact-number", CONTACT_NUMBER)
+            // put("firstName", "John")
+            // put("lastName", "Smith")
+          },
+      ),
     )
   }
 }

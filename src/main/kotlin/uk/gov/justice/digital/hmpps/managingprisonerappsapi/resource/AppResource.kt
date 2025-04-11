@@ -56,14 +56,14 @@ class AppResource(var appService: AppService) {
   )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun updateAppRequestData(
-    @PathVariable("prisonerId") prisonerId: String,
-    @PathVariable("appId") appId: UUID,
-    @RequestBody appRequestDto: AppRequestDto,
+    @PathVariable prisonerId: String,
+    @PathVariable appId: UUID,
+    @RequestBody appFormData: List<Map<String, Any>>,
     authentication: Authentication,
   ): ResponseEntity<AppResponseDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for updating app requests data for $prisonerId by ${authentication.principal}")
-    val appResponseDto = appService.submitApp(prisonerId, authentication.principal, appRequestDto)
+    val appResponseDto = appService.updateAppFormData(prisonerId, authentication.principal, appId, appFormData)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 

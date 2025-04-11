@@ -38,6 +38,7 @@ class AppServiceImpl(
   }
 
   override fun saveApp(app: App): App = appRepository.save(app)
+
   override fun updateAppFormData(
     prisonerId: String,
     staffId: String,
@@ -240,7 +241,6 @@ class AppServiceImpl(
       mutableListOf(),
       convertRequestsToAppRequests(appRequest.requests),
       prisoner.username,
-      // random firstname just for ui  in dev env if it is not in request payload
       prisoner.firstName,
       prisoner.lastName,
       AppStatus.PENDING,

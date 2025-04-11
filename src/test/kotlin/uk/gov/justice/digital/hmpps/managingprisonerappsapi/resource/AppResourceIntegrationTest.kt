@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppReposi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.CONTACT_NUMBER
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -85,7 +86,7 @@ class AppResourceIntegrationTest(
 
   @Test
   fun `submit an app`() {
-    val response = webTestClient.post()
+    var response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
@@ -109,7 +110,34 @@ class AppResourceIntegrationTest(
     Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, response.appType)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.PENDING, response.status)
-    Assertions.assertEquals(1, response.requests?.size)
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertNotNull(response.requests.get(0)["id"])
+    Assertions.assertEquals(response.requests.get(0)["contact-number"], CONTACT_NUMBER)
+
+    val newContactNumber = "0987654321"
+    val map = response.requests.get(0).toMutableMap()
+    map["contact-number"] = newContactNumber
+    response = webTestClient.put()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${response.id}")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(
+        listOf(map),
+      )
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Any, Any>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponseDto<Any, Any>
+
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, response.appType)
+    Assertions.assertEquals(requestedByFirst, response.requestedBy)
+    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertEquals(newContactNumber, response.requests.get(0)["contact-number"])
   }
 
   @Test
