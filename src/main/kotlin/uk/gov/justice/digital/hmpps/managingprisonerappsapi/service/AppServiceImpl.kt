@@ -103,8 +103,8 @@ class AppServiceImpl(
     if (prisoner.establishmentId != staff.establishmentId) {
       throw ApiException("Staff and prisoner is from two different establishment", HttpStatus.FORBIDDEN)
     }
-    if (appRequestDto.requests.size > 1) {
-      throw ApiException("Multiple requests in app is not supported", HttpStatus.FORBIDDEN)
+    if (appRequestDto.requests.size != 1) {
+      throw ApiException("Only one requests in app is supported", HttpStatus.BAD_REQUEST)
     }
     val group =
       groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
@@ -124,9 +124,6 @@ class AppServiceImpl(
   ): AppResponseDto<Any, Any> {
     val app = appRepository.findAppsByIdAndRequestedBy(appId, prisonerId)
       .orElseThrow<ApiException> { throw ApiException("No app exist with id $appId", HttpStatus.NOT_FOUND) }
-    if (prisonerId != app.requestedBy) {
-      throw ApiException("The app with id $appId is not requested by $prisonerId", HttpStatus.FORBIDDEN)
-    }
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
@@ -150,7 +147,7 @@ class AppServiceImpl(
 
   override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID): AppResponseDto<Any, Any> {
     val app = appRepository.findById(appId)
-      .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.NOT_FOUND) }
+      .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.FORBIDDEN) }
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
@@ -244,7 +241,7 @@ class AppServiceImpl(
       prisoner.firstName,
       prisoner.lastName,
       AppStatus.PENDING,
-      staff.establishmentId,
+      prisoner.establishmentId!!,
       mutableListOf(),
     )
   }
@@ -339,7 +336,7 @@ class AppServiceImpl(
 
   private fun validateStaffPermission(staff: Staff, app: App) {
     if (staff.establishmentId != app.establishmentId) {
-      throw ApiException("Staff with id ${staff.username}do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
+      throw ApiException("Staff with id ${staff.username} do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
     }
   }
 }

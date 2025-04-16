@@ -31,12 +31,8 @@ class CommentServiceImpl(
     appId: UUID,
     commentRequestDto: CommentRequestDto,
   ): CommentResponseDto<Any> {
-    val staff = staffService.getStaffById(staffId).orElseThrow {
-      ApiException("Staff with id $staffId does not exist", HttpStatus.NOT_FOUND)
-    }
-    val app = appService.getAppById(appId).orElseThrow {
-      ApiException("App with id $appId does not exist", HttpStatus.FORBIDDEN)
-    }
+    val staff = getStaff(staffId)
+    val app = getAppById(appId)
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
     val comment = commentRepository.save(
@@ -61,10 +57,9 @@ class CommentServiceImpl(
     commentId: UUID,
   ): CommentResponseDto<Any> {
     val staff = getStaff(staffId)
-    val app = appService.getAppById(appId).orElseThrow {
-      ApiException("App with id $appId does not exist", HttpStatus.FORBIDDEN)
-    }
+    val app = getAppById(appId)
     validateStaffPermission(staff, app)
+    validatePrisonerByRequestedBy(prisonerId, app)
     val comment = commentRepository.findById(commentId).orElseThrow {
       throw ApiException("Comment with id $commentId does not exist", HttpStatus.NOT_FOUND)
     }
@@ -97,9 +92,7 @@ class CommentServiceImpl(
     pageSize: Long,
   ): PageResultComments {
     val staff = getStaff(staffId)
-    val app = appService.getAppById(appId).orElseThrow {
-      ApiException("App with id $appId does not exist", HttpStatus.FORBIDDEN)
-    }
+    val app = getAppById(appId)
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
     val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt())
@@ -159,6 +152,10 @@ class CommentServiceImpl(
       )
     }
     return list
+  }
+
+  private fun getAppById(appId: UUID): App = appService.getAppById(appId).orElseThrow {
+    ApiException("App with id $appId does not exist", HttpStatus.FORBIDDEN)
   }
 
   private fun getStaff(staffId: String): Staff = staffService.getStaffById(staffId).orElseThrow {
