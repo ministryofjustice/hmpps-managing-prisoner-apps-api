@@ -39,6 +39,40 @@ class AppServiceImpl(
 
   override fun saveApp(app: App): App = appRepository.save(app)
 
+  override fun updateAppFormData(
+    prisonerId: String,
+    staffId: String,
+    appId: UUID,
+    requestFormData: List<Map<String, Any>>,
+  ): AppResponseDto<Any, Any> {
+    if (requestFormData.size > 1 || requestFormData.isEmpty()) {
+      throw ApiException("Multiple or zero requests in app is not supported", HttpStatus.FORBIDDEN)
+    }
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("Staff with id $staffId not found", HttpStatus.NOT_FOUND)
+    }
+    var app = appRepository.findAppsByIdAndRequestedBy(appId, prisonerId)
+      .orElseThrow<ApiException> { throw ApiException("No app exist with id $appId", HttpStatus.NOT_FOUND) }
+    validateStaffPermission(staff, app)
+
+    if (app.status != AppStatus.PENDING) {
+      throw ApiException("App is closed and cannot be updated", HttpStatus.FORBIDDEN)
+    }
+    requestFormData.forEach { l ->
+      app.requests.forEach { req ->
+        if (req["id"] == l["id"] && req["responseId"] == null) {
+          req.keys.forEach { key ->
+            if (key != "id" && l[key] != null) {
+              req[key] = l[key] as Any
+            }
+          }
+        }
+      }
+    }
+    app = appRepository.save(app)
+    return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup)
+  }
+
   fun updateApp(app: App): App = appRepository.save(app)
 
   fun deleteAppById(id: UUID) {
@@ -69,8 +103,8 @@ class AppServiceImpl(
     if (prisoner.establishmentId != staff.establishmentId) {
       throw ApiException("Staff and prisoner is from two different establishment", HttpStatus.FORBIDDEN)
     }
-    if (appRequestDto.requests.size > 1) {
-      throw ApiException("Multiple requests in app is not supported", HttpStatus.FORBIDDEN)
+    if (appRequestDto.requests.size != 1) {
+      throw ApiException("Only one requests in app is supported", HttpStatus.BAD_REQUEST)
     }
     val group =
       groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
@@ -90,9 +124,6 @@ class AppServiceImpl(
   ): AppResponseDto<Any, Any> {
     val app = appRepository.findAppsByIdAndRequestedBy(appId, prisonerId)
       .orElseThrow<ApiException> { throw ApiException("No app exist with id $appId", HttpStatus.NOT_FOUND) }
-    if (prisonerId != app.requestedBy) {
-      throw ApiException("The app with id $appId is not requested by $prisonerId", HttpStatus.FORBIDDEN)
-    }
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
@@ -116,7 +147,7 @@ class AppServiceImpl(
 
   override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID): AppResponseDto<Any, Any> {
     val app = appRepository.findById(appId)
-      .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.NOT_FOUND) }
+      .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.FORBIDDEN) }
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
@@ -207,17 +238,16 @@ class AppServiceImpl(
       mutableListOf(),
       convertRequestsToAppRequests(appRequest.requests),
       prisoner.username,
-      // random firstname just for ui  in dev env if it is not in request payload
-      if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomfirstname",
-      if (appRequest.requestedByFirstName != null) appRequest.requestedByFirstName else "randomlasttname",
+      prisoner.firstName,
+      prisoner.lastName,
       AppStatus.PENDING,
-      staff.establishmentId,
+      prisoner.establishmentId!!,
       mutableListOf(),
     )
   }
 
-  private fun convertRequestsToAppRequests(requests: List<Map<String, Any>>): List<Map<String, Any>> {
-    val appRequests = ArrayList<Map<String, Any>>()
+  private fun convertRequestsToAppRequests(requests: List<Map<String, Any>>): List<MutableMap<String, Any>> {
+    val appRequests = ArrayList<MutableMap<String, Any>>()
     requests.forEach { request ->
       val map = HashMap<String, Any>()
       map.put("id", UUID.randomUUID().toString())
@@ -306,7 +336,7 @@ class AppServiceImpl(
 
   private fun validateStaffPermission(staff: Staff, app: App) {
     if (staff.establishmentId != app.establishmentId) {
-      throw ApiException("Staff with id ${staff.username}do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
+      throw ApiException("Staff with id ${staff.username} do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
     }
   }
 }

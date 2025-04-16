@@ -46,7 +46,7 @@ class ResponseServiceImpl(
     if (response.appliesTo.size > 1) {
       throw ApiException("Multiple responses is not supported as multiple request is not supported", HttpStatus.FORBIDDEN)
     }
-    val reqs = ArrayList<Map<String, Any>>()
+    val reqs = ArrayList<MutableMap<String, Any>>()
     var responseEntity: Response? = null
     app.requests.forEach { request ->
       val req = request.toMutableMap()
