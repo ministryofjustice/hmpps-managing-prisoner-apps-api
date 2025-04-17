@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.PageResultComments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
 import java.util.*
 
 interface CommentService {

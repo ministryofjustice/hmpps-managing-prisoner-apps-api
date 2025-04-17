@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.PageResultComments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.CommentService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import java.util.*
