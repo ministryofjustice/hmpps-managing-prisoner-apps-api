@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDateTime

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import java.time.LocalDateTime

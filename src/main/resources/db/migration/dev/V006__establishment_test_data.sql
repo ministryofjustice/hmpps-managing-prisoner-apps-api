@@ -1,0 +1,1 @@
+INSERT INTO public.establishment (id, name) VALUES ('TEST_ESTABLISHMENT_FIRST', 'ESTABLISHMENT_NAME_1');
