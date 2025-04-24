@@ -18,6 +18,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-validation")
   // implementation("org.flywaydb:flyway-core:10.16.0")
   implementation("org.postgresql:postgresql:42.7.3")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
 
   // runtimeOnly("org.flywaydb:flyway-database-postgresql:10.16.0")
 

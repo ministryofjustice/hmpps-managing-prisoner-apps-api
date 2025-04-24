@@ -1,5 +1,9 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -18,6 +22,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentResponseD
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.CommentService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
+import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.*
 
 @RestController
@@ -34,6 +39,44 @@ class CommentResource(val commentService: CommentService) {
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @Operation(
+    summary = "Change an incomplete application",
+    requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
+      content = [
+        Content(
+          mediaType = "application/json",
+          schema = Schema(implementation = CommentRequestDto::class),
+        ),
+      ],
+    ),
+    responses = [
+      ApiResponse(
+        responseCode = "200",
+        description = "Visit slot changed",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = CommentResponseDto::class))],
+        ),
+      ApiResponse(
+        responseCode = "400",
+        description = "Incorrect request to changed a visit slot",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Incorrect permissions to changed a visit slot",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "Visit slot not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
   fun addComment(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
