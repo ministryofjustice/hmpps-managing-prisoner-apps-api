@@ -25,6 +25,9 @@ class CommentServiceImpl(
   private val commentRepository: CommentRepository,
   private val establishmentService: EstablishmentService,
 ) : CommentService {
+
+  override fun saveComment(comment: Comment): Comment = commentRepository.save(comment)
+
   override fun addComment(
     prisonerId: String,
     staffId: String,

@@ -76,7 +76,7 @@ class InitializeDB {
         assignedGroupSecond,
         establishmentIdFirst,
         assignedGroupSecondName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT, AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT, AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
         GroupType.WING,
       ),
     )
@@ -213,7 +213,7 @@ class InitializeDB {
     "testStaaf@moj",
     LocalDateTime.now(ZoneOffset.UTC),
     "testStaaf@moj",
-    arrayListOf(UUID.randomUUID()),
+    arrayListOf(),
     mutableListOf(HashMap<String, Any>().apply { put("contact", 123456) }),
     requestedBy,
     requestedByFirstName,

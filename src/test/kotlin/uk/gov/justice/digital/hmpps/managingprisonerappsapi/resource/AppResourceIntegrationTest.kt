@@ -9,6 +9,7 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSearchQueryDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
@@ -20,6 +21,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
@@ -33,6 +35,7 @@ class AppResourceIntegrationTest(
   @Autowired private val appRepository: AppRepository,
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
+  @Autowired private val commentRepository: CommentRepository,
 ) : IntegrationTestBase() {
 
   private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
@@ -191,11 +194,13 @@ class AppResourceIntegrationTest(
   @Test
   fun `forward app request to other group`() {
     // groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentIdFirst)
-    val response = webTestClient.get()
+    val forwardingMessage = "Forwarding  to group $assignedGroupSecond"
+    val response = webTestClient.post()
       .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupSecond")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(CommentRequestDto(forwardingMessage))
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -204,6 +209,10 @@ class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<AssignedGroupDto, String>
 
+    val comment = commentRepository.findAll().get(0)
+    Assertions.assertEquals(forwardingMessage, comment.message)
+    Assertions.assertEquals(appIdFirst, comment.appId)
+    Assertions.assertEquals(loggedUserId, comment.createdBy)
     Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, response.appType)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)

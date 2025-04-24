@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppListViewDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseListDto
@@ -16,10 +17,12 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAppTypeCo
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedGroupCounts
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource.AppResource
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -27,10 +30,12 @@ import java.util.*
 
 @Service
 class AppServiceImpl(
-  var appRepository: AppRepository,
-  var prisonerService: PrisonerService,
-  var staffService: StaffService,
-  var groupsService: GroupService,
+  private val appRepository: AppRepository,
+  private val prisonerService: PrisonerService,
+  private val staffService: StaffService,
+  private val groupsService: GroupService,
+  private val commentRepository: CommentRepository,
+
 ) : AppService {
 
   companion object {
@@ -145,15 +150,25 @@ class AppServiceImpl(
     return convertAppToAppResponseDto(app, prisoner, groupsDto)
   }
 
-  override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID): AppResponseDto<Any, Any> {
+  override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID, commentRequestDto: CommentRequestDto): AppResponseDto<Any, Any> {
     val app = appRepository.findById(appId)
       .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.FORBIDDEN) }
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
     validateStaffPermission(staff, app)
+    val comment = commentRepository.save(
+      Comment(
+        UUID.randomUUID(),
+        commentRequestDto.message,
+        LocalDateTime.now(ZoneOffset.UTC),
+        staffId,
+        appId,
+      ),
+    )
     val group = groupsService.getGroupById(groupId)
     app.assignedGroup = groupId
+    app.comments.add(comment.id)
     appRepository.save(app)
     return convertAppToAppResponseDto(app, app.requestedBy, group)
   }
