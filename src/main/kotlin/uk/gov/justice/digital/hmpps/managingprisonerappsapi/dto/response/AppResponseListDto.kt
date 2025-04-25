@@ -28,6 +28,8 @@ data class AppListViewDto(
   val status: String,
   val appType: String,
   val requestedBy: String,
+  val requestedByFirstName: String,
+  val requestedByLastName: String,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val requestedDate: LocalDateTime,
   val assignedGroup: Any,

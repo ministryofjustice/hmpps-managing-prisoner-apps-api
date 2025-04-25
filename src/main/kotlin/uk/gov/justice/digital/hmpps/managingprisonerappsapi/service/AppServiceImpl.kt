@@ -309,6 +309,8 @@ class AppServiceImpl(
         app.status.toString(),
         app.appType.toString(),
         app.requestedBy,
+        app.requestedByFirstName,
+        app.requestedByLastName,
         app.requestedDate,
         groupAppListviewDto,
       )
