@@ -150,25 +150,34 @@ class AppServiceImpl(
     return convertAppToAppResponseDto(app, prisoner, groupsDto)
   }
 
-  override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID, commentRequestDto: CommentRequestDto): AppResponseDto<Any, Any> {
-    val app = appRepository.findById(appId)
-      .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.FORBIDDEN) }
+  override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID, commentRequestDto: CommentRequestDto?): AppResponseDto<Any, Any> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
+    val app = appRepository.findById(appId)
+      .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.FORBIDDEN) }
     validateStaffPermission(staff, app)
-    val comment = commentRepository.save(
-      Comment(
-        UUID.randomUUID(),
-        commentRequestDto.message,
-        LocalDateTime.now(ZoneOffset.UTC),
-        staffId,
-        appId,
-      ),
-    )
+    if (groupId == app.assignedGroup) {
+      throw ApiException("App already assigned to group $groupId", HttpStatus.BAD_REQUEST)
+    }
+    var comment: Comment? = null
+    if (commentRequestDto != null) {
+      comment = commentRepository.save(
+        Comment(
+          UUID.randomUUID(),
+          commentRequestDto.message,
+          LocalDateTime.now(ZoneOffset.UTC),
+          staffId,
+          appId,
+        ),
+      )
+    }
+
     val group = groupsService.getGroupById(groupId)
     app.assignedGroup = groupId
-    app.comments.add(comment.id)
+    if (comment != null) {
+      app.comments.add(comment.id)
+    }
     appRepository.save(app)
     return convertAppToAppResponseDto(app, app.requestedBy, group)
   }

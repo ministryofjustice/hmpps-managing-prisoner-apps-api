@@ -195,7 +195,16 @@ class AppResourceIntegrationTest(
   fun `forward app request to other group`() {
     // groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentIdFirst)
     val forwardingMessage = "Forwarding  to group $assignedGroupSecond"
-    val response = webTestClient.post()
+
+    webTestClient.post()
+      .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupFirst")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isBadRequest
+
+    var response = webTestClient.post()
       .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupSecond")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
@@ -219,6 +228,28 @@ class AppResourceIntegrationTest(
     Assertions.assertEquals(AppStatus.PENDING, response.status)
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(assignedGroupSecond, response.assignedGroup.id)
+
+    // forwarding without forwarding message
+
+    response = webTestClient.post()
+      .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupFirst")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<AssignedGroupDto, String>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponseDto<AssignedGroupDto, String>
+
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, response.appType)
+    Assertions.assertEquals(appIdFirst, response.id)
+    Assertions.assertEquals(requestedByFirst, response.requestedBy)
+    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(1, response.requests?.size)
+    Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
   }
 
   @Test

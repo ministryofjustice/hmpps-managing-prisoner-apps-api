@@ -93,7 +93,7 @@ class AppResource(var appService: AppService) {
     @PathVariable groupId: UUID,
     @PathVariable appId: UUID,
     authentication: Authentication,
-    @RequestBody commentRequestDto: CommentRequestDto,
+    @RequestBody commentRequestDto: CommentRequestDto?,
   ): ResponseEntity<AppResponseDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for to forward app to $groupId by ${authentication.principal}")
