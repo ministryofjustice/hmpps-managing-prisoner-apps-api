@@ -1,22 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.config
 
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.util.*
-
-@Configuration
+//@Configuration
 class InitializeDB {
   // This only for populating database in dev till flyway is not used. It will be deleted after integrating flyway.
   // Data will be populated in dev through flyway sql script.
