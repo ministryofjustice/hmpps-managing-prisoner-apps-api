@@ -26,7 +26,7 @@ class InitializeDB {
     dataSourceInitializer.setDataSource(datasource)
     dataSourceInitializer.setDatabasePopulator(DatabasePopulator {  })
   }*/
-  private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
+  /*private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
   private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
   private val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
   private val assignedGroupFirst = UUID.fromString("343a7876-07b9-4ef8-947c-7cf554fae864")
@@ -235,5 +235,5 @@ class InitializeDB {
     establishmentId,
     initialApps,
     groupType,
-  )
+  )*/
 }

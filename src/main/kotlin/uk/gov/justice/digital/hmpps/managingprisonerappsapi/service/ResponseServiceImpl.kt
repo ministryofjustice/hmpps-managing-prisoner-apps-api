@@ -63,7 +63,7 @@ class ResponseServiceImpl(
             staffId,
           ),
         )
-        activityService.addActivity(responseEntity!!.id, EntityType.APP, app.id, Activity.APP_SUBMITTED, app.establishmentId, app.createdBy)
+        activityService.addActivity(responseEntity!!.id, EntityType.RESPONSE, app.id, Activity.RESPONSE_ADDED, app.establishmentId, staffId)
         req["responseId"] = responseEntity!!.id.toString()
         app.responses.add(responseEntity!!.id)
       }
