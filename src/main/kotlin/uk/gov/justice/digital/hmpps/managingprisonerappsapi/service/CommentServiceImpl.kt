@@ -8,8 +8,10 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.StaffDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
@@ -24,6 +26,7 @@ class CommentServiceImpl(
   private val appService: AppService,
   private val commentRepository: CommentRepository,
   private val establishmentService: EstablishmentService,
+  private val activityService: ActivityService,
 ) : CommentService {
 
   override fun saveComment(comment: Comment): Comment = commentRepository.save(comment)
@@ -49,6 +52,7 @@ class CommentServiceImpl(
     )
     app.comments.add(comment.id)
     appService.saveApp(app)
+    activityService.addActivity(comment.id, EntityType.COMMENT, app.id, Activity.COMMENT_ADDED, app.establishmentId, staffId)
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }
 

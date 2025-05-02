@@ -4,4 +4,5 @@ enum class EntityType {
   APP,
   COMMENT,
   RESPONSE,
+  ASSIGNED_GROUP,
 }

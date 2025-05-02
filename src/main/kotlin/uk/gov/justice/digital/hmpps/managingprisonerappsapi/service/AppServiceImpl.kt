@@ -12,12 +12,14 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.GroupAppListViewDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAppTypeCounts
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedGroupCounts
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
@@ -35,6 +37,7 @@ class AppServiceImpl(
   private val staffService: StaffService,
   private val groupsService: GroupService,
   private val commentRepository: CommentRepository,
+  private val activityService: ActivityService,
 
 ) : AppService {
 
@@ -75,6 +78,7 @@ class AppServiceImpl(
       }
     }
     app = appRepository.save(app)
+    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_REQUEST_FORM_DATA_UPDATED, app.establishmentId, staffId)
     return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup)
   }
 
@@ -117,6 +121,7 @@ class AppServiceImpl(
     val assignedGroup = groupsService.getGroupById(group.id)
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
+    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_SUBMITTED, app.establishmentId, staffId)
     return convertAppToAppResponseDto(app, prisonerId, assignedGroup)
   }
 
@@ -172,13 +177,13 @@ class AppServiceImpl(
         ),
       )
     }
-
     val group = groupsService.getGroupById(groupId)
     app.assignedGroup = groupId
     if (comment != null) {
       app.comments.add(comment.id)
     }
     appRepository.save(app)
+    activityService.addActivity(groupId, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_FORWARDED_TO_A_GROUP, app.establishmentId, staffId)
     return convertAppToAppResponseDto(app, app.requestedBy, group)
   }
 

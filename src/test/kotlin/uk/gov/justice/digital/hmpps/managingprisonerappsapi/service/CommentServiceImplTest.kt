@@ -46,6 +46,7 @@ class CommentServiceImplTest {
   private lateinit var commentRepository: CommentRepository
   private lateinit var establishmentService: EstablishmentService
   private lateinit var commentServiceImpl: CommentServiceImpl
+  private lateinit var activityService: ActivityService
   private lateinit var app: App
   private lateinit var comment: Comment
 
@@ -77,7 +78,8 @@ class CommentServiceImplTest {
     commentRepository = Mockito.mock(CommentRepository::class.java)
     establishmentService = Mockito.mock(EstablishmentService::class.java)
     staffService = Mockito.mock(StaffService::class.java)
-    commentServiceImpl = CommentServiceImpl(staffService, appService, commentRepository, establishmentService)
+    activityService = Mockito.mock(ActivityService::class.java)
+    commentServiceImpl = CommentServiceImpl(staffService, appService, commentRepository, establishmentService, activityService)
   }
 
   @AfterEach
