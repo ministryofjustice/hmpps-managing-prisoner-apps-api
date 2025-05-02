@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.config
 
-//@Configuration
+// @Configuration
 class InitializeDB {
   // This only for populating database in dev till flyway is not used. It will be deleted after integrating flyway.
   // Data will be populated in dev through flyway sql script.
