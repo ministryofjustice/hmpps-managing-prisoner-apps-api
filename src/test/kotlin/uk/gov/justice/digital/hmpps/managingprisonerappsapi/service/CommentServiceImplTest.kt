@@ -11,10 +11,10 @@ import org.mockito.kotlin.any
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.EstablishmentDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.StaffDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.StaffDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
@@ -46,6 +46,7 @@ class CommentServiceImplTest {
   private lateinit var commentRepository: CommentRepository
   private lateinit var establishmentService: EstablishmentService
   private lateinit var commentServiceImpl: CommentServiceImpl
+  private lateinit var activityService: ActivityService
   private lateinit var app: App
   private lateinit var comment: Comment
 
@@ -77,7 +78,8 @@ class CommentServiceImplTest {
     commentRepository = Mockito.mock(CommentRepository::class.java)
     establishmentService = Mockito.mock(EstablishmentService::class.java)
     staffService = Mockito.mock(StaffService::class.java)
-    commentServiceImpl = CommentServiceImpl(staffService, appService, commentRepository, establishmentService)
+    activityService = Mockito.mock(ActivityService::class.java)
+    commentServiceImpl = CommentServiceImpl(staffService, appService, commentRepository, establishmentService, activityService)
   }
 
   @AfterEach

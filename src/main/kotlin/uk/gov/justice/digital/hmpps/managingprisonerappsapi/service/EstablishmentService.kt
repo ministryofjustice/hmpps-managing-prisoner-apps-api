@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.EstablishmentDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository

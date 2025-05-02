@@ -8,20 +8,23 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.springframework.http.HttpStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AssignedGroupDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.EstablishmentDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.CONTACT_NUMBER
 import java.time.LocalDateTime
@@ -37,6 +40,7 @@ class AppServiceImplTest {
   private val createdBy = "Staff12345"
   private val staffFullName = "Test Staff"
   private val groupId = UUID.randomUUID()
+  private val forwardingComment = "Forwarding Comment"
 
   private lateinit var prisoner: Prisoner
   private lateinit var staff: Staff
@@ -44,9 +48,12 @@ class AppServiceImplTest {
   private lateinit var prisonerService: PrisonerService
   private lateinit var staffService: StaffService
   private lateinit var groupService: GroupService
+  private lateinit var commentRepository: CommentRepository
+  private lateinit var activityService: ActivityService
 
   private lateinit var appService: AppService
   private lateinit var app: App
+  private lateinit var comment: Comment
 
   @BeforeEach
   fun beforeEach() {
@@ -54,6 +61,8 @@ class AppServiceImplTest {
     prisonerService = Mockito.mock(PrisonerService::class.java)
     staffService = Mockito.mock(StaffService::class.java)
     groupService = Mockito.mock(GroupService::class.java)
+    commentRepository = Mockito.mock(CommentRepository::class.java)
+    activityService = Mockito.mock(ActivityService::class.java)
 
     app = DataGenerator.generateApp(
       establishmentId,
@@ -64,6 +73,14 @@ class AppServiceImplTest {
       requestedByLastName,
       AppStatus.PENDING,
       groupId,
+    )
+
+    comment = Comment(
+      UUID.randomUUID(),
+      forwardingComment,
+      LocalDateTime.now(ZoneOffset.UTC),
+      app.createdBy,
+      app.id,
     )
 
     staff = Staff(
@@ -86,7 +103,7 @@ class AppServiceImplTest {
       establishmentId,
     )
 
-    appService = AppServiceImpl(appRepository, prisonerService, staffService, groupService)
+    appService = AppServiceImpl(appRepository, prisonerService, staffService, groupService, commentRepository, activityService)
   }
 
   @Test
@@ -349,7 +366,7 @@ class AppServiceImplTest {
   fun `forward app to group when staff not found`() {
     Mockito.`when`(staffService.getStaffById(any())).thenReturn(Optional.empty())
     val exception = assertThrows(ApiException::class.java) {
-      appService.forwardAppToGroup(createdBy, UUID.randomUUID(), UUID.randomUUID())
+      appService.forwardAppToGroup(createdBy, UUID.randomUUID(), UUID.randomUUID(), CommentRequestDto(forwardingComment))
     }
     assertEquals(HttpStatus.FORBIDDEN, exception.status)
   }
@@ -360,7 +377,8 @@ class AppServiceImplTest {
     Mockito.`when`(staffService.getStaffById(createdBy)).thenReturn(Optional.of(staff))
     Mockito.`when`(appRepository.findById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(AssignedGroupDto(forwardGroupId, "Forward group", EstablishmentDto(establishmentId, "Test Establishment"), AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS, GroupType.WING))
-    val appResponse = appService.forwardAppToGroup(createdBy, forwardGroupId, app.id)
+    Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
+    val appResponse = appService.forwardAppToGroup(createdBy, forwardGroupId, app.id, CommentRequestDto(forwardingComment))
     assertEquals(forwardGroupId, app.assignedGroup)
     assertApp(app, appResponse)
   }

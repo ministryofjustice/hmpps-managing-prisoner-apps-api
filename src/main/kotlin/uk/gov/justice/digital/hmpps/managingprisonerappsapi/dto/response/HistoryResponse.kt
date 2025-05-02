@@ -1,15 +1,15 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
-data class CommentResponseDto<T>(
+data class HistoryResponse(
   val id: UUID,
   val appId: UUID,
-  val message: String,
-  val prisonerNumber: String,
+  val createdBy: String,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val createdDate: LocalDateTime,
-  val createdBy: T,
+  val establishment: String,
+  val message: String,
 )

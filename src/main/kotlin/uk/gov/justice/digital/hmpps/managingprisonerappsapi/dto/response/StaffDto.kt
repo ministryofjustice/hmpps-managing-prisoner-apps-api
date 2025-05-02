@@ -1,7 +1,6 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
-import java.util.*
 
 data class StaffDto(
   val username: String,

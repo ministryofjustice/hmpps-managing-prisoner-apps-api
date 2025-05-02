@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType

@@ -3,13 +3,15 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.CommentResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.PageResultComments
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.StaffDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.StaffDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
@@ -24,7 +26,11 @@ class CommentServiceImpl(
   private val appService: AppService,
   private val commentRepository: CommentRepository,
   private val establishmentService: EstablishmentService,
+  private val activityService: ActivityService,
 ) : CommentService {
+
+  override fun saveComment(comment: Comment): Comment = commentRepository.save(comment)
+
   override fun addComment(
     prisonerId: String,
     staffId: String,
@@ -46,6 +52,7 @@ class CommentServiceImpl(
     )
     app.comments.add(comment.id)
     appService.saveApp(app)
+    activityService.addActivity(comment.id, EntityType.COMMENT, app.id, Activity.COMMENT_ADDED, app.establishmentId, staffId)
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }
 

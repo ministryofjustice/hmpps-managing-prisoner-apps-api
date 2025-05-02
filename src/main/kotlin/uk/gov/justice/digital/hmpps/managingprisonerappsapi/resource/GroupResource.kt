@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AssignedGroupDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.GroupsRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.GroupsRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.GroupService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import java.util.UUID

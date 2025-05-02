@@ -1,8 +1,9 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppResponseListDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseListDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
@@ -20,7 +21,7 @@ interface AppService {
 
   fun getAppsById(prisonerId: String, appId: UUID, staffId: String, requestedBy: Boolean, assignedGroup: Boolean): AppResponseDto<Any, Any>
 
-  fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID): AppResponseDto<Any, Any>
+  fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID, commentRequestDto: CommentRequestDto?): AppResponseDto<Any, Any>
 
   fun searchAppsByColumnsFilter(
     staffId: String,

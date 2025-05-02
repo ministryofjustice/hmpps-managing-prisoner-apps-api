@@ -1,22 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.config
 
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.util.*
-
-@Configuration
+// @Configuration
 class InitializeDB {
   // This only for populating database in dev till flyway is not used. It will be deleted after integrating flyway.
   // Data will be populated in dev through flyway sql script.
@@ -26,7 +10,7 @@ class InitializeDB {
     dataSourceInitializer.setDataSource(datasource)
     dataSourceInitializer.setDatabasePopulator(DatabasePopulator {  })
   }*/
-  private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
+  /*private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
   private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
   private val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
   private val assignedGroupFirst = UUID.fromString("343a7876-07b9-4ef8-947c-7cf554fae864")
@@ -76,7 +60,7 @@ class InitializeDB {
         assignedGroupSecond,
         establishmentIdFirst,
         assignedGroupSecondName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT, AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT, AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
         GroupType.WING,
       ),
     )
@@ -213,7 +197,7 @@ class InitializeDB {
     "testStaaf@moj",
     LocalDateTime.now(ZoneOffset.UTC),
     "testStaaf@moj",
-    arrayListOf(UUID.randomUUID()),
+    arrayListOf(),
     mutableListOf(HashMap<String, Any>().apply { put("contact", 123456) }),
     requestedBy,
     requestedByFirstName,
@@ -235,5 +219,5 @@ class InitializeDB {
     establishmentId,
     initialApps,
     groupType,
-  )
+  )*/
 }

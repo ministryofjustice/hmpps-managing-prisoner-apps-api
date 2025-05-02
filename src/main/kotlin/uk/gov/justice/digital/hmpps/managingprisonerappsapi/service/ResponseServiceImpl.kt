@@ -3,13 +3,15 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.AppDecisionResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.StaffDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppDecisionRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppDecisionResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.StaffDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
@@ -25,6 +27,7 @@ class ResponseServiceImpl(
   private val staffService: StaffService,
   private val responseRepository: ResponseRepository,
   private val establishmentService: EstablishmentService,
+  private val activityService: ActivityService,
 ) : ResponseService {
 
   companion object {
@@ -60,6 +63,7 @@ class ResponseServiceImpl(
             staffId,
           ),
         )
+        activityService.addActivity(responseEntity!!.id, EntityType.RESPONSE, app.id, Activity.RESPONSE_ADDED, app.establishmentId, staffId)
         req["responseId"] = responseEntity!!.id.toString()
         app.responses.add(responseEntity!!.id)
       }
@@ -75,6 +79,7 @@ class ResponseServiceImpl(
       }
     }
     appService.saveApp(app)
+
     return convertResponseToAppDecisionResponse(prisonerId, staff.username, response.appliesTo, app.id, responseEntity!!)
   }
 

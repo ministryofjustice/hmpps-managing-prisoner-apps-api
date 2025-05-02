@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
 data class PageResultComments(
   val page: Int,
