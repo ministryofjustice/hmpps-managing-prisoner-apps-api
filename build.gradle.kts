@@ -16,10 +16,10 @@ dependencies {
   // implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("org.flywaydb:flyway-core:10.16.0")
+  implementation("org.flywaydb:flyway-core:11.8.0")
   implementation("org.postgresql:postgresql:42.7.3")
 
-  implementation("org.flywaydb:flyway-database-postgresql:10.16.0")
+  implementation("org.flywaydb:flyway-database-postgresql:11.8.0")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux")
