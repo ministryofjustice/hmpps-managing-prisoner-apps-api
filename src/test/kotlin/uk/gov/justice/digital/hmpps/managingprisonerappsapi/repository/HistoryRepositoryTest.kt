@@ -43,7 +43,7 @@ class HistoryRepositoryTest(@Autowired private val historyRepository: HistoryRep
 
     Assertions.assertNotNull(entity)
 
-    val records = historyRepository.findByAppIdAndEstablishment(appId, "ETS")
+    val records = historyRepository.findByAppIdAndEstablishmentOrderByCreatedDate(appId, "ETS")
     Assertions.assertEquals(1, records.size)
   }
 }

@@ -27,7 +27,7 @@ class HistoryServiceImpl(
     /*val staff = staffService.getStaffById(user).orElseThrow {
       ApiException("Staff with id $user does not exist", HttpStatus.FORBIDDEN)
     }*/
-    val history = historyRepository.findByAppIdAndEstablishment(appId, establishment)
+    val history = historyRepository.findByAppIdAndEstablishmentOrderByCreatedDate(appId, establishment)
     return convertHistoryEntityToHistory(history)
   }
 
@@ -46,7 +46,7 @@ class HistoryServiceImpl(
       ),
     )
     println("history = $history")
-    println("history list = ${historyRepository.findByAppIdAndEstablishment(appId, establishment)}")
+    println("history list = ${historyRepository.findByAppIdAndEstablishmentOrderByCreatedDate(appId, establishment)}")
   }
 
   private fun convertHistoryEntityToHistory(history: List<History>): List<HistoryResponse> {
