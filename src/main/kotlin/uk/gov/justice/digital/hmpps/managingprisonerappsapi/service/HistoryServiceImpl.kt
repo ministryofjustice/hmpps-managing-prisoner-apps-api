@@ -63,6 +63,8 @@ class HistoryServiceImpl(
       val historyResponse = HistoryResponse(
         h.id,
         h.appId,
+        h.entityId,
+        h.entityType,
         if (h.activity == Activity.APP_FORWARDED_TO_A_GROUP) {
           convertActivityToReadableMessage(h.activity, "${createdBy.fullName} to group $groupName")
         } else {
