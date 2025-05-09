@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseListDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.GroupAppListViewDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
@@ -38,6 +39,7 @@ class AppServiceImpl(
   private val groupsService: GroupService,
   private val commentRepository: CommentRepository,
   private val activityService: ActivityService,
+  private val historyService: HistoryService,
 
 ) : AppService {
 
@@ -153,6 +155,14 @@ class AppServiceImpl(
       prisoner = prisonerId
     }
     return convertAppToAppResponseDto(app, prisoner, groupsDto)
+  }
+
+  override fun getHistoryAppsId(prisonerId: String, appId: UUID, staffId: String): List<HistoryResponse> {
+    // TODO("Not yet implemented")
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
+    }
+    return historyService.getHistoryByAppId(appId, staff.establishmentId)
   }
 
   override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID, commentRequestDto: CommentRequestDto?): AppResponseDto<Any, Any> {

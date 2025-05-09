@@ -63,7 +63,8 @@ class ResponseServiceImpl(
             staffId,
           ),
         )
-        activityService.addActivity(responseEntity!!.id, EntityType.RESPONSE, app.id, Activity.RESPONSE_ADDED, app.establishmentId, staffId)
+        val activity = if (responseEntity!!.decision == Decision.APPROVED) Activity.APP_APPROVED else Activity.APP_DECLINED
+        activityService.addActivity(responseEntity!!.id, EntityType.RESPONSE, app.id, activity, app.establishmentId, staffId)
         req["responseId"] = responseEntity!!.id.toString()
         app.responses.add(responseEntity!!.id)
       }

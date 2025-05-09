@@ -8,5 +8,5 @@ import java.util.UUID
 @Repository
 interface HistoryRepository : JpaRepository<History, UUID> {
 
-  fun findHistoryByAppIdAndEstablishment(appId: UUID, establishment: String): List<History>
+  fun findByAppIdAndEstablishment(appId: UUID, establishment: String): List<History>
 }

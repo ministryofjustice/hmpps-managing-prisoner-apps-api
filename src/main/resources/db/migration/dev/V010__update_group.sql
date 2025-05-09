@@ -1,0 +1,1 @@
+INSERT INTO public.groups_initials_apps (groups_id, initials_apps) VALUES ('1ebf7110-82cf-4dc1-b872-92c7d71847fc', 'PIN_PHONE_SUPPLY_LIST_OF_CONTACTS');
