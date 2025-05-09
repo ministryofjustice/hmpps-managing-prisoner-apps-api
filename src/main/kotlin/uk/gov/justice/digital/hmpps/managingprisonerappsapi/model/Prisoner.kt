@@ -9,4 +9,5 @@ data class Prisoner(
   val location: String?,
   val iep: String?,
   val establishmentId: String?,
+  val alerts: Int,
 )

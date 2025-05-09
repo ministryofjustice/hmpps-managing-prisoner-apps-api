@@ -33,4 +33,13 @@ data class PrisonerDto(
 
   @Schema(description = "Convicted Status", example = "Convicted", allowableValues = ["Convicted", "Remand"])
   val convictedStatus: String? = null,
+
+  val alerts: List<Alert>,
+)
+
+data class Alert(
+  val alertType: String,
+  val alertCode: String,
+  val active: Boolean,
+  val expired: Boolean,
 )

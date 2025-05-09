@@ -7,7 +7,7 @@ import java.util.UUID
 
 interface HistoryService {
 
-  fun getHistoryByAppId(appId: UUID, user: String): List<HistoryResponse>
+  fun getHistoryByAppId(appId: UUID, establishment: String): List<HistoryResponse>
 
   fun updateActivityInHistory(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String)
 }
