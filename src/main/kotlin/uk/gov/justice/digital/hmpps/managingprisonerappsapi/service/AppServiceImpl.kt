@@ -80,7 +80,7 @@ class AppServiceImpl(
       }
     }
     app = appRepository.save(app)
-    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_REQUEST_FORM_DATA_UPDATED, app.establishmentId, staffId)
+    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_REQUEST_FORM_DATA_UPDATED, app.establishmentId, staffId, LocalDateTime.now(ZoneOffset.UTC))
     return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup)
   }
 
@@ -123,8 +123,9 @@ class AppServiceImpl(
     val assignedGroup = groupsService.getGroupById(group.id)
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
-    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_SUBMITTED, app.establishmentId, staffId)
-    activityService.addActivity(app.assignedGroup, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_FORWARDED_TO_A_GROUP, app.establishmentId, staffId)
+    val createdDate = LocalDateTime.now(ZoneOffset.UTC)
+    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_SUBMITTED, app.establishmentId, staffId, createdDate)
+    activityService.addActivity(app.assignedGroup, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_FORWARDED_TO_A_GROUP, app.establishmentId, staffId, createdDate)
     return convertAppToAppResponseDto(app, prisonerId, assignedGroup)
   }
 
@@ -190,11 +191,13 @@ class AppServiceImpl(
     }
     val group = groupsService.getGroupById(groupId)
     app.assignedGroup = groupId
+    val createdDate = LocalDateTime.now(ZoneOffset.UTC)
     if (comment != null) {
       app.comments.add(comment.id)
+      activityService.addActivity(comment.id, EntityType.COMMENT, app.id, Activity.FORWARDING_COMMENT_ADDED, app.establishmentId, staffId, createdDate)
     }
     appRepository.save(app)
-    activityService.addActivity(groupId, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_FORWARDED_TO_A_GROUP, app.establishmentId, staffId)
+    activityService.addActivity(groupId, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_FORWARDED_TO_A_GROUP, app.establishmentId, staffId, createdDate)
     return convertAppToAppResponseDto(app, app.requestedBy, group)
   }
 
