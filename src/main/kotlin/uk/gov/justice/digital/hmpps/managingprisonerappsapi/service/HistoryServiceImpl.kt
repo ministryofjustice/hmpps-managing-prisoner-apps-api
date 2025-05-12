@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.*
 
 @Service
