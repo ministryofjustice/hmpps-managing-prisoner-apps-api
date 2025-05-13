@@ -208,7 +208,7 @@ class AppResourceIntegrationTest(
   @Test
   fun `forward app request to other group`() {
     // groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentIdFirst)
-    val forwardingMessage = "Forwarding  to group $assignedGroupSecond"
+    val forwardingMessage = "Forwarding  to group $assignedGroupSecondName"
 
     webTestClient.post()
       .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupFirst")
@@ -277,6 +277,19 @@ class AppResourceIntegrationTest(
     Assertions.assertEquals(AppStatus.PENDING, response.status)
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
+
+    webTestClient.get()
+      .uri("/v1/prisoners/$requestedByFirst/apps/$appIdFirst/history")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<List<HistoryResponse>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as List<HistoryResponse>
   }
 
   @Test
