@@ -6,10 +6,6 @@ example-api:
     id: "example-api-client"
     secret: "example-api-client-secret"
 
-spring:
-  flyway:
-     locations: classpath:db/migration/dev
-
 hmpps:
   auth:
     base-url: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
