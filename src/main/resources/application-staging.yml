@@ -1,0 +1,24 @@
+# example client configuration for calling out to other services
+# TODO: Remove / replace this configuration
+example-api:
+  url: "http://managing-prisoner-apps-api-staging.hmpps.service.justice.gov.uk:8080"
+  client:
+    id: "example-api-client"
+    secret: "example-api-client-secret"
+
+spring:
+  flyway:
+     locations: classpath:db/migration/dev
+
+hmpps:
+  auth:
+    base-url: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+    timeout: 10s
+  manage-users:
+    api:
+      url: https://manage-users-api-dev.hmpps.service.justice.gov.uk
+      timeout: 10s
+  prisoner-search:
+    api:
+      url: https://prisoner-search-dev.prison.service.justice.gov.uk
+      timeout: 10s
