@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSear
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
@@ -141,6 +142,19 @@ class AppResourceIntegrationTest(
     Assertions.assertEquals(AppStatus.PENDING, response.status)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertEquals(newContactNumber, response.requests.get(0)["contact-number"])
+
+    webTestClient.get()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${response.id}/history")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<List<HistoryResponse>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as List<HistoryResponse>
   }
 
   @Test
@@ -194,7 +208,7 @@ class AppResourceIntegrationTest(
   @Test
   fun `forward app request to other group`() {
     // groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentIdFirst)
-    val forwardingMessage = "Forwarding  to group $assignedGroupSecond"
+    val forwardingMessage = "Forwarding  to group $assignedGroupSecondName"
 
     webTestClient.post()
       .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupFirst")
@@ -229,6 +243,19 @@ class AppResourceIntegrationTest(
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(assignedGroupSecond, response.assignedGroup.id)
 
+    webTestClient.get()
+      .uri("/v1/prisoners/$requestedByFirst/apps/$appIdFirst/history")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<List<HistoryResponse>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as List<HistoryResponse>
+
     // forwarding without forwarding message
 
     response = webTestClient.post()
@@ -250,6 +277,19 @@ class AppResourceIntegrationTest(
     Assertions.assertEquals(AppStatus.PENDING, response.status)
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
+
+    webTestClient.get()
+      .uri("/v1/prisoners/$requestedByFirst/apps/$appIdFirst/history")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<List<HistoryResponse>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as List<HistoryResponse>
   }
 
   @Test

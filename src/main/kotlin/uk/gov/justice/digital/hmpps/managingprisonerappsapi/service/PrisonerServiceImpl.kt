@@ -26,6 +26,7 @@ class PrisonerServiceImpl(
       prisonerDto.locationDescription,
       prisonerDto.currentIncentive?.level?.description,
       if (activeProfile.equals("test") || activeProfile.equals("dev")) "TEST_ESTABLISHMENT_FIRST" else prisonerDto.prisonId,
+      prisonerDto.alerts.size,
     )
     return Optional.of(prisoner)
   }

@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.StaffDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
@@ -108,6 +109,19 @@ class CommentIntegrationTest(
     Assertions.assertNotNull(message, response.message)
     Assertions.assertEquals(app.id, response.appId)
     Assertions.assertEquals(app.requestedBy, response.prisonerNumber)
+
+    webTestClient.get()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/history")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<List<HistoryResponse>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as List<HistoryResponse>
   }
 
   @Test
