@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSear
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseListDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppService
@@ -80,6 +81,19 @@ class AppResource(var appService: AppService) {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for get app for $prisonerId by ${authentication.principal}")
     val appResponseDto = appService.getAppsById(prisonerId, id, authentication.principal, requestedBy, assignedGroup)
+    return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
+  }
+
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @GetMapping("/prisoners/{prisonerId}/apps/{id}/history")
+  fun getHistoryByAppId(
+    @PathVariable prisonerId: String,
+    @PathVariable id: UUID,
+    authentication: Authentication,
+  ): ResponseEntity<List<HistoryResponse>> {
+    authentication as AuthAwareAuthenticationToken
+    logger.info("Request received for get app for $prisonerId by ${authentication.principal}")
+    val appResponseDto = appService.getHistoryAppsId(prisonerId, id, authentication.principal)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 

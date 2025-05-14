@@ -9,6 +9,7 @@ enum class AppType {
   PIN_PHONE_ADD_NEW_CONTACT,
   PIN_PHONE_REMOVE_CONTACT,
   PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
+  PIN_PHONE_SUPPLY_LIST_OF_CONTACTS,
   ;
 
   companion object {
@@ -27,6 +28,9 @@ enum class AppType {
       }
       if (type == PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS.toString()) {
         return PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS
+      }
+      if (type == PIN_PHONE_SUPPLY_LIST_OF_CONTACTS.toString()) {
+        return PIN_PHONE_SUPPLY_LIST_OF_CONTACTS
       }
       throw ApiException("$type do not match with any app type", HttpStatus.BAD_REQUEST)
     }

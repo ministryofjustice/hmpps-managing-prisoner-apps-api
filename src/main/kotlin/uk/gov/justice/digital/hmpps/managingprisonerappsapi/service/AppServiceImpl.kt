@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseListDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.GroupAppListViewDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
@@ -38,6 +39,7 @@ class AppServiceImpl(
   private val groupsService: GroupService,
   private val commentRepository: CommentRepository,
   private val activityService: ActivityService,
+  private val historyService: HistoryService,
 
 ) : AppService {
 
@@ -78,7 +80,7 @@ class AppServiceImpl(
       }
     }
     app = appRepository.save(app)
-    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_REQUEST_FORM_DATA_UPDATED, app.establishmentId, staffId)
+    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_REQUEST_FORM_DATA_UPDATED, app.establishmentId, staffId, LocalDateTime.now(ZoneOffset.UTC))
     return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup)
   }
 
@@ -121,7 +123,8 @@ class AppServiceImpl(
     val assignedGroup = groupsService.getGroupById(group.id)
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
-    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_SUBMITTED, app.establishmentId, staffId)
+    val createdDate = LocalDateTime.now(ZoneOffset.UTC)
+    activityService.addActivity(app.assignedGroup, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_SUBMITTED, app.establishmentId, staffId, createdDate)
     return convertAppToAppResponseDto(app, prisonerId, assignedGroup)
   }
 
@@ -155,6 +158,14 @@ class AppServiceImpl(
     return convertAppToAppResponseDto(app, prisoner, groupsDto)
   }
 
+  override fun getHistoryAppsId(prisonerId: String, appId: UUID, staffId: String): List<HistoryResponse> {
+    // TODO("Not yet implemented")
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
+    }
+    return historyService.getHistoryByAppId(appId, staff.establishmentId)
+  }
+
   override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID, commentRequestDto: CommentRequestDto?): AppResponseDto<Any, Any> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
@@ -179,11 +190,15 @@ class AppServiceImpl(
     }
     val group = groupsService.getGroupById(groupId)
     app.assignedGroup = groupId
+    val createdDate = LocalDateTime.now(ZoneOffset.UTC)
     if (comment != null) {
       app.comments.add(comment.id)
     }
     appRepository.save(app)
-    activityService.addActivity(groupId, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_FORWARDED_TO_A_GROUP, app.establishmentId, staffId)
+    activityService.addActivity(groupId, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_FORWARDED_TO_A_GROUP, app.establishmentId, staffId, createdDate)
+    if (comment != null) {
+      activityService.addActivity(comment.id, EntityType.COMMENT, app.id, Activity.FORWARDING_COMMENT_ADDED, app.establishmentId, staffId, createdDate)
+    }
     return convertAppToAppResponseDto(app, app.requestedBy, group)
   }
 

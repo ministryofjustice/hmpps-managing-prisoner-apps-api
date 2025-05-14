@@ -50,6 +50,7 @@ class AppServiceImplTest {
   private lateinit var groupService: GroupService
   private lateinit var commentRepository: CommentRepository
   private lateinit var activityService: ActivityService
+  private lateinit var historyService: HistoryService
 
   private lateinit var appService: AppService
   private lateinit var app: App
@@ -63,6 +64,7 @@ class AppServiceImplTest {
     groupService = Mockito.mock(GroupService::class.java)
     commentRepository = Mockito.mock(CommentRepository::class.java)
     activityService = Mockito.mock(ActivityService::class.java)
+    historyService = Mockito.mock(HistoryService::class.java)
 
     app = DataGenerator.generateApp(
       establishmentId,
@@ -101,9 +103,10 @@ class AppServiceImplTest {
       UUID.randomUUID().toString(),
       UUID.randomUUID().toString(),
       establishmentId,
+      2,
     )
 
-    appService = AppServiceImpl(appRepository, prisonerService, staffService, groupService, commentRepository, activityService)
+    appService = AppServiceImpl(appRepository, prisonerService, staffService, groupService, commentRepository, activityService, historyService)
   }
 
   @Test
