@@ -7,4 +7,3 @@ create table if not exists public.comment
     message      varchar(1000),
     created_by   varchar(255)
     );
-

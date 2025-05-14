@@ -10,7 +10,3 @@ create table if not exists public.response
     check ((decision)::text = ANY
 ((ARRAY ['APPROVED'::character varying, 'DECLINED'::character varying])::text[]))
     );
-
-
-
-

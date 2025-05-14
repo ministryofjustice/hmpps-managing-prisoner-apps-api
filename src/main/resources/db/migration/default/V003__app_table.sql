@@ -39,4 +39,3 @@ create table if not exists public.app_responses
     references public.app,
     responses uuid
 );
-
