@@ -72,7 +72,7 @@ class GroupsServiceImpl(
     groups.id,
     groups.name,
     establishmentDto,
-    groups.initialsApps.first(),
+    if (groups.initialsApps.isNotEmpty()) groups.initialsApps.first() else null,
     groups.type,
   )
 
