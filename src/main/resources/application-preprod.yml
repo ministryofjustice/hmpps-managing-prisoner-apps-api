@@ -3,8 +3,8 @@
 example-api:
   url: https://managing-prisoner-apps-api-preprod.hmpps.service.justice.gov.uk
   client:
-    id: ${example-api.client.id}
-    secret: ${example-api.client.secret}
+    id: "example-api-client"
+    secret: "example-api-client-secret"
 
 hmpps:
   auth:
