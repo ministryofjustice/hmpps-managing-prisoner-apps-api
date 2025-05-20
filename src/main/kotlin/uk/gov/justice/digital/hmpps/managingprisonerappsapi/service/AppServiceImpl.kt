@@ -80,7 +80,16 @@ class AppServiceImpl(
       }
     }
     app = appRepository.save(app)
-    activityService.addActivity(app.id, EntityType.APP, app.id, Activity.APP_REQUEST_FORM_DATA_UPDATED, app.establishmentId, staffId, LocalDateTime.now(ZoneOffset.UTC))
+    activityService.addActivity(
+      app.id,
+      EntityType.APP,
+      app.id,
+      Activity.APP_REQUEST_FORM_DATA_UPDATED,
+      app.establishmentId,
+      staffId,
+      LocalDateTime.now(ZoneOffset.UTC),
+      prisonerId,
+    )
     return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup)
   }
 
@@ -124,7 +133,16 @@ class AppServiceImpl(
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
-    activityService.addActivity(app.assignedGroup, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_SUBMITTED, app.establishmentId, staffId, createdDate)
+    activityService.addActivity(
+      app.assignedGroup,
+      EntityType.ASSIGNED_GROUP,
+      app.id,
+      Activity.APP_SUBMITTED,
+      app.establishmentId,
+      staffId,
+      createdDate,
+      prisonerId,
+    )
     return convertAppToAppResponseDto(app, prisonerId, assignedGroup)
   }
 
@@ -195,9 +213,27 @@ class AppServiceImpl(
       app.comments.add(comment.id)
     }
     appRepository.save(app)
-    activityService.addActivity(groupId, EntityType.ASSIGNED_GROUP, app.id, Activity.APP_FORWARDED_TO_A_GROUP, app.establishmentId, staffId, createdDate)
+    activityService.addActivity(
+      groupId,
+      EntityType.ASSIGNED_GROUP,
+      app.id,
+      Activity.APP_FORWARDED_TO_A_GROUP,
+      app.establishmentId,
+      staffId,
+      createdDate,
+      app.requestedBy,
+    )
     if (comment != null) {
-      activityService.addActivity(comment.id, EntityType.COMMENT, app.id, Activity.FORWARDING_COMMENT_ADDED, app.establishmentId, staffId, createdDate)
+      activityService.addActivity(
+        comment.id,
+        EntityType.COMMENT,
+        app.id,
+        Activity.FORWARDING_COMMENT_ADDED,
+        app.establishmentId,
+        staffId,
+        createdDate,
+        app.requestedBy,
+      )
     }
     return convertAppToAppResponseDto(app, app.requestedBy, group)
   }

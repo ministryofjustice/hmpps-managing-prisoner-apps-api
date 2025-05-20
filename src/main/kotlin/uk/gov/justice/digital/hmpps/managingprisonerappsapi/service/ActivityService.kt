@@ -13,8 +13,17 @@ class ActivityService(
   private val telemetryService: TelemetryService,
 ) {
 
-  fun addActivity(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime) {
+  fun addActivity(
+    entityId: UUID,
+    entityType: EntityType,
+    appId: UUID,
+    activity: Activity,
+    establishment: String,
+    createdBy: String,
+    createdDate: LocalDateTime,
+    prisonerId: String,
+  ) {
     historyService.updateActivityInHistory(entityId, entityType, appId, activity, establishment, createdBy, createdDate)
-    telemetryService.addTelemetryData(entityId, entityType, appId, activity, establishment, createdBy, createdDate)
+    telemetryService.addTelemetryData(entityId, entityType, appId, activity, establishment, createdBy, createdDate, prisonerId)
   }
 }
