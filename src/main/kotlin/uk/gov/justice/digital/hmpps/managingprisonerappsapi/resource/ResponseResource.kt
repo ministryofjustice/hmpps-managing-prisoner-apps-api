@@ -32,7 +32,7 @@ class ResponseResource(val responseService: ResponseService) {
     consumes = [MediaType.APPLICATION_JSON_VALUE],
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun addResponse(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
@@ -49,7 +49,7 @@ class ResponseResource(val responseService: ResponseService) {
     "prisoners/{prisonerId}/apps/{appId}/responses/{responseId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getResponseById(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
