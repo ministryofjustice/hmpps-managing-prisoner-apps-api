@@ -52,7 +52,16 @@ class CommentServiceImpl(
     )
     app.comments.add(comment.id)
     appService.saveApp(app)
-    activityService.addActivity(comment.id, EntityType.COMMENT, app.id, Activity.COMMENT_ADDED, app.establishmentId, staffId, LocalDateTime.now(ZoneOffset.UTC))
+    activityService.addActivity(
+      comment.id,
+      EntityType.COMMENT,
+      app.id,
+      Activity.COMMENT_ADDED,
+      app.establishmentId,
+      staffId,
+      LocalDateTime.now(ZoneOffset.UTC),
+      prisonerId,
+    )
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }
 

@@ -17,9 +17,10 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
     private val logger = LoggerFactory.getLogger(TelemetryService::class.java)
   }
 
-  fun addTelemetryData(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime) {
+  fun addTelemetryData(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime, prisonerId: String) {
     try {
       val map = LinkedHashMap<String, String>()
+      map["requestedBy"] = prisonerId
       map["appId"] = appId.toString()
       map["dateTime"] = createdDate.format(FORMATTER)
       map["createdBy"] = createdBy
