@@ -89,6 +89,7 @@ class AppServiceImpl(
       staffId,
       LocalDateTime.now(ZoneOffset.UTC),
       prisonerId,
+      app.appType,
     )
     return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup)
   }
@@ -142,6 +143,7 @@ class AppServiceImpl(
       staffId,
       createdDate,
       prisonerId,
+      app.appType,
     )
     return convertAppToAppResponseDto(app, prisonerId, assignedGroup)
   }
@@ -222,6 +224,7 @@ class AppServiceImpl(
       staffId,
       createdDate,
       app.requestedBy,
+      app.appType,
     )
     if (comment != null) {
       activityService.addActivity(
@@ -233,6 +236,7 @@ class AppServiceImpl(
         staffId,
         createdDate,
         app.requestedBy,
+        app.appType,
       )
     }
     return convertAppToAppResponseDto(app, app.requestedBy, group)
