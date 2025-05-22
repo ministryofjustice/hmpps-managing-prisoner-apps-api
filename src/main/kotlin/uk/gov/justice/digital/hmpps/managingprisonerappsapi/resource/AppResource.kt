@@ -125,6 +125,7 @@ class AppResource(var appService: AppService) {
     @RequestBody appsSearchQueryDto: AppsSearchQueryDto,
     authentication: Authentication,
   ): ResponseEntity<AppResponseListDto> {
+    logger.info("Request received for to search apps")
     authentication as AuthAwareAuthenticationToken
     if (appsSearchQueryDto.types != null && appsSearchQueryDto.types!!.isEmpty()) {
       appsSearchQueryDto.types = null
@@ -156,6 +157,7 @@ class AppResource(var appService: AppService) {
     @RequestParam name: String,
     authentication: Authentication,
   ): ResponseEntity<List<RequestedByNameSearchResult>> {
+    logger.info("Request received for to search requested by text:$name")
     authentication as AuthAwareAuthenticationToken
     val searchResult = appService.searchRequestedByTextSearch(authentication.principal, name)
     return ResponseEntity.status(HttpStatus.OK).body(searchResult)

@@ -40,7 +40,7 @@ class CommentResource(val commentService: CommentService) {
     @RequestBody commentRequestDto: CommentRequestDto,
     authentication: Authentication,
   ): ResponseEntity<CommentResponseDto<Any>> {
-    logger.info("Request for adding comment for $appId")
+    logger.info("Request received for adding comment for app: $appId")
     authentication as AuthAwareAuthenticationToken
     val comment = commentService.addComment(prisonerId, authentication.principal, appId, commentRequestDto)
     return ResponseEntity.status(HttpStatus.CREATED).body(comment)
@@ -58,7 +58,7 @@ class CommentResource(val commentService: CommentService) {
     @RequestParam(required = false) createdBy: Boolean,
     authentication: Authentication,
   ): ResponseEntity<CommentResponseDto<Any>> {
-    logger.info("Request to  get comment for app: $appId and comment: $commentId")
+    logger.info("Request received to  get comment for app: $appId and comment: $commentId")
     authentication as AuthAwareAuthenticationToken
     val comment = commentService.getCommentById(prisonerId, authentication.principal, appId, createdBy, commentId)
     return ResponseEntity.status(HttpStatus.OK).body(comment)
@@ -76,7 +76,7 @@ class CommentResource(val commentService: CommentService) {
     @RequestParam(required = false) createdBy: Boolean,
     authentication: Authentication,
   ): ResponseEntity<PageResultComments> {
-    logger.info("Request to  get comments for app: $appId")
+    logger.info("Request received to  get comments for app: $appId")
     authentication as AuthAwareAuthenticationToken
     val comments =
       commentService.getCommentsByAppId(prisonerId, authentication.principal, appId, createdBy, page, size)

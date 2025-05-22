@@ -54,6 +54,9 @@ class ResponseServiceImpl(
     app.requests.forEach { request ->
       val req = request.toMutableMap()
       if (response.appliesTo.contains(UUID.fromString(request.get("id") as String))) {
+        if (request.get("responseId") != null) {
+          throw ApiException("Response already added for request id: ${request.get("id")}", HttpStatus.BAD_REQUEST)
+        }
         responseEntity = responseRepository.save(
           Response(
             UUID.randomUUID(),
