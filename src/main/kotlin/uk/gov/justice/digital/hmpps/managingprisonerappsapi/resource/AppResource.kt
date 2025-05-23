@@ -39,7 +39,7 @@ class AppResource(var appService: AppService) {
     produces = [MediaType.APPLICATION_JSON_VALUE],
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun submitApp(
     @PathVariable("prisonerId") prisonerId: String,
     @RequestBody appRequestDto: AppRequestDto,
@@ -56,7 +56,7 @@ class AppResource(var appService: AppService) {
     produces = [MediaType.APPLICATION_JSON_VALUE],
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun updateAppRequestData(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
@@ -69,7 +69,7 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/prisoners/{prisonerId}/apps/{id}")
   fun getAppById(
     @PathVariable prisonerId: String,
@@ -84,7 +84,7 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/prisoners/{prisonerId}/apps/{id}/history")
   fun getHistoryByAppId(
     @PathVariable prisonerId: String,
@@ -97,7 +97,7 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @PostMapping(
     "/apps/{appId}/forward/groups/{groupId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
@@ -115,7 +115,7 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(app)
   }
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @PostMapping(
     "/prisoners/apps/search",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
@@ -148,7 +148,7 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping(
     "/prisoners/search",
     produces = [MediaType.APPLICATION_JSON_VALUE],
