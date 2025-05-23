@@ -35,7 +35,7 @@ class GroupResource(private val groupService: GroupService) {
     return ResponseEntity.status(HttpStatus.CREATED).body(createdGroup)
   }
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/groups/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
   fun getGroupById(@PathVariable id: UUID): ResponseEntity<AssignedGroupDto> {
     val group = groupService.getGroupById(id)
@@ -67,7 +67,7 @@ class GroupResource(private val groupService: GroupService) {
     return ResponseEntity.status(HttpStatus.OK).build()
   }
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @GetMapping("/groups", produces = [MediaType.APPLICATION_JSON_VALUE])
   fun getGroupsByLoggedUserEstablishment(
     authentication: Authentication,
