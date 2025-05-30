@@ -1,5 +1,11 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -18,6 +24,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.CommentService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
+import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.*
 
 @RestController
@@ -28,6 +35,25 @@ class CommentResource(val commentService: CommentService) {
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
+  @Tag(name = "Comments")
+  @Operation(
+    summary = "Add a comment to an App request for a prisoner.",
+    description = "This api endpoint is for adding comment to an app request for a prisoner. The logged staff and prisoner  for whom app request created should belongs to same establishment for adding comment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "Comment added successfully"),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint. The issue can be logged staff and prisoner have different establishment.",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
   @PostMapping(
     "/prisoners/{prisonerId}/apps/{appId}/comments",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
@@ -46,6 +72,25 @@ class CommentResource(val commentService: CommentService) {
     return ResponseEntity.status(HttpStatus.CREATED).body(comment)
   }
 
+  @Tag(name = "Apps")
+  @Operation(
+    summary = "Get a comment by comment id",
+    description = "This api endpoint is for submitting app request for a prisoner. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "Comment data returned in response successfully."),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
   @GetMapping(
     "/prisoners/{prisonerId}/apps/{appId}/comments/{commentId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
@@ -64,6 +109,25 @@ class CommentResource(val commentService: CommentService) {
     return ResponseEntity.status(HttpStatus.OK).body(comment)
   }
 
+  @Tag(name = "Apps")
+  @Operation(
+    summary = "Get all comments for a give app id",
+    description = "This api endpoint is for getting list of comments by app Id. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "List fo comments returned successfully."),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
   @GetMapping(
     "/prisoners/{prisonerId}/apps/{appId}/comments",
   )
