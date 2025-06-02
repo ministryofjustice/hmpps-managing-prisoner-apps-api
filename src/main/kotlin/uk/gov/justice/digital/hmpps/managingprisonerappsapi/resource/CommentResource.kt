@@ -37,8 +37,8 @@ class CommentResource(val commentService: CommentService) {
 
   @Tag(name = "Comments")
   @Operation(
-    summary = "Add a comment to an App request for a prisoner.",
-    description = "This api endpoint is for adding comment to an app request for a prisoner. The logged staff and prisoner  for whom app request created should belongs to same establishment for adding comment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    summary = "Add a comment to an App request of a prisoner.",
+    description = "This api endpoint is for adding comment to an app request of a prisoner. The logged staff and prisoner  for whom app request created should belongs to same establishment for adding comment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "Comment added successfully"),
@@ -72,10 +72,10 @@ class CommentResource(val commentService: CommentService) {
     return ResponseEntity.status(HttpStatus.CREATED).body(comment)
   }
 
-  @Tag(name = "Apps")
+  @Tag(name = "Comments")
   @Operation(
     summary = "Get a comment by comment id",
-    description = "This api endpoint is for submitting app request for a prisoner. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    description = "This api endpoint is for getting comment details. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "Comment data returned in response successfully."),
@@ -109,9 +109,9 @@ class CommentResource(val commentService: CommentService) {
     return ResponseEntity.status(HttpStatus.OK).body(comment)
   }
 
-  @Tag(name = "Apps")
+  @Tag(name = "Comments")
   @Operation(
-    summary = "Get all comments for a give app id",
+    summary = "Get all comments for a give app by app id",
     description = "This api endpoint is for getting list of comments by app Id. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [

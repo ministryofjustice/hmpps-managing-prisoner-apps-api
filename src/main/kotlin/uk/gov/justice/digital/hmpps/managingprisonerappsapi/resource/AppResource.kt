@@ -121,7 +121,7 @@ class AppResource(var appService: AppService) {
     description = "This api endpoint to get prisoner app. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
-      ApiResponse(responseCode = "200", description = "App form data updated"),
+      ApiResponse(responseCode = "200", description = "Successfully got app by id."),
       ApiResponse(
         responseCode = "401",
         description = "Unauthorized to access this endpoint",
@@ -148,9 +148,10 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
+  @Tag(name = "Apps")
   @Operation(
     summary = "Get all activity associated with an app.",
-    description = "This api endpoint to get all activities associated with an app. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    description = "This api endpoint to get all activities associated with an app by app id. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "All activity associated with processing app request provided in response."),
@@ -179,6 +180,7 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
+  @Tag(name = "Apps")
   @Operation(
     summary = "Forward app to another group.",
     description = "This api endpoint is forwarding app to a different group. The logged staff and prisoner to which this app belongs should have same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
@@ -215,9 +217,10 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(app)
   }
 
+  @Tag(name = "Apps")
   @Operation(
     summary = "Search apps by search filter",
-    description = "This api endpoint is for searching apps by using search filter. The logged staff can search only apps which belongs to staff establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    description = "This api endpoint is for searching apps by using search filter which are app status, assigned group, app type, prisoner id and establishment. The logged staff can search only apps which belongs to staff establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "List of apps based on search filter parameter values"),
@@ -266,9 +269,10 @@ class AppResource(var appService: AppService) {
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
+  @Tag(name = "Apps")
   @Operation(
     summary = "Search prisoners by name either first or lastname or both",
-    description = "This api endpoint is for searching prisoners for whom the app request has been submitted. The logged staff and prisoner to which this app belongs should have same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    description = "This api endpoint is for searching prisoners for whom the app request has been submitted. The user can see only the prisoners name for their own establishment only. The logged staff and prisoner to which this app belongs should have same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "App successfully forwarded to another group"),

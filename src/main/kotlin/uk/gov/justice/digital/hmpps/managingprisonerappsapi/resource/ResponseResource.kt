@@ -42,7 +42,7 @@ class ResponseResource(val responseService: ResponseService) {
       " Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
-      ApiResponse(responseCode = "200", description = "App request submitted"),
+      ApiResponse(responseCode = "200", description = "AResponse added to an app request."),
       ApiResponse(
         responseCode = "401",
         description = "Unauthorized to access this endpoint",
@@ -73,10 +73,10 @@ class ResponseResource(val responseService: ResponseService) {
     return ResponseEntity.status(HttpStatus.CREATED).body(entity)
   }
 
-  @Tag(name = "Responses.")
+  @Tag(name = "Responses")
   @Operation(
     summary = "Get response by id.",
-    description = "This api endpoint is for getting response addy by prison staff for prisoner's app request.. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    description = "This api endpoint is for getting response added by prison staff for prisoner's app request. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "App response returned in response successfully."),
