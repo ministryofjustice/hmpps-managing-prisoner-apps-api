@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
@@ -25,7 +22,7 @@ import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 @RequestMapping("v1/")
 class EstablishmentResource(private val establishmentService: EstablishmentService) {
 
-  @Tag(name = "Establishments")
+  /*@Tag(name = "Establishments")
   @Operation(
     summary = "Add an establishment",
     description = "This api endpoint is for adding an establishment with agency id and name. Requires role ROLE_MANAGING_PRISONER_APPS",
@@ -81,7 +78,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
     }
     val establishment = establishmentService.updateEstablishment(establishmentDto)
     return ResponseEntity.status(HttpStatus.OK).body(establishment)
-  }
+  }*/
 
   @Tag(name = "Establishments")
   @Operation(
