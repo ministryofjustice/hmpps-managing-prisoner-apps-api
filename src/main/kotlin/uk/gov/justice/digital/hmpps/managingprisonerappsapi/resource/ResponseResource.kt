@@ -1,5 +1,11 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -17,6 +23,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppDecis
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppDecisionResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.ResponseService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
+import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.*
 
 @RestController
@@ -27,6 +34,27 @@ class ResponseResource(val responseService: ResponseService) {
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
+  @Tag(name = "Responses")
+  @Operation(
+    summary = "Add a response for a app request.",
+    description = "This api endpoint is for adding response to an app request. The logged staff and prisoner should belongs to same establishment." +
+      " Currently only one request is supported in per app so there is only one approval or decline." +
+      " Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "AResponse added to an app request."),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
   @PostMapping(
     "prisoners/{prisonerId}/apps/{appId}/responses",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
@@ -45,6 +73,25 @@ class ResponseResource(val responseService: ResponseService) {
     return ResponseEntity.status(HttpStatus.CREATED).body(entity)
   }
 
+  @Tag(name = "Responses")
+  @Operation(
+    summary = "Get response by id.",
+    description = "This api endpoint is for getting response added by prison staff for prisoner's app request. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "App response returned in response successfully."),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
   @GetMapping(
     "prisoners/{prisonerId}/apps/{appId}/responses/{responseId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
