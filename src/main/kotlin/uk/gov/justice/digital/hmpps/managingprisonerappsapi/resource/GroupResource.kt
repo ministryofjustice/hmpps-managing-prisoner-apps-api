@@ -14,12 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.GroupsRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.GroupService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
@@ -34,7 +30,7 @@ class GroupResource(private val groupService: GroupService) {
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  @Tag(name = "Groups")
+  /* @Tag(name = "Groups")
   @Operation(
     summary = "Add a group",
     description = "This api endpoint is for adding a group. Requires role ROLE_MANAGING_PRISONER_APPS",
@@ -58,7 +54,7 @@ class GroupResource(private val groupService: GroupService) {
   fun createGroup(@RequestBody groupsRequestDto: GroupsRequestDto): ResponseEntity<AssignedGroupDto> {
     val createdGroup = groupService.createGroup(groupsRequestDto)
     return ResponseEntity.status(HttpStatus.CREATED).body(createdGroup)
-  }
+  }*/
 
   @Tag(name = "Groups")
   @Operation(
@@ -86,7 +82,7 @@ class GroupResource(private val groupService: GroupService) {
     return ResponseEntity.status(HttpStatus.OK).body(group)
   }
 
-  @Tag(name = "Groups")
+  /*@Tag(name = "Groups")
   @Operation(
     summary = "Update a group by id",
     description = "This api endpoint is for updating a group. Requires role ROLE_MANAGING_PRISONER_APPS",
@@ -117,7 +113,7 @@ class GroupResource(private val groupService: GroupService) {
   ): ResponseEntity<AssignedGroupDto> {
     val updatedGroup = groupService.updateGroup(groupsRequestDto)
     return ResponseEntity.status(HttpStatus.OK).body(updatedGroup)
-  }
+  }*/
 
   /*@PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   @DeleteMapping(
