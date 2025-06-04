@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
@@ -17,7 +16,7 @@ import java.time.Duration
 
 class EstablishmentIntegrationTest(
   @Autowired private val establishmentRepository: EstablishmentRepository,
-): IntegrationTestBase() {
+) : IntegrationTestBase() {
 
   private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
   private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
