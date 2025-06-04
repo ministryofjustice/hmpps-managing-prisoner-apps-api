@@ -99,7 +99,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
       ),
     ],
   )
-  @GetMapping("/{id}")
+  @GetMapping("/establishments/{id}")
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
   fun getEstablishmentById(@PathVariable id: String): ResponseEntity<EstablishmentDto> {
     val establishmentDto = establishmentService.getEstablishmentById(id)
@@ -107,5 +107,31 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
       throw ApiException("No establishment with id $id", HttpStatus.BAD_REQUEST)
     }
     return ResponseEntity.status(HttpStatus.OK).body(establishmentDto.get())
+  }
+
+  @Tag(name = "Establishments")
+  @Operation(
+    summary = "Get list of  establishment.",
+    description = "This api endpoint is for getting establishment list using manage prisoner apps. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @GetMapping("/establishments")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  fun getEstablishments(): ResponseEntity<List<EstablishmentDto>> {
+    val establishments = establishmentService.getEstablishments()
+    return ResponseEntity.status(HttpStatus.OK).body(establishments)
   }
 }
