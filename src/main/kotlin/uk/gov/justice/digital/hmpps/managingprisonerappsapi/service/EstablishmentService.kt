@@ -7,7 +7,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExcept
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Service
 class EstablishmentService(private val establishmentRepository: EstablishmentRepository) {
@@ -35,11 +34,11 @@ class EstablishmentService(private val establishmentRepository: EstablishmentRep
     }
   }
 
-  fun getEstablishments(): List<EstablishmentDto> {
+  fun getEstablishments(): Set<String> {
     val establishments: List<Establishment> = establishmentRepository.findAll()
-    val list = ArrayList<EstablishmentDto>()
+    val list = HashSet<String>()
     establishments.forEach { establishment ->
-      list.add(convertEstablishmentToEstablishmentDto(establishment))
+      list.add(establishment.id)
     }
     return list
   }

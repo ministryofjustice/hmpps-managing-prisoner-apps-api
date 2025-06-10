@@ -100,7 +100,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
     ],
   )
   @GetMapping("/establishments/{id}")
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getEstablishmentById(@PathVariable id: String): ResponseEntity<EstablishmentDto> {
     val establishmentDto = establishmentService.getEstablishmentById(id)
     if (establishmentDto.isEmpty) {
@@ -129,8 +129,8 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
     ],
   )
   @GetMapping("/establishments")
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
-  fun getEstablishments(): ResponseEntity<List<EstablishmentDto>> {
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  fun getEstablishments(): ResponseEntity<Set<String>> {
     val establishments = establishmentService.getEstablishments()
     return ResponseEntity.status(HttpStatus.OK).body(establishments)
   }

@@ -1,4 +1,4 @@
-create table if not exists public.comment
+create table if not exists comment
 (
     id           uuid not null
     primary key,

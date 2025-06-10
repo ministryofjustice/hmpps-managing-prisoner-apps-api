@@ -65,7 +65,7 @@ class AppResource(var appService: AppService) {
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun submitApp(
     @PathVariable("prisonerId") prisonerId: String,
     @RequestBody appRequestDto: AppRequestDto,
@@ -101,7 +101,7 @@ class AppResource(var appService: AppService) {
     produces = [MediaType.APPLICATION_JSON_VALUE],
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun updateAppRequestData(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
@@ -134,7 +134,7 @@ class AppResource(var appService: AppService) {
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getAppById(
     @PathVariable prisonerId: String,
     @PathVariable id: UUID,
@@ -167,7 +167,7 @@ class AppResource(var appService: AppService) {
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   @GetMapping("/prisoners/{prisonerId}/apps/{id}/history")
   fun getHistoryByAppId(
     @PathVariable prisonerId: String,
@@ -199,7 +199,7 @@ class AppResource(var appService: AppService) {
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   @PostMapping(
     "/apps/{appId}/forward/groups/{groupId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
@@ -236,7 +236,7 @@ class AppResource(var appService: AppService) {
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   @PostMapping(
     "/prisoners/apps/search",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
@@ -288,7 +288,7 @@ class AppResource(var appService: AppService) {
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   @GetMapping(
     "/prisoners/search",
     produces = [MediaType.APPLICATION_JSON_VALUE],

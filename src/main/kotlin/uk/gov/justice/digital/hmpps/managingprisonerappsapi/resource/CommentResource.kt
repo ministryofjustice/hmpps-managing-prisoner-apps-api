@@ -59,7 +59,7 @@ class CommentResource(val commentService: CommentService) {
     consumes = [MediaType.APPLICATION_JSON_VALUE],
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun addComment(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
@@ -95,7 +95,7 @@ class CommentResource(val commentService: CommentService) {
     "/prisoners/{prisonerId}/apps/{appId}/comments/{commentId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getCommentById(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
@@ -131,7 +131,7 @@ class CommentResource(val commentService: CommentService) {
   @GetMapping(
     "/prisoners/{prisonerId}/apps/{appId}/comments",
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getCommentsByAppId(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,

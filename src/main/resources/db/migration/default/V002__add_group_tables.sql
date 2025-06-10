@@ -1,4 +1,4 @@
-create table if not exists public.groups
+create table if not exists groups
 (
     id               uuid not null
     primary key,
@@ -9,11 +9,11 @@ create table if not exists public.groups
     check ((type)::text = ANY ((ARRAY ['WING'::character varying, 'DEPARTMENT'::character varying])::text[]))
     );
 
-create table if not exists public.groups_initials_apps
+create table if not exists groups_initials_apps
 (
     groups_id     uuid not null
     constraint fkpyja8nonimdxtsrtkc79a2h06
-    references public.groups,
+    references groups,
     initials_apps varchar(255)
     constraint groups_initials_apps_initials_apps_check
     check ((initials_apps)::text = ANY
