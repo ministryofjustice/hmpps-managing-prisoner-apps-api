@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
@@ -46,10 +45,10 @@ class EstablishmentIntegrationTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<List<EstablishmentDto>>() {})
+      .expectBody(object : ParameterizedTypeReference<Set<String>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as List<EstablishmentDto>
+      .responseBody as Set<String>
     assertEquals(3, response.size)
   }
 

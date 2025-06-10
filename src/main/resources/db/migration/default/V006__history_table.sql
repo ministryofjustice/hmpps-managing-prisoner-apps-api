@@ -1,4 +1,4 @@
-create table if not exists public.history
+create table if not exists history
 (
     id            uuid not null
     primary key,

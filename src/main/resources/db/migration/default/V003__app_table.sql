@@ -1,4 +1,4 @@
-create table public.app
+create table if not exists app
 (
     id                      uuid not null
         primary key,
@@ -24,18 +24,18 @@ create table public.app
     requests                jsonb
 );
 
-create table if not exists public.app_comments
+create table if not exists app_comments
 (
     app_id   uuid not null
     constraint fkc1sltfa9f2a4p5s5wnso0awaw
-    references public.app,
+    references app,
     comments uuid
 );
 
-create table if not exists public.app_responses
+create table if not exists app_responses
 (
     app_id    uuid not null
     constraint fkon3hn0r56m2i3mta94q1agdqh
-    references public.app,
+    references app,
     responses uuid
 );

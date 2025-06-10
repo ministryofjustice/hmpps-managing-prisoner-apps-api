@@ -1,4 +1,4 @@
-create table if not exists public.response
+create table if not exists response
 (
     created_date timestamp(6),
     id           uuid not null

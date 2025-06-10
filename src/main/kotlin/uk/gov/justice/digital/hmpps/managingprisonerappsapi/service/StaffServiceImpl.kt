@@ -21,7 +21,7 @@ class StaffServiceImpl(
       userDetailsDto.userId,
       userDetailsDto.fullName,
       UserCategory.STAFF,
-      if (activeProfile.equals("test") || activeProfile.equals("dev")) "TEST_ESTABLISHMENT_FIRST" else userDetailsDto.activeCaseLoadId,
+      if (activeProfile.equals("test")) "TEST_ESTABLISHMENT_FIRST" else userDetailsDto.activeCaseLoadId,
       // setOf(UUID.randomUUID()), // Currently role is not required.
       "staffJobTitle", // To-Do find endpoint to get job title of the staff.
       userDetailsDto.uuid,
