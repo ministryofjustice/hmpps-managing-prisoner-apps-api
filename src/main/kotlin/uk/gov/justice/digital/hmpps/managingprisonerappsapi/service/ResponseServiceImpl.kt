@@ -114,23 +114,6 @@ class ResponseServiceImpl(
     if (app.requestedBy != prisonerId) {
       throw ApiException("Not applicable for id $prisonerId", HttpStatus.FORBIDDEN)
     }
-    if (createdBy) {
-      val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
-        ApiException(
-          "Staff establishment ${staff.establishmentId} not added in establishment record",
-          HttpStatus.BAD_REQUEST,
-        )
-      }
-      staffDto = StaffDto(
-        staff.username,
-        staff.userId,
-        "${staff.fullName}",
-        UserCategory.STAFF,
-        establishment,
-      )
-    } else {
-      staffDto = staff.username
-    }
     val appliesTo = ArrayList<UUID>()
     app.requests.forEach { request ->
       if (UUID.fromString(request["responseId"]!! as String).equals(responseId)) {
@@ -139,6 +122,26 @@ class ResponseServiceImpl(
     }
     val response = responseRepository.findById(responseId).orElseThrow {
       ApiException("No response found for id $responseId", HttpStatus.NOT_FOUND)
+    }
+    val recordCreatedBy = staffService.getStaffById(response.createdBy).orElseThrow {
+      ApiException("Record of by satff: ${response.createdBy} not found", HttpStatus.BAD_REQUEST)
+    }
+    if (createdBy) {
+      val establishment = establishmentService.getEstablishmentById(recordCreatedBy.establishmentId).orElseThrow {
+        ApiException(
+          "Staff establishment ${staff.establishmentId} not added in establishment record",
+          HttpStatus.BAD_REQUEST,
+        )
+      }
+      staffDto = StaffDto(
+        recordCreatedBy.username,
+        recordCreatedBy.userId,
+        "${recordCreatedBy.fullName}",
+        UserCategory.STAFF,
+        establishment,
+      )
+    } else {
+      staffDto = recordCreatedBy.username
     }
     return convertResponseToAppDecisionResponse(prisonerId, staffDto, appliesTo, appId, response)
   }
