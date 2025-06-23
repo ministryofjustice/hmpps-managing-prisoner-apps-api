@@ -81,4 +81,6 @@ interface AppRepository : JpaRepository<App, UUID> {
     nativeQuery = false,
   )
   fun searchRequestedByFirstOrLastName(establishmentId: String, searchText: String): List<RequestedByNameSearchResult>
+
+  fun findAppsByRequestedBy(requestedBy: String): List<App>
 }
