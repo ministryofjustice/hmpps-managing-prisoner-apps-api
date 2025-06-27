@@ -79,6 +79,8 @@ class AppServiceImpl(
         }
       }
     }
+    app.lastModifiedDate = LocalDateTime.now()
+    app.lastModifiedBy = staffId
     app = appRepository.save(app)
     activityService.addActivity(
       app.id,
@@ -210,6 +212,8 @@ class AppServiceImpl(
     }
     val group = groupsService.getGroupById(groupId)
     app.assignedGroup = groupId
+    app.lastModifiedDate = LocalDateTime.now(ZoneOffset.UTC)
+    app.lastModifiedBy = staffId
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
     if (comment != null) {
       app.comments.add(comment.id)

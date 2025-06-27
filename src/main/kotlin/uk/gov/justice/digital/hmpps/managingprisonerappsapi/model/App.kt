@@ -23,8 +23,8 @@ data class App(
   val requestedDate: LocalDateTime,
   val createdDate: LocalDateTime,
   val createdBy: String,
-  val lastModifiedDate: LocalDateTime?,
-  val lastModifiedBy: String?,
+  var lastModifiedDate: LocalDateTime,
+  var lastModifiedBy: String,
   @ElementCollection
   var comments: MutableList<UUID>,
   @JdbcTypeCode(SqlTypes.JSON)
