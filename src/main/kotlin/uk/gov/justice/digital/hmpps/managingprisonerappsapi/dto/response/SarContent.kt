@@ -1,6 +1,5 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import java.time.LocalDateTime
@@ -18,13 +17,14 @@ data class PrnApp(
   val status: AppStatus,
   val type: AppType,
   val requestedDate: LocalDateTime,
+  val lastModifiedDate: LocalDateTime,
   val establishment: String,
   val history: List<PrnAppHistory>,
   val formData: List<Map<String, Any>>,
 )
 
 data class PrnAppHistory(
-  val activity: Activity,
+  val activity: String,
   val date: LocalDateTime,
   val actionBy: String,
 )
