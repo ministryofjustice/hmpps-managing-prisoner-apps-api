@@ -4,12 +4,16 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import java.util.*
 
 @Service
-class EstablishmentService(private val establishmentRepository: EstablishmentRepository) {
+class EstablishmentService(
+  private val establishmentRepository: EstablishmentRepository,
+  private val staffService: StaffService,
+) {
 
   fun saveEstablishment(establishmentDto: EstablishmentDto): EstablishmentDto {
     val establishment = convertEstablishmentDtoToEstablishment(establishmentDto)
@@ -47,12 +51,22 @@ class EstablishmentService(private val establishmentRepository: EstablishmentRep
     return establishmentRepository.deleteById(id)
   }*/
 
-  fun convertEstablishmentToEstablishmentDto(establishment: Establishment): EstablishmentDto = EstablishmentDto(
+  fun getAppTypesByLoggedUserEstablishment(staffId: String): Set<AppType> {
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
+    }
+    establishmentRepository.findById(staff.establishmentId).orElseThrow {
+      ApiException("Establishment: ${staff.establishmentId} not enabled", HttpStatus.FORBIDDEN)
+    }
+    return AppType.entries.toSet()
+  }
+
+  private fun convertEstablishmentToEstablishmentDto(establishment: Establishment): EstablishmentDto = EstablishmentDto(
     id = establishment.id,
     name = establishment.name,
   )
 
-  fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment = Establishment(
+  private fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment = Establishment(
     id = establishmentDto.id,
     name = establishmentDto.name,
   )
