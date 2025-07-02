@@ -36,7 +36,7 @@ class GroupRepositoryTest(
   @Test
   fun `save groups`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT)
+    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         UUID.randomUUID(),
@@ -52,7 +52,7 @@ class GroupRepositoryTest(
   @Test
   fun `update groups`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT)
+    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         UUID.randomUUID(),
@@ -68,7 +68,7 @@ class GroupRepositoryTest(
   @Test
   fun `delete groups`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT)
+    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         UUID.randomUUID(),
@@ -87,7 +87,7 @@ class GroupRepositoryTest(
   @Test
   fun `get group by id`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT)
+    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         UUID.randomUUID(),
@@ -111,7 +111,7 @@ class GroupRepositoryTest(
         UUID.randomUUID(),
         establishmentIdOne,
         "Business Hub",
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT),
         GroupType.WING,
       ),
     )
@@ -129,7 +129,7 @@ class GroupRepositoryTest(
         UUID.randomUUID(),
         establishmentIdOne,
         "Business Hub",
-        listOf(AppType.PIN_PHONE_CREDIT_TOP_UP, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        listOf(AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
         GroupType.WING,
       ),
     )

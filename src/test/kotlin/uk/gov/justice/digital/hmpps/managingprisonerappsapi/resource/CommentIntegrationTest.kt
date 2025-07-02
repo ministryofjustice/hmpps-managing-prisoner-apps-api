@@ -236,7 +236,7 @@ class CommentIntegrationTest(
         assignedGroupFirst,
         establishmentIdFirst,
         assignedGroupFirstName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_ADD_NEW_CONTACT),
         GroupType.WING,
       ),
     )
@@ -245,7 +245,7 @@ class CommentIntegrationTest(
         assignedGroupSecond,
         establishmentIdFirst,
         assignedGroupSecondName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_ADD_NEW_CONTACT),
         GroupType.WING,
       ),
     )

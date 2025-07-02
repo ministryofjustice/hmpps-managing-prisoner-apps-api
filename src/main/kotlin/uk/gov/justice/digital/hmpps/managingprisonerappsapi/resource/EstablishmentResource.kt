@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.EstablishmentService
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
@@ -134,4 +135,11 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
     val establishments = establishmentService.getEstablishments()
     return ResponseEntity.status(HttpStatus.OK).body(establishments)
   }
+
+  @GetMapping("/establishments/{id}/apps")
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  fun getAppTypesByEstablishment(@PathVariable id: String): ResponseEntity<List<AppType>> {
+    return ResponseEntity.status(HttpStatus.OK).body(AppType.entries)
+  }
+
 }
