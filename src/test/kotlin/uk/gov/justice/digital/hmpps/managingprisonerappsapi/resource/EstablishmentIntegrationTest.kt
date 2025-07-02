@@ -59,7 +59,7 @@ class EstablishmentIntegrationTest(
   }
 
   @Test
-  fun `get apptypes by establishments`() {
+  fun `get app types by establishments`() {
     val response = webTestClient.get()
       .uri("/v1/establishments/apps/types")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISON")))
