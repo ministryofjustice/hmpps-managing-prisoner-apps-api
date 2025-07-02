@@ -54,7 +54,7 @@ class EstablishmentIntegrationTest(
   }
 
   @Test
-  fun `get apptypes by establishments`(){
+  fun `get apptypes by establishments`() {
     val response = webTestClient.get()
       .uri("/v1/establishments/$establishmentIdFirst/apps")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))

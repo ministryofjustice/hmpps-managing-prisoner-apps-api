@@ -209,9 +209,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(4, countResult.get(0).getCount())
- //   Assertions.assertEquals(1, countResult.get(1).getCount())
+    //   Assertions.assertEquals(1, countResult.get(1).getCount())
     Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, countResult.get(0).getAppType())
- //   Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, countResult.get(1).getAppType())
+    //   Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, countResult.get(1).getAppType())
 
     var countResultByAssignedGroup = appRepository.countBySearchFilterGroupByAssignedGroup(
       establishmentIdFirst,

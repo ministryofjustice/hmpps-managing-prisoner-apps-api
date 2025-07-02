@@ -138,8 +138,5 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
 
   @GetMapping("/establishments/{id}/apps")
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
-  fun getAppTypesByEstablishment(@PathVariable id: String): ResponseEntity<List<AppType>> {
-    return ResponseEntity.status(HttpStatus.OK).body(AppType.entries)
-  }
-
+  fun getAppTypesByEstablishment(@PathVariable id: String): ResponseEntity<List<AppType>> = ResponseEntity.status(HttpStatus.OK).body(AppType.entries)
 }
