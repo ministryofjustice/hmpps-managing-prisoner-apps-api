@@ -20,4 +20,15 @@ data class History(
   val establishment: String,
   val createdBy: String,
   val createdDate: LocalDateTime,
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as History
+
+    return id == other.id
+  }
+
+  override fun hashCode(): Int = id.hashCode()
+}
