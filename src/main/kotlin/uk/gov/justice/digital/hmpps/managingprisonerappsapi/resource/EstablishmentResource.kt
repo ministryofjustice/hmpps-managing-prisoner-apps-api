@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
@@ -161,7 +162,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
       ),
     ],
   )
-  @GetMapping("/establishments/apps/types")
+  @GetMapping("/establishments/apps/types", produces = [MediaType.APPLICATION_JSON_VALUE],)
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getAppTypesByEstablishment(authentication: Authentication): ResponseEntity<Set<AppType>> {
     authentication as AuthAwareAuthenticationToken
