@@ -162,7 +162,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
       ),
     ],
   )
-  @GetMapping("/establishments/apps/types", produces = [MediaType.APPLICATION_JSON_VALUE],)
+  @GetMapping("/establishments/apps/types", produces = [MediaType.APPLICATION_JSON_VALUE])
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getAppTypesByEstablishment(authentication: Authentication): ResponseEntity<Set<AppType>> {
     authentication as AuthAwareAuthenticationToken
