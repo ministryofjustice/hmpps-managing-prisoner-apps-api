@@ -301,7 +301,7 @@ class AppResourceIntegrationTest(
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
         DataGenerator.generateAppRequestDto(
-          AppType.PIN_PHONE_REMOVE_CONTACT,
+          AppType.PIN_PHONE_ADD_NEW_CONTACT,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedByFirstSurname,
@@ -439,7 +439,7 @@ class AppResourceIntegrationTest(
         assignedGroupFirst,
         establishmentIdFirst,
         assignedGroupFirstName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_ADD_NEW_CONTACT),
         GroupType.WING,
       ),
     )
@@ -457,7 +457,7 @@ class AppResourceIntegrationTest(
         assignedGroupSecond,
         establishmentIdFirst,
         assignedGroupSecondName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_ADD_NEW_CONTACT),
         GroupType.WING,
       ),
     )
@@ -504,7 +504,7 @@ class AppResourceIntegrationTest(
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_REMOVE_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_CONTACT,
         requestedBySecond,
         LocalDateTime.now(ZoneOffset.UTC).minusDays(2).minusHours(1),
         requestedBySecondMainName,
@@ -516,7 +516,7 @@ class AppResourceIntegrationTest(
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdSecond,
-        AppType.PIN_PHONE_REMOVE_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_CONTACT,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,

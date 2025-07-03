@@ -9,6 +9,8 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import java.time.Duration
@@ -24,6 +26,10 @@ class EstablishmentIntegrationTest(
   @BeforeEach
   fun setup() {
     populateEstablishments()
+
+    manageUsersApi.start()
+    manageUsersApi.stubStaffDetailsFound(loggedUserId)
+
     webTestClient = webTestClient
       .mutate()
       .responseTimeout(Duration.ofMillis(30000))
@@ -50,6 +56,23 @@ class EstablishmentIntegrationTest(
       .returnResult()
       .responseBody as Set<String>
     assertEquals(3, response.size)
+  }
+
+  @Test
+  fun `get app types by establishments`() {
+    val response = webTestClient.get()
+      .uri("/v1/establishments/apps/types")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISON")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<List<String>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as List<String>
+    assertEquals(AppType.entries.size, response.size)
   }
 
   private fun populateEstablishments() {
