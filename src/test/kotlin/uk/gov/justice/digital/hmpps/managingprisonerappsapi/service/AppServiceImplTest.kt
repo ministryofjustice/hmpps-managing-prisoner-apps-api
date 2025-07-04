@@ -100,6 +100,7 @@ class AppServiceImplTest {
       requestedByFirstName,
       requestedByLastName,
       UserCategory.PRISONER,
+      "7-1-007",
       UUID.randomUUID().toString(),
       UUID.randomUUID().toString(),
       establishmentId,
