@@ -23,6 +23,7 @@ class PrisonerServiceImpl(
       prisonerDto.firstName,
       prisonerDto.lastName,
       UserCategory.PRISONER,
+      prisonerDto.cellLocation,
       prisonerDto.locationDescription,
       prisonerDto.currentIncentive?.level?.description,
       if (activeProfile.equals("test")) "TEST_ESTABLISHMENT_FIRST" else prisonerDto.prisonId,

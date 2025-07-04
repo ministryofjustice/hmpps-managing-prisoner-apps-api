@@ -105,6 +105,7 @@ class PrisonerSearchApiMockServer : WireMockServer(8093) {
                 "  \"recall\": false,\n" +
                 "  \"indeterminateSentence\": false,\n" +
                 "  \"receptionDate\": \"2012-09-17\",\n" +
+                "  \"cellLocation\": \"7-1-007\",\n" +
                 "  \"locationDescription\": \"Outside - released from Bronzefield (HMP)\",\n" +
                 "  \"restrictedPatient\": false,\n" +
                 "  \"currentIncentive\": {\n" +
