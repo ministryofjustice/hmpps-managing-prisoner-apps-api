@@ -68,7 +68,7 @@ class AppServiceImplTest {
 
     app = DataGenerator.generateApp(
       establishmentId,
-      AppType.PIN_PHONE_ADD_NEW_CONTACT,
+      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
       requestedBy,
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstName,
@@ -133,7 +133,7 @@ class AppServiceImplTest {
         requestedBy,
         createdBy,
         DataGenerator.generateAppRequestDto(
-          AppType.PIN_PHONE_ADD_NEW_CONTACT,
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
@@ -157,7 +157,7 @@ class AppServiceImplTest {
         requestedBy,
         createdBy,
         DataGenerator.generateAppRequestDto(
-          AppType.PIN_PHONE_ADD_NEW_CONTACT,
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
@@ -181,7 +181,7 @@ class AppServiceImplTest {
         requestedBy,
         createdBy,
         DataGenerator.generateAppRequestDto(
-          AppType.PIN_PHONE_ADD_NEW_CONTACT,
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
@@ -204,7 +204,7 @@ class AppServiceImplTest {
         groupId,
         "Test Group",
         establishmentId,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
         GroupType.WING,
       ),
     )
@@ -216,7 +216,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
         ),
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
       ),
     )
@@ -225,7 +225,7 @@ class AppServiceImplTest {
       requestedBy,
       createdBy,
       DataGenerator.generateAppRequestDto(
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstName,
         requestedByLastName,
@@ -247,7 +247,7 @@ class AppServiceImplTest {
         groupId,
         "Test Group",
         establishmentId,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
         GroupType.WING,
       ),
     )
@@ -259,7 +259,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
         ),
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
       ),
     )
@@ -270,7 +270,7 @@ class AppServiceImplTest {
         createdBy,
         AppRequestDto(
           "Testing",
-          AppType.PIN_PHONE_ADD_NEW_CONTACT.toString(),
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(),
         ),
@@ -284,7 +284,7 @@ class AppServiceImplTest {
         createdBy,
         AppRequestDto(
           "Testing",
-          AppType.PIN_PHONE_ADD_NEW_CONTACT.toString(),
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(
             HashMap<String, Any>()
@@ -322,7 +322,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
         ),
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
       ),
     )

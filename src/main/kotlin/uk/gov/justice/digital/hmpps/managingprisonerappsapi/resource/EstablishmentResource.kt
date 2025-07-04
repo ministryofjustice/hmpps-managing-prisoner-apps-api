@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.EstablishmentService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
@@ -164,7 +164,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
   )
   @GetMapping("/establishments/apps/types", produces = [MediaType.APPLICATION_JSON_VALUE])
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
-  fun getAppTypesByEstablishment(authentication: Authentication): ResponseEntity<Set<AppType>> {
+  fun getAppTypesByEstablishment(authentication: Authentication): ResponseEntity<List<AppTypeResponse>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for get app types by ${authentication.principal}")
     val appTypes = establishmentService.getAppTypesByLoggedUserEstablishment(authentication.principal)

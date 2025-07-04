@@ -50,7 +50,7 @@ class DataGenerator {
       UUID.randomUUID(),
       UUID.randomUUID().toString(),
       UUID.randomUUID(),
-      AppType.PIN_PHONE_ADD_NEW_CONTACT,
+      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
       LocalDateTime.now(),
       LocalDateTime.now(),
       "testStaaf@moj",

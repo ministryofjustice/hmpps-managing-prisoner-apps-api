@@ -54,7 +54,7 @@ class CommentServiceImplTest {
   fun beforeEach() {
     app = DataGenerator.generateApp(
       establishmentId,
-      AppType.PIN_PHONE_ADD_NEW_CONTACT,
+      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
       requestedBy,
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstName,
