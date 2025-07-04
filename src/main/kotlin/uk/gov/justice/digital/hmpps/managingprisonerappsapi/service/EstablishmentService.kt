@@ -77,36 +77,35 @@ class EstablishmentService(
     appTypes.forEach { appType ->
       if (appType == AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT) {
         appTypesList.add(
-            AppTypeResponse(
-                appType.name,
-                "add-social-pin-phone-contact",
-                "Add new social PIN phone contact",
-            ),
+          AppTypeResponse(
+            appType.name,
+            "add-social-pin-phone-contact",
+            "Add new social PIN phone contact",
+          ),
         )
-
       } else if (appType == AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP) {
         appTypesList.add(
-            AppTypeResponse(
-                appType.name,
-                "add-emergency-pin-phone-credit",
-                "Add emergency PIN phone credit",
-            ),
+          AppTypeResponse(
+            appType.name,
+            "add-emergency-pin-phone-credit",
+            "Add emergency PIN phone credit",
+          ),
         )
       } else if (appType == AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS) {
         appTypesList.add(
-            AppTypeResponse(
-                appType.name,
-                "swap-visiting-orders-for-pin-credit",
-                "Swap visiting orders (VOs) for PIN credit",
-            ),
+          AppTypeResponse(
+            appType.name,
+            "swap-visiting-orders-for-pin-credit",
+            "Swap visiting orders (VOs) for PIN credit",
+          ),
         )
       } else if (appType == AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS) {
         appTypesList.add(
-            AppTypeResponse(
-                appType.name,
-                "supply-list-of-pin-phone-contacts",
-                "Supply list of PIN phone contacts",
-            ),
+          AppTypeResponse(
+            appType.name,
+            "supply-list-of-pin-phone-contacts",
+            "Supply list of PIN phone contacts",
+          ),
         )
       } else {
         throw ApiException("No app type found for ${appType.name}", HttpStatus.INTERNAL_SERVER_ERROR)
