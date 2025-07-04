@@ -97,7 +97,7 @@ class AppResourceIntegrationTest(
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
         DataGenerator.generateAppRequestDto(
-          AppType.PIN_PHONE_ADD_NEW_CONTACT,
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedBySecondSurname,
@@ -111,7 +111,7 @@ class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<Any, Any>
 
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, response.appType)
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, response.appType)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.PENDING, response.status)
     Assertions.assertEquals(1, response.requests.size)
@@ -137,7 +137,7 @@ class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<Any, Any>
 
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, response.appType)
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, response.appType)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.PENDING, response.status)
     Assertions.assertEquals(1, response.requests.size)
@@ -236,7 +236,7 @@ class AppResourceIntegrationTest(
     Assertions.assertEquals(forwardingMessage, comment.message)
     Assertions.assertEquals(appIdFirst, comment.appId)
     Assertions.assertEquals(loggedUserId, comment.createdBy)
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, response.appType)
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, response.appType)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.PENDING, response.status)
@@ -271,7 +271,7 @@ class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<AssignedGroupDto, String>
 
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, response.appType)
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, response.appType)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.PENDING, response.status)
@@ -301,7 +301,7 @@ class AppResourceIntegrationTest(
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
         DataGenerator.generateAppRequestDto(
-          AppType.PIN_PHONE_ADD_NEW_CONTACT,
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedByFirstSurname,
@@ -316,7 +316,7 @@ class AppResourceIntegrationTest(
     val app = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
@@ -324,7 +324,7 @@ class AppResourceIntegrationTest(
         AppStatus.PENDING,
         groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(
           establishmentIdFirst,
-          AppType.PIN_PHONE_ADD_NEW_CONTACT,
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         ).get(0).id,
       ),
     )
@@ -353,7 +353,7 @@ class AppResourceIntegrationTest(
     val app = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
@@ -361,7 +361,7 @@ class AppResourceIntegrationTest(
         AppStatus.PENDING,
         groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(
           establishmentIdFirst,
-          AppType.PIN_PHONE_ADD_NEW_CONTACT,
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         ).get(0).id,
       ),
     )
@@ -393,7 +393,7 @@ class AppResourceIntegrationTest(
     val app = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
@@ -401,7 +401,7 @@ class AppResourceIntegrationTest(
         AppStatus.PENDING,
         groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(
           establishmentIdFirst,
-          AppType.PIN_PHONE_ADD_NEW_CONTACT,
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         ).get(0).id,
       ),
     )
@@ -439,7 +439,7 @@ class AppResourceIntegrationTest(
         assignedGroupFirst,
         establishmentIdFirst,
         assignedGroupFirstName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_ADD_NEW_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
         GroupType.WING,
       ),
     )
@@ -457,7 +457,7 @@ class AppResourceIntegrationTest(
         assignedGroupSecond,
         establishmentIdFirst,
         assignedGroupSecondName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_ADD_NEW_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
         GroupType.WING,
       ),
     )
@@ -467,7 +467,7 @@ class AppResourceIntegrationTest(
     appIdFirst = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC).minusDays(4),
         requestedByFirstMainName,
@@ -479,7 +479,7 @@ class AppResourceIntegrationTest(
     appIdSecond = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC).minusDays(2),
         requestedByFirstMainName,
@@ -492,7 +492,7 @@ class AppResourceIntegrationTest(
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC).minusDays(1),
         requestedByFirstMainName,
@@ -504,7 +504,7 @@ class AppResourceIntegrationTest(
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         requestedBySecond,
         LocalDateTime.now(ZoneOffset.UTC).minusDays(2).minusHours(1),
         requestedBySecondMainName,
@@ -516,7 +516,7 @@ class AppResourceIntegrationTest(
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdSecond,
-        AppType.PIN_PHONE_ADD_NEW_CONTACT,
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,

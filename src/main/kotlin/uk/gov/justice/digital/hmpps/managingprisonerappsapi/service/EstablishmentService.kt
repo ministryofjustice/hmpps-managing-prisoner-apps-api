@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
@@ -51,14 +52,14 @@ class EstablishmentService(
     return establishmentRepository.deleteById(id)
   }*/
 
-  fun getAppTypesByLoggedUserEstablishment(staffId: String): Set<AppType> {
+  fun getAppTypesByLoggedUserEstablishment(staffId: String): List<AppTypeResponse> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
     }
     establishmentRepository.findById(staff.establishmentId).orElseThrow {
       ApiException("Establishment: ${staff.establishmentId} not enabled", HttpStatus.FORBIDDEN)
     }
-    return AppType.entries.toSet()
+    return convertAppTypeToAppTypeListResponse(AppType.entries.toSet())
   }
 
   private fun convertEstablishmentToEstablishmentDto(establishment: Establishment): EstablishmentDto = EstablishmentDto(
@@ -70,4 +71,47 @@ class EstablishmentService(
     id = establishmentDto.id,
     name = establishmentDto.name,
   )
+
+  private fun convertAppTypeToAppTypeListResponse(appTypes: Set<AppType>): List<AppTypeResponse> {
+    val appTypesList = ArrayList<AppTypeResponse>(appTypes.size)
+    appTypes.forEach { appType ->
+      if (appType == AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT) {
+        appTypesList.add(
+            AppTypeResponse(
+                appType.name,
+                "add-social-pin-phone-contact",
+                "Add new social PIN phone contact",
+            ),
+        )
+
+      } else if (appType == AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP) {
+        appTypesList.add(
+            AppTypeResponse(
+                appType.name,
+                "add-emergency-pin-phone-credit",
+                "Add emergency PIN phone credit",
+            ),
+        )
+      } else if (appType == AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS) {
+        appTypesList.add(
+            AppTypeResponse(
+                appType.name,
+                "swap-visiting-orders-for-pin-credit",
+                "Swap visiting orders (VOs) for PIN credit",
+            ),
+        )
+      } else if (appType == AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS) {
+        appTypesList.add(
+            AppTypeResponse(
+                appType.name,
+                "supply-list-of-pin-phone-contacts",
+                "Supply list of PIN phone contacts",
+            ),
+        )
+      } else {
+        throw ApiException("No app type found for ${appType.name}", HttpStatus.INTERNAL_SERVER_ERROR)
+      }
+    }
+    return appTypesList
+  }
 }

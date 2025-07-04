@@ -36,7 +36,7 @@ class GroupRepositoryTest(
   @Test
   fun `save groups`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT)
+    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         UUID.randomUUID(),
@@ -52,7 +52,7 @@ class GroupRepositoryTest(
   @Test
   fun `update groups`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT)
+    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         UUID.randomUUID(),
@@ -68,7 +68,7 @@ class GroupRepositoryTest(
   @Test
   fun `delete groups`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT)
+    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         UUID.randomUUID(),
@@ -87,7 +87,7 @@ class GroupRepositoryTest(
   @Test
   fun `get group by id`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT)
+    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         UUID.randomUUID(),
@@ -111,7 +111,7 @@ class GroupRepositoryTest(
         UUID.randomUUID(),
         establishmentIdOne,
         "Business Hub",
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
         GroupType.WING,
       ),
     )
@@ -120,7 +120,7 @@ class GroupRepositoryTest(
         UUID.randomUUID(),
         establishmentIdOne,
         "Business Hub",
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
         GroupType.WING,
       ),
     )
@@ -138,13 +138,13 @@ class GroupRepositoryTest(
         UUID.randomUUID(),
         establishmentIdTwo,
         "Business Hub",
-        listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
         GroupType.WING,
       ),
     )
     val findGroups = groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(
       establishmentIdOne,
-      AppType.PIN_PHONE_ADD_NEW_CONTACT,
+      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
     )
     Assertions.assertEquals(2, findGroups.size)
   }
