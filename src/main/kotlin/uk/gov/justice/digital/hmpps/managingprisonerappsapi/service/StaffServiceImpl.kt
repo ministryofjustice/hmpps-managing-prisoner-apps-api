@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.client.ManageUsersApiClient
@@ -14,6 +15,10 @@ class StaffServiceImpl(
   @Value("\${spring.profiles.active:test}")
   private lateinit var activeProfile: String
 
+  companion object {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+  }
+
   override fun getStaffById(staffId: String): Optional<Staff> {
     val userDetailsDto = manageUsersApiClient.getUserDetails(staffId)
     val staff = Staff(
@@ -26,6 +31,8 @@ class StaffServiceImpl(
       "staffJobTitle", // To-Do find endpoint to get job title of the staff.
       userDetailsDto.uuid,
     )
+    logger.info("Staff detail id: ${staff.username} and active caseload id: ${staff.establishmentId}")
+
     return Optional.of(staff)
   }
 }
