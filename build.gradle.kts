@@ -30,14 +30,12 @@ dependencies {
   testImplementation("com.h2database:h2:2.3.232")
 }
 
-java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+kotlin {
+  jvmToolchain(21)
 }
 
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-      jvmTarget = "21"
-    }
+    compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
   }
 }
