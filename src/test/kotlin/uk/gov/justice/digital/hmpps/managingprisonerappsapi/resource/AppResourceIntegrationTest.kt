@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
@@ -97,7 +98,7 @@ class AppResourceIntegrationTest(
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
         DataGenerator.generateAppRequestDto(
-          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+          AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedBySecondSurname,
@@ -111,9 +112,10 @@ class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<Any, Any>
 
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, response.appType)
+    Assertions.assertEquals(AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS, response.appType)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(false, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
     Assertions.assertEquals(response.requests.get(0)["contact-number"], CONTACT_NUMBER)
@@ -137,9 +139,10 @@ class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<Any, Any>
 
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, response.appType)
+    Assertions.assertEquals(AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS, response.appType)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(false, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertEquals(newContactNumber, response.requests.get(0)["contact-number"])
 
@@ -155,6 +158,123 @@ class AppResourceIntegrationTest(
       .consumeWith(System.out::println)
       .returnResult()
       .responseBody as List<HistoryResponse>
+  }
+
+  @Test
+  fun `test submit app request with first night center true for pin hone add new social contact app type`() {
+    var appRequest = AppRequestDto(
+      "Testing",
+      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
+      LocalDateTime.now(),
+      listOf(
+        HashMap<String, Any>()
+          .apply {
+            // put("amount", 10)
+            put("contact-number", CONTACT_NUMBER)
+            // put("firstName", "John")
+            // put("lastName", "Smith")
+          },
+      ),
+      true,
+    )
+    var response = webTestClient.post()
+      .uri("/v1/prisoners/$requestedByFirst/apps")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(
+        appRequest,
+      )
+      .exchange()
+      .expectStatus().isCreated
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Any, Any>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponseDto<Any, Any>
+
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, response.appType)
+    Assertions.assertEquals(requestedByFirst, response.requestedBy)
+    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(true, response.firstNightCenter)
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertNotNull(response.requests.get(0)["id"])
+    Assertions.assertEquals(response.requests.get(0)["contact-number"], CONTACT_NUMBER)
+  }
+
+  @Test
+  fun `test submit app request with first night center false for pin hone add new social contact app type`() {
+    val appRequest = AppRequestDto(
+      "Testing",
+      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
+      LocalDateTime.now(),
+      listOf(
+        HashMap<String, Any>()
+          .apply {
+            // put("amount", 10)
+            put("contact-number", CONTACT_NUMBER)
+            // put("firstName", "John")
+            // put("lastName", "Smith")
+          },
+      ),
+      false,
+    )
+    val response = webTestClient.post()
+      .uri("/v1/prisoners/$requestedByFirst/apps")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(
+        appRequest,
+      )
+      .exchange()
+      .expectStatus().isCreated
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Any, Any>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponseDto<Any, Any>
+
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, response.appType)
+    Assertions.assertEquals(requestedByFirst, response.requestedBy)
+    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(false, response.firstNightCenter)
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertNotNull(response.requests.get(0)["id"])
+    Assertions.assertEquals(response.requests.get(0)["contact-number"], CONTACT_NUMBER)
+  }
+
+  @Test
+  fun `test submit app request with first night center false for supply list contact app type`() {
+    val appRequest = DataGenerator.generateAppRequestDto(
+      AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS,
+      LocalDateTime.now(ZoneOffset.UTC),
+      requestedByFirstMainName,
+      requestedBySecondSurname,
+    )
+    val response = webTestClient.post()
+      .uri("/v1/prisoners/$requestedByFirst/apps")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(
+        appRequest,
+      )
+      .exchange()
+      .expectStatus().isCreated
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Any, Any>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponseDto<Any, Any>
+
+    Assertions.assertEquals(AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS, response.appType)
+    Assertions.assertEquals(requestedByFirst, response.requestedBy)
+    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(false, response.firstNightCenter)
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertNotNull(response.requests.get(0)["id"])
+    Assertions.assertEquals(response.requests.get(0)["contact-number"], CONTACT_NUMBER)
   }
 
   @Test
@@ -457,7 +577,7 @@ class AppResourceIntegrationTest(
         assignedGroupSecond,
         establishmentIdFirst,
         assignedGroupSecondName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS),
         GroupType.WING,
       ),
     )
