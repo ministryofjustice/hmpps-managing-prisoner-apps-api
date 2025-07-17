@@ -9,4 +9,5 @@ data class AppRequestDto(
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val requestedDate: LocalDateTime,
   val requests: List<MutableMap<String, Any>>,
+  val firstNightCenter: Boolean,
 )

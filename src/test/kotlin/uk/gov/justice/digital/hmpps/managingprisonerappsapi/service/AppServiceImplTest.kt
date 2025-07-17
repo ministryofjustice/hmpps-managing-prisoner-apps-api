@@ -274,6 +274,7 @@ class AppServiceImplTest {
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(),
+          false,
         ),
       )
     }
@@ -300,6 +301,7 @@ class AppServiceImplTest {
                 put("contact-number", CONTACT_NUMBER)
               },
           ),
+          false,
         ),
       )
     }

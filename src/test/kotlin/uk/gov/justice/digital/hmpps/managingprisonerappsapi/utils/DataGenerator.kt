@@ -64,6 +64,7 @@ class DataGenerator {
       AppStatus.PENDING,
       UUID.randomUUID().toString(),
       mutableListOf(),
+      false,
     )
 
     fun generateApp(
@@ -93,6 +94,7 @@ class DataGenerator {
       appStatus,
       establishmentId,
       mutableListOf(),
+      false,
     )
 
     fun generateEstablishment(): Establishment = Establishment("HST", "Test Establishment")
@@ -117,18 +119,19 @@ class DataGenerator {
       requestedByFirstName: String,
       requestedByLastName: String,
     ): AppRequestDto = AppRequestDto(
-      "Testing",
-      appType.toString(),
-      requestedDate,
-      listOf(
-        HashMap<String, Any>()
-          .apply {
-            // put("amount", 10)
-            put("contact-number", CONTACT_NUMBER)
-            // put("firstName", "John")
-            // put("lastName", "Smith")
-          },
-      ),
+        "Testing",
+        appType.toString(),
+        requestedDate,
+        listOf(
+          HashMap<String, Any>()
+            .apply {
+              // put("amount", 10)
+              put("contact-number", CONTACT_NUMBER)
+              // put("firstName", "John")
+              // put("lastName", "Smith")
+            },
+        ),
+        false,
     )
   }
 }

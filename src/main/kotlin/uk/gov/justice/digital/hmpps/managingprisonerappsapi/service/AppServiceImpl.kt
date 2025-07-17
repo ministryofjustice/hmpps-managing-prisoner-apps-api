@@ -331,6 +331,7 @@ class AppServiceImpl(
       AppStatus.PENDING,
       prisoner.establishmentId!!,
       mutableListOf(),
+      false,
     )
   }
 
@@ -369,6 +370,7 @@ class AppServiceImpl(
     app.status,
     app.establishmentId,
     app.responses,
+    false,
   )
 
   private fun convertAppToAppListDto(apps: List<App>): List<AppListViewDto> {

@@ -27,4 +27,5 @@ data class AppResponseDto<X, Y>(
   val status: AppStatus,
   val establishmentId: String,
   val responses: List<UUID>?,
+  val firstNightCenter: Boolean,
 )
