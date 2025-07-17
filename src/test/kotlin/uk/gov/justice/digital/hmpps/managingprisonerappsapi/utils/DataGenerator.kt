@@ -119,19 +119,19 @@ class DataGenerator {
       requestedByFirstName: String,
       requestedByLastName: String,
     ): AppRequestDto = AppRequestDto(
-        "Testing",
-        appType.toString(),
-        requestedDate,
-        listOf(
-          HashMap<String, Any>()
-            .apply {
-              // put("amount", 10)
-              put("contact-number", CONTACT_NUMBER)
-              // put("firstName", "John")
-              // put("lastName", "Smith")
-            },
-        ),
-        false,
+      "Testing",
+      appType.toString(),
+      requestedDate,
+      listOf(
+        HashMap<String, Any>()
+          .apply {
+            // put("amount", 10)
+            put("contact-number", CONTACT_NUMBER)
+            // put("firstName", "John")
+            // put("lastName", "Smith")
+          },
+      ),
+      false,
     )
   }
 }
