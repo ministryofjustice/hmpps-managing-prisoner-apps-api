@@ -313,6 +313,10 @@ class AppServiceImpl(
     appRequest: AppRequestDto,
   ): App {
     val localDateTime = LocalDateTime.now(ZoneOffset.UTC)
+    var firstNightCenter = false
+    if (appRequest.type == AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString() && appRequest.firstNightCenter != null) {
+      firstNightCenter = appRequest.firstNightCenter
+    }
     return App(
       UUID.randomUUID(), // id
       appRequest.reference, // reference
@@ -331,6 +335,7 @@ class AppServiceImpl(
       AppStatus.PENDING,
       prisoner.establishmentId!!,
       mutableListOf(),
+      firstNightCenter,
     )
   }
 
@@ -369,6 +374,7 @@ class AppServiceImpl(
     app.status,
     app.establishmentId,
     app.responses,
+    app.firstNightCenter,
   )
 
   private fun convertAppToAppListDto(apps: List<App>): List<AppListViewDto> {

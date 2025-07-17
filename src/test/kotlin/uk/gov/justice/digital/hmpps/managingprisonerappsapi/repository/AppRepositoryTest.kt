@@ -66,6 +66,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       createdApp.status,
       UUID.randomUUID().toString(),
       mutableListOf(),
+      false,
     )
     app = appRepository.save(app)
     Assertions.assertEquals("new reference 123", app.reference)

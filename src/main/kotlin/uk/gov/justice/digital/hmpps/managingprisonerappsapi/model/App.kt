@@ -37,6 +37,7 @@ data class App(
   val establishmentId: String,
   @ElementCollection
   var responses: MutableList<UUID>,
+  val firstNightCenter: Boolean,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
