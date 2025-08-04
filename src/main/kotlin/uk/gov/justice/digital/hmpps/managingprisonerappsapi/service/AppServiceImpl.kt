@@ -263,7 +263,7 @@ class AppServiceImpl(
       throw ApiException("No staff with id $staffId", HttpStatus.BAD_REQUEST)
     }
     var appTypeDto: List<AppByAppTypeCounts> = listOf()
-    var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> =  listOf()
+    var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> = listOf()
     var pageResult: Page<App> = Page.empty()
     runBlocking {
       launch {
