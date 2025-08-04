@@ -202,11 +202,12 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
 
     // By establishment Id and status
     var countResult = appRepository.countBySearchFilterGroupByAppType(
-      establishmentIdFirst,
-      setOf(AppStatus.PENDING),
-      null,
-      null,
-      null,
+        establishmentIdFirst,
+        setOf(AppStatus.PENDING),
+        null,
+        null,
+        null,
+        false,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(4, countResult.get(0).getCount())
@@ -220,6 +221,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       null,
+      false,
     )
     println("size by assignedgroup ${countResultByAssignedGroup.size}")
     println(countResultByAssignedGroup.get(0).getCount())
@@ -231,17 +233,19 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       null,
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 4)
 
     // By establishment and status and appType
     countResult = appRepository.countBySearchFilterGroupByAppType(
-      establishmentIdSecond,
-      setOf(AppStatus.PENDING),
-      setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
-      null,
-      null,
+        establishmentIdSecond,
+        setOf(AppStatus.PENDING),
+        setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        null,
+        null,
+        false,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(1, countResult.get(0).getCount())
@@ -253,17 +257,19 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
       null,
       null,
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 1)
 
     // By EstablishmentId AND status and requestedBy
     countResult = appRepository.countBySearchFilterGroupByAppType(
-      establishmentIdFirst,
-      setOf(AppStatus.PENDING),
-      null,
-      requestedByFirst,
-      null,
+        establishmentIdFirst,
+        setOf(AppStatus.PENDING),
+        null,
+        requestedByFirst,
+        null,
+      false,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(3, countResult.get(0).getCount())
@@ -275,17 +281,19 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       requestedByFirst,
       null,
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 3)
 
     // By EstablishmentId and Status and assignedGroup
     countResult = appRepository.countBySearchFilterGroupByAppType(
-      establishmentIdFirst,
-      setOf(AppStatus.PENDING),
-      null,
-      null,
-      setOf(assignedGroupFirst),
+        establishmentIdFirst,
+        setOf(AppStatus.PENDING),
+        null,
+        null,
+        setOf(assignedGroupFirst),
+      false,
     )
     Assertions.assertEquals(1, countResult.size)
     pageResult = appRepository.appsBySearchFilter(
@@ -294,17 +302,19 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       setOf(assignedGroupFirst),
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 4)
 
     // By establishment id and status and appType and requestedBy and assignedGroup
     countResult = appRepository.countBySearchFilterGroupByAppType(
-      establishmentIdSecond,
-      setOf(AppStatus.PENDING),
-      setOf(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
-      requestedByThird,
-      setOf(assignedGroupSecond),
+        establishmentIdSecond,
+        setOf(AppStatus.PENDING),
+        setOf(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
+        requestedByThird,
+        setOf(assignedGroupSecond),
+      false,
     )
     Assertions.assertEquals(countResult.size, 1)
     Assertions.assertEquals(2, countResult.get(0).getCount())
@@ -316,6 +326,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       setOf(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
       requestedByThird,
       setOf(assignedGroupSecond),
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(2, pageResult1.totalElements)
