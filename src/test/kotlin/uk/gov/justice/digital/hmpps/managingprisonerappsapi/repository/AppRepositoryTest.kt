@@ -207,6 +207,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       null,
+      false,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(4, countResult.get(0).getCount())
@@ -220,6 +221,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       null,
+      false,
     )
     println("size by assignedgroup ${countResultByAssignedGroup.size}")
     println(countResultByAssignedGroup.get(0).getCount())
@@ -231,6 +233,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       null,
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 4)
@@ -242,6 +245,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
       null,
       null,
+      false,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(1, countResult.get(0).getCount())
@@ -253,6 +257,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
       null,
       null,
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 1)
@@ -264,6 +269,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       requestedByFirst,
       null,
+      false,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(3, countResult.get(0).getCount())
@@ -275,6 +281,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       requestedByFirst,
       null,
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 3)
@@ -286,6 +293,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       setOf(assignedGroupFirst),
+      false,
     )
     Assertions.assertEquals(1, countResult.size)
     pageResult = appRepository.appsBySearchFilter(
@@ -294,6 +302,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       setOf(assignedGroupFirst),
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 4)
@@ -305,6 +314,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       setOf(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
       requestedByThird,
       setOf(assignedGroupSecond),
+      false,
     )
     Assertions.assertEquals(countResult.size, 1)
     Assertions.assertEquals(2, countResult.get(0).getCount())
@@ -316,6 +326,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       setOf(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
       requestedByThird,
       setOf(assignedGroupSecond),
+      false,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(2, pageResult1.totalElements)

@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -252,36 +255,50 @@ class AppServiceImpl(
     appTypes: Set<AppType>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
+    firstNightCenter: Boolean,
     pageNumber: Long,
     pageSize: Long,
   ): AppResponseListDto {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       throw ApiException("No staff with id $staffId", HttpStatus.BAD_REQUEST)
     }
-    val appTypeDto = appRepository.countBySearchFilterGroupByAppType(
-      staff.establishmentId,
-      status,
-      appTypes,
-      requestedBy,
-      assignedGroups,
-    )
-    val assignedGroupTypesCounts = appRepository.countBySearchFilterGroupByAssignedGroup(
-      staff.establishmentId,
-      status,
-      appTypes,
-      requestedBy,
-      assignedGroups,
-    )
-
-    val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt())
-    val pageResult = appRepository.appsBySearchFilter(
-      staff.establishmentId,
-      status,
-      appTypes,
-      requestedBy,
-      assignedGroups,
-      pageRequest,
-    )
+    var appTypeDto: List<AppByAppTypeCounts> = listOf()
+    var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> = listOf()
+    var pageResult: Page<App> = Page.empty()
+    runBlocking {
+      launch {
+        appTypeDto = appRepository.countBySearchFilterGroupByAppType(
+          staff.establishmentId,
+          status,
+          appTypes,
+          requestedBy,
+          assignedGroups,
+          firstNightCenter,
+        )
+      }
+      launch {
+        assignedGroupTypesCounts = appRepository.countBySearchFilterGroupByAssignedGroup(
+          staff.establishmentId,
+          status,
+          appTypes,
+          requestedBy,
+          assignedGroups,
+          firstNightCenter,
+        )
+      }
+      launch {
+        val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt())
+        pageResult = appRepository.appsBySearchFilter(
+          staff.establishmentId,
+          status,
+          appTypes,
+          requestedBy,
+          assignedGroups,
+          firstNightCenter,
+          pageRequest,
+        )
+      }
+    }
     val appsList = convertAppToAppListDto(pageResult.content)
     val groups = groupsService.getGroupsByEstablishmentId(staff.establishmentId)
     return AppResponseListDto(
@@ -293,6 +310,7 @@ class AppServiceImpl(
         groups,
         assignedGroupTypesCounts,
       ),
+      pageResult.totalElements,
       appsList,
     )
   }

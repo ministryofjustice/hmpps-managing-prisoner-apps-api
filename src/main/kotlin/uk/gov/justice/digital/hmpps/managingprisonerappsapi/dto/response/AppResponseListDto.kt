@@ -12,6 +12,7 @@ data class AppResponseListDto(
   val exhausted: Boolean,
   val types: Map<AppType, Int>,
   val assignedGroups: List<GroupAppListViewDto>,
+  val firstNightCenter: Long,
   val apps: List<AppListViewDto>,
 )
 

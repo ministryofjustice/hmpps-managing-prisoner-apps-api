@@ -263,6 +263,7 @@ class AppResource(var appService: AppService) {
       appsSearchQueryDto.types,
       appsSearchQueryDto.requestedBy,
       appsSearchQueryDto.assignedGroups,
+      appsSearchQueryDto.firstNightCenter,
       appsSearchQueryDto.page,
       appsSearchQueryDto.size,
     )
