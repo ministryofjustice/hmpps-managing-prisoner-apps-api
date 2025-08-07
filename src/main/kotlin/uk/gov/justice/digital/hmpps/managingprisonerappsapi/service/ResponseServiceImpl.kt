@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import com.fasterxml.uuid.Generators
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -59,7 +60,7 @@ class ResponseServiceImpl(
         }
         responseEntity = responseRepository.save(
           Response(
-            UUID.randomUUID(),
+            Generators.timeBasedEpochGenerator().generate(),
             response.reason,
             response.decision,
             LocalDateTime.now(ZoneOffset.UTC),

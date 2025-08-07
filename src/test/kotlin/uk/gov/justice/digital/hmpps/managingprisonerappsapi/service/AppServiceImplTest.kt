@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import com.fasterxml.uuid.Generators
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -39,7 +40,7 @@ class AppServiceImplTest {
   private val requestedByLastName = "Prisoner"
   private val createdBy = "Staff12345"
   private val staffFullName = "Test Staff"
-  private val groupId = UUID.randomUUID()
+  private val groupId = Generators.timeBasedEpochGenerator().generate()
   private val forwardingComment = "Forwarding Comment"
 
   private lateinit var prisoner: Prisoner
@@ -78,7 +79,7 @@ class AppServiceImplTest {
     )
 
     comment = Comment(
-      UUID.randomUUID(),
+      Generators.timeBasedEpochGenerator().generate(),
       forwardingComment,
       LocalDateTime.now(ZoneOffset.UTC),
       app.createdBy,
@@ -87,7 +88,7 @@ class AppServiceImplTest {
 
     staff = Staff(
       createdBy,
-      UUID.randomUUID().toString(),
+      Generators.timeBasedEpochGenerator().generate().toString(),
       staffFullName,
       UserCategory.STAFF,
       establishmentId,

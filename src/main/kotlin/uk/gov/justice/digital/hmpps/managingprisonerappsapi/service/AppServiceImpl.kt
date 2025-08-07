@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import com.fasterxml.uuid.Generators
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
@@ -205,7 +206,7 @@ class AppServiceImpl(
     if (commentRequestDto != null) {
       comment = commentRepository.save(
         Comment(
-          UUID.randomUUID(),
+          Generators.timeBasedEpochGenerator().generate(),
           commentRequestDto.message,
           LocalDateTime.now(ZoneOffset.UTC),
           staffId,
@@ -336,7 +337,7 @@ class AppServiceImpl(
       firstNightCenter = appRequest.firstNightCenter
     }
     return App(
-      UUID.randomUUID(), // id
+      Generators.timeBasedEpochGenerator().generate(), // id
       appRequest.reference, // reference
       groupId, // group id
       AppType.getAppType(appRequest.type),

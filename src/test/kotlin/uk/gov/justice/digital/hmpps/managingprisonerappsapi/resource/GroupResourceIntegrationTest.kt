@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
+import com.fasterxml.uuid.Generators
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -29,9 +30,9 @@ class GroupResourceIntegrationTest(
   private val baseUrl = "http://localhost"
 
   val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
-  val assignedGroupFirst = UUID.randomUUID()
+  val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
   val assignedGroupFirstName = "Business Hub"
-  val assignedGroupSecond = UUID.randomUUID()
+  val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
   val assignedGroupSecondName = "OMU"
 
   @BeforeEach

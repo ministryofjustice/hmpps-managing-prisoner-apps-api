@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import com.fasterxml.uuid.Generators
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -43,7 +44,7 @@ class CommentServiceImpl(
     validatePrisonerByRequestedBy(prisonerId, app)
     val comment = commentRepository.save(
       Comment(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         commentRequestDto.message,
         LocalDateTime.now(ZoneOffset.UTC),
         staffId,

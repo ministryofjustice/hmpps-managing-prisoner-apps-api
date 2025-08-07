@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository
 
+import com.fasterxml.uuid.Generators
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -24,13 +25,13 @@ import java.util.*
 class ResponseRepositoryTest(@Autowired var responseRepository: ResponseRepository) {
   @Test
   fun `save response`() {
-    val response = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID().toString()))
+    val response = responseRepository.save(DataGenerator.generateResponse(Generators.timeBasedEpochGenerator().generate().toString()))
     Assertions.assertNotNull(response)
   }
 
   @Test
   fun `update response`() {
-    val createdResponse = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID().toString()))
+    val createdResponse = responseRepository.save(DataGenerator.generateResponse(Generators.timeBasedEpochGenerator().generate().toString()))
     var response = Response(
       createdResponse.id,
       "updating reason",
@@ -44,14 +45,14 @@ class ResponseRepositoryTest(@Autowired var responseRepository: ResponseReposito
 
   @Test
   fun `find response by id`() {
-    val createdResponse = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID().toString()))
+    val createdResponse = responseRepository.save(DataGenerator.generateResponse(Generators.timeBasedEpochGenerator().generate().toString()))
     val response = responseRepository.findById(createdResponse.id)
     Assertions.assertEquals(true, response.isPresent)
   }
 
   @Test
   fun `delete response by id`() {
-    val createdResponse = responseRepository.save(DataGenerator.generateResponse(UUID.randomUUID().toString()))
+    val createdResponse = responseRepository.save(DataGenerator.generateResponse(Generators.timeBasedEpochGenerator().generate().toString()))
     responseRepository.deleteById(createdResponse.id)
     val response = responseRepository.findById(createdResponse.id)
     Assertions.assertEquals(false, response.isPresent)

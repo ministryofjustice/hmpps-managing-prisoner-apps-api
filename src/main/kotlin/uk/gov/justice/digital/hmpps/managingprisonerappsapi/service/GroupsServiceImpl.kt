@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import com.fasterxml.uuid.Generators
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.GroupsRequestDto
@@ -77,7 +78,7 @@ class GroupsServiceImpl(
   )
 
   fun convertGroupsRequestDtoToGroups(groupsRequestDto: GroupsRequestDto): Groups = Groups(
-    UUID.randomUUID(),
+    Generators.timeBasedEpochGenerator().generate(),
     groupsRequestDto.name,
     groupsRequestDto.establishmentId,
     groupsRequestDto.initialsApps,
