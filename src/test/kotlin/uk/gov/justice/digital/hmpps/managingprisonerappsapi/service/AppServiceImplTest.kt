@@ -76,6 +76,7 @@ class AppServiceImplTest {
       requestedByLastName,
       AppStatus.PENDING,
       groupId,
+      false,
     )
 
     comment = Comment(

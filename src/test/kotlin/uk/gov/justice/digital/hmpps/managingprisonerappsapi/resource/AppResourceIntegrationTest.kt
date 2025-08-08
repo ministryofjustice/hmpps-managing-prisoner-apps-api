@@ -287,6 +287,7 @@ class AppResourceIntegrationTest(
       setOf(),
       requestedByFirst,
       setOf(),
+      null,
     )
     webTestClient.post()
       .uri("/v1/prisoners/apps/search")
@@ -447,6 +448,7 @@ class AppResourceIntegrationTest(
           establishmentIdFirst,
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         ).get(0).id,
+        false,
       ),
     )
     val response = webTestClient.get()
@@ -484,6 +486,7 @@ class AppResourceIntegrationTest(
           establishmentIdFirst,
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         ).get(0).id,
+        false,
       ),
     )
 
@@ -524,6 +527,7 @@ class AppResourceIntegrationTest(
           establishmentIdFirst,
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         ).get(0).id,
+        false,
       ),
     )
 
@@ -595,6 +599,7 @@ class AppResourceIntegrationTest(
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     ).id
     appIdSecond = appRepository.save(
@@ -607,6 +612,7 @@ class AppResourceIntegrationTest(
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     ).id
 
@@ -620,6 +626,7 @@ class AppResourceIntegrationTest(
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     )
     appRepository.save(
@@ -632,6 +639,7 @@ class AppResourceIntegrationTest(
         requestedBySecondSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     )
     appRepository.save(
@@ -644,6 +652,7 @@ class AppResourceIntegrationTest(
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     )
     appRepository.save(
@@ -656,6 +665,7 @@ class AppResourceIntegrationTest(
         requestedByThirdSurname,
         AppStatus.PENDING,
         assignedGroupSecond,
+        false,
       ),
     )
     appRepository.save(
@@ -668,6 +678,7 @@ class AppResourceIntegrationTest(
         requestedByThirdSurname,
         AppStatus.PENDING,
         assignedGroupSecond,
+        false,
       ),
     )
     appRepository.save(
@@ -680,6 +691,7 @@ class AppResourceIntegrationTest(
         requestedByThirdSurname,
         AppStatus.PENDING,
         assignedGroupSecond,
+        false,
       ),
     )
   }
