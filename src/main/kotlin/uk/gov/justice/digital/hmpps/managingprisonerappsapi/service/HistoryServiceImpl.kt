@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import com.fasterxml.uuid.Generators
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -37,7 +38,7 @@ class HistoryServiceImpl(
     logger.info("Updating history for entity:$entityType, activity: $activity,  entityType: $entityType, appId: $appId")
     val history = historyRepository.save(
       History(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         entityId,
         entityType,
         appId,

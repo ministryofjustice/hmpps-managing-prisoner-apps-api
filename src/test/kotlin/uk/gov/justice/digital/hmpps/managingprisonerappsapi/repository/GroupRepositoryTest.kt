@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository
 
+import com.fasterxml.uuid.Generators
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,7 +40,7 @@ class GroupRepositoryTest(
     val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         establishmentId,
         "Business Hub",
         initialApps,
@@ -55,7 +56,7 @@ class GroupRepositoryTest(
     val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         establishmentId,
         "Business Hub",
         initialApps,
@@ -71,7 +72,7 @@ class GroupRepositoryTest(
     val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         establishmentId,
         "Business Hub",
         initialApps,
@@ -90,7 +91,7 @@ class GroupRepositoryTest(
     val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         establishmentId,
         "Business Hub",
         initialApps,
@@ -108,7 +109,7 @@ class GroupRepositoryTest(
     val establishmentIdTwo = "YTS"
     groupRepository.save(
       DataGenerator.generateGroups(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         establishmentIdOne,
         "Business Hub",
         listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
@@ -117,7 +118,7 @@ class GroupRepositoryTest(
     )
     groupRepository.save(
       DataGenerator.generateGroups(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         establishmentIdOne,
         "Business Hub",
         listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
@@ -126,7 +127,7 @@ class GroupRepositoryTest(
     )
     groupRepository.save(
       DataGenerator.generateGroups(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         establishmentIdOne,
         "Business Hub",
         listOf(AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
@@ -135,7 +136,7 @@ class GroupRepositoryTest(
     )
     groupRepository.save(
       DataGenerator.generateGroups(
-        UUID.randomUUID(),
+        Generators.timeBasedEpochGenerator().generate(),
         establishmentIdTwo,
         "Business Hub",
         listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),

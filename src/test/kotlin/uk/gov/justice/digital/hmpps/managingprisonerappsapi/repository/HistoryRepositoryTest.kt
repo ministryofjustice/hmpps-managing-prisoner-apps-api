@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository
 
+import com.fasterxml.uuid.Generators
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -27,8 +28,8 @@ class HistoryRepositoryTest(@Autowired private val historyRepository: HistoryRep
 
   @Test
   fun `save history`() {
-    val id = UUID.randomUUID()
-    val appId = UUID.randomUUID()
+    val id = Generators.timeBasedEpochGenerator().generate()
+    val appId = Generators.timeBasedEpochGenerator().generate()
     val history = History(
       id,
       appId,

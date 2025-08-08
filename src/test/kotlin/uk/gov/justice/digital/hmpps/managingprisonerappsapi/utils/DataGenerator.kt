@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils
 
+import com.fasterxml.uuid.Generators
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
@@ -31,7 +32,7 @@ class DataGenerator {
 
     val CONTACT_NUMBER = "1234567890"
     fun generateComment(createdBy: String): Comment = Comment(
-      UUID.randomUUID(),
+      Generators.timeBasedEpochGenerator().generate(),
       MESSAGE,
       LocalDateTime.now(),
       createdBy,
@@ -39,7 +40,7 @@ class DataGenerator {
     )
 
     fun generateResponse(staffId: String): Response = Response(
-      UUID.randomUUID(),
+      Generators.timeBasedEpochGenerator().generate(),
       "Pass all requirement",
       Decision.APPROVED,
       LocalDateTime.now(),
@@ -47,22 +48,22 @@ class DataGenerator {
     )
 
     fun generateApp(): App = App(
-      UUID.randomUUID(),
+      Generators.timeBasedEpochGenerator().generate(),
       UUID.randomUUID().toString(),
-      UUID.randomUUID(),
+      Generators.timeBasedEpochGenerator().generate(),
       AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
       LocalDateTime.now(),
       LocalDateTime.now(),
       "testStaaf@moj",
       LocalDateTime.now(),
       "testStaaf@moj",
-      arrayListOf(UUID.randomUUID()),
+      arrayListOf(Generators.timeBasedEpochGenerator().generate()),
       listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
       "testprisoner@moj",
       "Test",
       "Prisoner",
       AppStatus.PENDING,
-      UUID.randomUUID().toString(),
+      Generators.timeBasedEpochGenerator().generate().toString(),
       mutableListOf(),
       false,
     )
@@ -77,7 +78,7 @@ class DataGenerator {
       appStatus: AppStatus,
       groupId: UUID,
     ): App = App(
-      UUID.randomUUID(),
+      Generators.timeBasedEpochGenerator().generate(),
       UUID.randomUUID().toString(),
       groupId,
       appType,
@@ -86,7 +87,7 @@ class DataGenerator {
       "testStaaf@moj",
       LocalDateTime.now(ZoneOffset.UTC),
       "testStaaf@moj",
-      arrayListOf(UUID.randomUUID()),
+      arrayListOf(Generators.timeBasedEpochGenerator().generate()),
       listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
       requestedBy,
       requestedByFirstName,

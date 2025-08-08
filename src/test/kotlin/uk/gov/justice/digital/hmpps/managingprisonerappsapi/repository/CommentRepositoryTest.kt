@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository
 
+import com.fasterxml.uuid.Generators
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -34,7 +35,7 @@ class CommentRepositoryTest(
 
   @Test
   fun saveComment() {
-    val id = UUID.randomUUID()
+    val id = Generators.timeBasedEpochGenerator().generate()
     val comment = DataGenerator.generateComment(id.toString())
     val createdComment = commentRepository.save(comment)
     Assertions.assertNotNull(createdComment)
@@ -42,14 +43,14 @@ class CommentRepositoryTest(
 
   @Test
   fun getCommentBydId() {
-    val createdComment = commentRepository.save(DataGenerator.generateComment(UUID.randomUUID().toString()))
+    val createdComment = commentRepository.save(DataGenerator.generateComment(Generators.timeBasedEpochGenerator().generate().toString()))
     val comment = commentRepository.findById(createdComment.id)
     Assertions.assertEquals(true, comment.isPresent)
   }
 
   @Test
   fun `update comment`() {
-    var createdComment = commentRepository.save(DataGenerator.generateComment(UUID.randomUUID().toString()))
+    var createdComment = commentRepository.save(DataGenerator.generateComment(Generators.timeBasedEpochGenerator().generate().toString()))
     var comment = Comment(
       createdComment.id,
       "updating message",
@@ -63,7 +64,7 @@ class CommentRepositoryTest(
 
   @Test
   fun deleteCommentById() {
-    val createdComment = commentRepository.save(DataGenerator.generateComment(UUID.randomUUID().toString()))
+    val createdComment = commentRepository.save(DataGenerator.generateComment(Generators.timeBasedEpochGenerator().generate().toString()))
     commentRepository.deleteById(createdComment.id)
     val comment = commentRepository.findById(createdComment.id)
     Assertions.assertEquals(false, comment.isPresent)

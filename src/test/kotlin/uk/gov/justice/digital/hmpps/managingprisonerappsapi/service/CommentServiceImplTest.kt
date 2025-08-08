@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import com.fasterxml.uuid.Generators
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
@@ -36,7 +37,7 @@ class CommentServiceImplTest {
   private val requestedByLastName = "Prisoner"
   private val createdBy = "Staff12345"
   private val staffFullName = "Test Staff"
-  private val groupId = UUID.randomUUID()
+  private val groupId = Generators.timeBasedEpochGenerator().generate()
   private val message = "This is require more information from other department"
   private val createdDate = LocalDateTime.now(ZoneOffset.UTC)
 
@@ -73,7 +74,7 @@ class CommentServiceImplTest {
       UUID.randomUUID(),
     )
 
-    comment = Comment(UUID.randomUUID(), message, createdDate, createdBy, app.id)
+    comment = Comment(Generators.timeBasedEpochGenerator().generate(), message, createdDate, createdBy, app.id)
     appService = Mockito.mock(AppService::class.java)
     commentRepository = Mockito.mock(CommentRepository::class.java)
     establishmentService = Mockito.mock(EstablishmentService::class.java)
