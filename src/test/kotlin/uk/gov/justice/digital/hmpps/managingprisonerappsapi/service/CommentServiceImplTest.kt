@@ -62,6 +62,7 @@ class CommentServiceImplTest {
       requestedByLastName,
       AppStatus.PENDING,
       groupId,
+      false,
     )
 
     staff = Staff(

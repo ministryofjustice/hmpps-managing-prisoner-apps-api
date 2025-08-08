@@ -30,7 +30,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
 
 class CommentIntegrationTest(
   @Autowired private val appRepository: AppRepository,
@@ -263,6 +262,7 @@ class CommentIntegrationTest(
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     )
   }

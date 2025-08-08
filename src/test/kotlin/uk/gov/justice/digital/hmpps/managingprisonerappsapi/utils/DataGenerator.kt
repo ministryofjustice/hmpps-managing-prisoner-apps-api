@@ -77,6 +77,7 @@ class DataGenerator {
       requestedByLastName: String,
       appStatus: AppStatus,
       groupId: UUID,
+      firstNightCenter: Boolean,
     ): App = App(
       Generators.timeBasedEpochGenerator().generate(),
       UUID.randomUUID().toString(),
@@ -95,7 +96,7 @@ class DataGenerator {
       appStatus,
       establishmentId,
       mutableListOf(),
-      false,
+      firstNightCenter,
     )
 
     fun generateEstablishment(): Establishment = Establishment("HST", "Test Establishment")

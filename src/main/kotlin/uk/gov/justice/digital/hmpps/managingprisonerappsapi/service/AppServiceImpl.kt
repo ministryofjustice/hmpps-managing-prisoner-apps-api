@@ -256,7 +256,7 @@ class AppServiceImpl(
     appTypes: Set<AppType>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
-    firstNightCenter: Boolean,
+    firstNightCenter: Boolean?,
     pageNumber: Long,
     pageSize: Long,
   ): AppResponseListDto {

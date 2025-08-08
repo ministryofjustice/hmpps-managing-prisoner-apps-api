@@ -25,7 +25,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " AND (:appTypes IS NULL OR a.appType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
       " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
-      " AND a.firstNightCenter = :firstNightCenter" +
+      " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
       " GROUP BY a.appType ORDER BY a.appType ASC",
     nativeQuery = false,
   )
@@ -35,7 +35,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     appTypes: Set<AppType>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
-    firstNightCenter: Boolean,
+    firstNightCenter: Boolean?,
   ): List<AppByAppTypeCounts>
 
   @Query(
@@ -45,7 +45,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " AND (:appTypes IS NULL OR a.appType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
       " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
-      " AND a.firstNightCenter = :firstNightCenter" +
+      " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
       " GROUP BY a.assignedGroup",
     nativeQuery = false,
   )
@@ -55,7 +55,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     appTypes: Set<AppType>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
-    firstNightCenter: Boolean,
+    firstNightCenter: Boolean?,
   ): List<AppByAssignedGroupCounts>
 
   @Query(
@@ -65,7 +65,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " AND (:appTypes IS NULL OR a.appType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
       " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
-      " AND a.firstNightCenter = :firstNightCenter" +
+      " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
       " ORDER BY a.requestedDate DESC",
     nativeQuery = false,
   )
@@ -75,7 +75,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     appTypes: Set<AppType>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
-    firstNightCenter: Boolean,
+    firstNightCenter: Boolean?,
     pageable: Pageable,
   ): Page<App>
 

@@ -114,6 +114,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     )
     appRepository.save(
@@ -126,6 +127,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     )
     appRepository.save(
@@ -138,6 +140,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     )
     appRepository.save(
@@ -150,6 +153,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         requestedBySecondSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        false,
       ),
     )
     appRepository.save(
@@ -162,6 +166,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
+        true,
       ),
     )
     appRepository.save(
@@ -174,6 +179,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         requestedByThirdSurname,
         AppStatus.PENDING,
         assignedGroupSecond,
+        false,
       ),
     )
     appRepository.save(
@@ -186,6 +192,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         requestedByThirdSurname,
         AppStatus.PENDING,
         assignedGroupSecond,
+        false,
       ),
     )
     appRepository.save(
@@ -198,6 +205,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
         requestedByThirdSurname,
         AppStatus.PENDING,
         assignedGroupSecond,
+        false,
       ),
     )
 
@@ -208,7 +216,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       null,
-      false,
+      null,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(4, countResult.get(0).getCount())
@@ -222,7 +230,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       null,
-      false,
+      null,
     )
     println("size by assignedgroup ${countResultByAssignedGroup.size}")
     println(countResultByAssignedGroup.get(0).getCount())
@@ -234,7 +242,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       null,
-      false,
+      null,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 4)
@@ -246,7 +254,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
       null,
       null,
-      false,
+      null,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(1, countResult.get(0).getCount())
@@ -258,7 +266,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
       null,
       null,
-      false,
+      null,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 1)
@@ -270,7 +278,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       requestedByFirst,
       null,
-      false,
+      null,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(3, countResult.get(0).getCount())
@@ -282,7 +290,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       requestedByFirst,
       null,
-      false,
+      null,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 3)
@@ -294,7 +302,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       setOf(assignedGroupFirst),
-      false,
+      null,
     )
     Assertions.assertEquals(1, countResult.size)
     pageResult = appRepository.appsBySearchFilter(
@@ -303,12 +311,12 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       null,
       setOf(assignedGroupFirst),
-      false,
+      null,
       PageRequest.of(0, 4),
     )
     Assertions.assertEquals(pageResult.totalElements, 4)
 
-    // By establishment id and status and appType and requestedBy and assignedGroup
+    // By establishment id and status and appType and requestedBy and assignedGroup and firstNightCenter
     countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdSecond,
       setOf(AppStatus.PENDING),
@@ -335,5 +343,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     Assertions.assertEquals(2, userSearchResult.size)
     Assertions.assertEquals("John", userSearchResult.get(0).getFirstName())
     Assertions.assertEquals("John", userSearchResult.get(1).getFirstName())
+
+    // using filter first night center
   }
 }
