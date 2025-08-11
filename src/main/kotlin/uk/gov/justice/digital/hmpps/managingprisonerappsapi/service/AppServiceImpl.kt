@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAppTypeCounts
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedGroupCounts
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByFirstNightCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
@@ -265,6 +266,7 @@ class AppServiceImpl(
     }
     var appTypeDto: List<AppByAppTypeCounts> = listOf()
     var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> = listOf()
+    var appByFirstNightCount: Int = 0
     var pageResult: Page<App> = Page.empty()
     runBlocking {
       launch {
@@ -286,6 +288,16 @@ class AppServiceImpl(
           assignedGroups,
           firstNightCenter,
         )
+      }
+      launch {
+        appByFirstNightCount = appRepository.countBySearchFilterGroupByFirstNightCenter(
+          staff.establishmentId,
+          status,
+          appTypes,
+          requestedBy,
+          assignedGroups,
+          true,
+        ).getCount()
       }
       launch {
         val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt())
@@ -311,7 +323,7 @@ class AppServiceImpl(
         groups,
         assignedGroupTypesCounts,
       ),
-      pageResult.totalElements,
+      appByFirstNightCount.toLong(),
       appsList,
     )
   }
