@@ -265,6 +265,7 @@ class AppServiceImpl(
     }
     var appTypeDto: List<AppByAppTypeCounts> = listOf()
     var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> = listOf()
+    var appByFirstNightCount: Int = 0
     var pageResult: Page<App> = Page.empty()
     runBlocking {
       launch {
@@ -286,6 +287,16 @@ class AppServiceImpl(
           assignedGroups,
           firstNightCenter,
         )
+      }
+      launch {
+        appByFirstNightCount = appRepository.countBySearchFilterGroupByFirstNightCenter(
+          staff.establishmentId,
+          status,
+          appTypes,
+          requestedBy,
+          assignedGroups,
+          true,
+        ).getCount()
       }
       launch {
         val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt())
@@ -311,7 +322,7 @@ class AppServiceImpl(
         groups,
         assignedGroupTypesCounts,
       ),
-      pageResult.totalElements,
+      appByFirstNightCount.toLong(),
       appsList,
     )
   }
