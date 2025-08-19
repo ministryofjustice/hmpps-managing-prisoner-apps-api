@@ -44,6 +44,7 @@ class AppServiceImpl(
   private val commentRepository: CommentRepository,
   private val activityService: ActivityService,
   private val historyService: HistoryService,
+  private val establishmentService: EstablishmentService,
 
 ) : AppService {
 
@@ -267,7 +268,14 @@ class AppServiceImpl(
     var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> = listOf()
     var appByFirstNightCount: Int = 0
     var pageResult: Page<App> = Page.empty()
+    var establishmentAppTypes = emptySet<AppType>()
     runBlocking {
+      launch {
+        val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+          ApiException("", HttpStatus.FORBIDDEN)
+        }
+        establishmentAppTypes = establishment.appTypes
+      }
       launch {
         appTypeDto = appRepository.countBySearchFilterGroupByAppType(
           staff.establishmentId,
@@ -317,7 +325,7 @@ class AppServiceImpl(
       pageResult.pageable.pageNumber + 1,
       pageResult.totalElements,
       pageResult.isLast,
-      convertAppTypeCountsToMap(appTypeDto),
+      convertAppTypeCountsToMap(appTypeDto, establishmentAppTypes),
       convertAssignedGroupCountsToGroupAppListViewDto(
         groups,
         assignedGroupTypesCounts,
@@ -428,9 +436,9 @@ class AppServiceImpl(
     return list
   }
 
-  private fun convertAppTypeCountsToMap(appByAppTypeCounts: List<AppByAppTypeCounts>): Map<AppType, Int> {
+  private fun convertAppTypeCountsToMap(appByAppTypeCounts: List<AppByAppTypeCounts>, types: Set<AppType>): Map<AppType, Int> {
     val map = TreeMap<AppType, Int>()
-    var appTypes = AppType.entries.toSet()
+    var appTypes = types
     appByAppTypeCounts.forEach { appTypeCount ->
       map[appTypeCount.getAppType()] = appTypeCount.getCount()
       appTypes = appTypes.minus(appTypeCount.getAppType())

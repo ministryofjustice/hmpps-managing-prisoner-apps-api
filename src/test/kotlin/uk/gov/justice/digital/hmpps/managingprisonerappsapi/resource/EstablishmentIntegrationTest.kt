@@ -73,11 +73,12 @@ class EstablishmentIntegrationTest(
       .consumeWith(System.out::println)
       .returnResult()
       .responseBody as List<AppTypeResponse>
-    assertEquals(AppType.entries.size, response.size)
+    assertEquals(1, response.size)
+    assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(), response.get(0).key)
   }
 
   private fun populateEstablishments() {
-    establishmentRepository.save(Establishment(establishmentIdFirst, "ESTABLISHMENT_NAME_1", AppType.entries.toSet()))
+    establishmentRepository.save(Establishment(establishmentIdFirst, "ESTABLISHMENT_NAME_1", setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)))
     establishmentRepository.save(Establishment(establishmentIdSecond, "ESTABLISHMENT_NAME_2", AppType.entries.toSet()))
     establishmentRepository.save(Establishment(establishmentIdThird, "ESTABLISHMENT_NAME_3", AppType.entries.toSet()))
   }

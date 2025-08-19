@@ -71,7 +71,7 @@ class EstablishmentService(
   private fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment = Establishment(
     id = establishmentDto.id,
     name = establishmentDto.name,
-    establishmentDto.appTypes
+    establishmentDto.appTypes,
   )
 
   private fun convertAppTypeToAppTypeListResponse(appTypes: Set<AppType>): List<AppTypeResponse> {

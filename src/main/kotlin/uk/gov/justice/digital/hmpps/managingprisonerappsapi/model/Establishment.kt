@@ -13,7 +13,7 @@ data class Establishment(
   val id: String,
   val name: String,
   @JdbcTypeCode(SqlTypes.JSON)
-  val appTypes: Set<AppType>
+  val appTypes: Set<AppType>,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
