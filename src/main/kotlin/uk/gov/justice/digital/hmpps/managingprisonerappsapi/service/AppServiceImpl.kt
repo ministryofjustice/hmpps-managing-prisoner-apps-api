@@ -134,6 +134,12 @@ class AppServiceImpl(
     if (appRequestDto.requests.size != 1) {
       throw ApiException("Only one requests in app is supported", HttpStatus.BAD_REQUEST)
     }
+    val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+      ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
+    }
+    if (!establishment.appTypes.contains(AppType.getAppType(appRequestDto.type))) {
+      throw ApiException("The type: ${appRequestDto.type} is not enabled for ${establishment.name}", HttpStatus.FORBIDDEN)
+    }
     val group =
       groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
     var app = convertAppRequestToAppEntity(prisoner, staff, group.id, appRequestDto)
@@ -360,7 +366,7 @@ class AppServiceImpl(
       appRequest.reference, // reference
       groupId, // group id
       AppType.getAppType(appRequest.type),
-      appRequest.requestedDate,
+      appRequest.requestedDate ?: localDateTime,
       localDateTime, // created date
       staff.username,
       localDateTime, // last modified date

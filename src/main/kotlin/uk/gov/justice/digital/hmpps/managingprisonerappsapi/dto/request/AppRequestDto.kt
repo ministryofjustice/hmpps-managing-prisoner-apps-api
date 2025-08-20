@@ -8,7 +8,7 @@ data class AppRequestDto(
   val reference: String? = null,
   val type: String,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-  val requestedDate: LocalDateTime,
+  val requestedDate: LocalDateTime?,
   val requests: List<MutableMap<String, Any>>,
   @Schema(required = false, description = "Pass this value only for type PIN_PHONE_ADD_NEW_SOCIAL_CONTACT. No value passed is set as false. For other type this value is always false.")
   val firstNightCenter: Boolean?,

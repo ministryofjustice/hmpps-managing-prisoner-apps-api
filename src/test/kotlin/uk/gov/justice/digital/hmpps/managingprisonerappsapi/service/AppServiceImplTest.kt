@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ESTABLISHMENT_ID_1
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.CONTACT_NUMBER
 import java.time.LocalDateTime
@@ -45,6 +46,7 @@ class AppServiceImplTest {
 
   private lateinit var prisoner: Prisoner
   private lateinit var staff: Staff
+  private lateinit var establishment: EstablishmentDto
   private lateinit var appRepository: AppRepository
   private lateinit var prisonerService: PrisonerService
   private lateinit var staffService: StaffService
@@ -98,6 +100,7 @@ class AppServiceImplTest {
       "Staff",
       UUID.randomUUID(),
     )
+    establishment = EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet())
     prisoner = Prisoner(
       requestedBy,
       UUID.randomUUID().toString(),
@@ -204,6 +207,7 @@ class AppServiceImplTest {
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy)).thenReturn(
       Optional.of(prisoner),
     )
+    Mockito.`when`(establishmentService.getEstablishmentById(staff.establishmentId)).thenReturn(Optional.of(establishment))
     Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.appType)).thenReturn(
       Groups(
         groupId,

@@ -100,7 +100,7 @@ class AppResourceIntegrationTest(
       .bodyValue(
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS,
-          LocalDateTime.now(ZoneOffset.UTC),
+          null,
           requestedByFirstMainName,
           requestedBySecondSurname,
         ),
