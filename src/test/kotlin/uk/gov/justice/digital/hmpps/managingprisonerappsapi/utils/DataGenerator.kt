@@ -117,7 +117,7 @@ class DataGenerator {
 
     fun generateAppRequestDto(
       appType: AppType,
-      requestedDate: LocalDateTime,
+      requestedDate: LocalDateTime?,
       requestedByFirstName: String,
       requestedByLastName: String,
     ): AppRequestDto = AppRequestDto(
