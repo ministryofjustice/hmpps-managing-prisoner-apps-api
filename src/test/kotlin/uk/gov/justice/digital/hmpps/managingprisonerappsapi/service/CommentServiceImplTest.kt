@@ -177,7 +177,7 @@ class CommentServiceImplTest {
     Mockito.`when`(commentRepository.findById(comment.id)).thenReturn(Optional.of(comment))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment"),
+        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet()),
       ),
     )
     val result = commentServiceImpl.getCommentById(requestedBy, createdBy, app.id, true, comment.id)
@@ -218,7 +218,7 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment"),
+        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet()),
       ),
     )
     Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5)))

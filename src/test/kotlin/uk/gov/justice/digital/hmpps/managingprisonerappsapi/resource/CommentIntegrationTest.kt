@@ -227,7 +227,7 @@ class CommentIntegrationTest(
   }
 
   private fun populateEstablishments() {
-    establishmentRepository.save(Establishment(establishmentIdFirst, "ESTABLISHMENT_NAME_1"))
+    establishmentRepository.save(Establishment(establishmentIdFirst, "ESTABLISHMENT_NAME_1", AppType.entries.toSet()))
   }
 
   private fun populateGroups() {

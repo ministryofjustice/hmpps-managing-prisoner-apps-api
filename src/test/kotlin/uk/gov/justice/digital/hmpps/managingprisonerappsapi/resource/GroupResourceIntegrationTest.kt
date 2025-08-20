@@ -75,7 +75,7 @@ class GroupResourceIntegrationTest(
   }
 
   private fun populateEstablishments() {
-    establishmentRepository.save(Establishment(establishmentIdFirst, establishmentIdFirst))
+    establishmentRepository.save(Establishment(establishmentIdFirst, establishmentIdFirst, AppType.entries.toSet()))
   }
 
   private fun populateGroups() {

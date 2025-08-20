@@ -52,6 +52,7 @@ class AppServiceImplTest {
   private lateinit var commentRepository: CommentRepository
   private lateinit var activityService: ActivityService
   private lateinit var historyService: HistoryService
+  private lateinit var establishmentService: EstablishmentService
 
   private lateinit var appService: AppService
   private lateinit var app: App
@@ -66,6 +67,7 @@ class AppServiceImplTest {
     commentRepository = Mockito.mock(CommentRepository::class.java)
     activityService = Mockito.mock(ActivityService::class.java)
     historyService = Mockito.mock(HistoryService::class.java)
+    establishmentService = Mockito.mock(EstablishmentService::class.java)
 
     app = DataGenerator.generateApp(
       establishmentId,
@@ -109,7 +111,7 @@ class AppServiceImplTest {
       2,
     )
 
-    appService = AppServiceImpl(appRepository, prisonerService, staffService, groupService, commentRepository, activityService, historyService)
+    appService = AppServiceImpl(appRepository, prisonerService, staffService, groupService, commentRepository, activityService, historyService, establishmentService)
   }
 
   @Test
@@ -218,6 +220,7 @@ class AppServiceImplTest {
         EstablishmentDto(
           establishmentId,
           "Test Establishment",
+          AppType.entries.toSet(),
         ),
         AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
@@ -261,6 +264,7 @@ class AppServiceImplTest {
         EstablishmentDto(
           establishmentId,
           "Test Establishment",
+          AppType.entries.toSet(),
         ),
         AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
@@ -326,6 +330,7 @@ class AppServiceImplTest {
         EstablishmentDto(
           establishmentId,
           "Test Establishment",
+          AppType.entries.toSet(),
         ),
         AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
@@ -384,7 +389,19 @@ class AppServiceImplTest {
     val forwardGroupId = UUID.randomUUID()
     Mockito.`when`(staffService.getStaffById(createdBy)).thenReturn(Optional.of(staff))
     Mockito.`when`(appRepository.findById(app.id)).thenReturn(Optional.of(app))
-    Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(AssignedGroupDto(forwardGroupId, "Forward group", EstablishmentDto(establishmentId, "Test Establishment"), AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS, GroupType.WING))
+    Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(
+      AssignedGroupDto(
+        forwardGroupId,
+        "Forward group",
+        EstablishmentDto(
+          establishmentId,
+          "Test Establishment",
+          AppType.entries.toSet(),
+        ),
+        AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
+        GroupType.WING,
+      ),
+    )
     Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
     val appResponse = appService.forwardAppToGroup(createdBy, forwardGroupId, app.id, CommentRequestDto(forwardingComment))
     assertEquals(forwardGroupId, app.assignedGroup)

@@ -99,7 +99,7 @@ class DataGenerator {
       firstNightCenter,
     )
 
-    fun generateEstablishment(): Establishment = Establishment("HST", "Test Establishment")
+    fun generateEstablishment(): Establishment = Establishment("HST", "Test Establishment", AppType.entries.toSet())
 
     fun generateGroups(
       id: UUID,

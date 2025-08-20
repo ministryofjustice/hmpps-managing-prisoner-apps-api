@@ -56,20 +56,22 @@ class EstablishmentService(
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
     }
-    establishmentRepository.findById(staff.establishmentId).orElseThrow {
+    val establishment = establishmentRepository.findById(staff.establishmentId).orElseThrow {
       ApiException("Establishment: ${staff.establishmentId} not enabled", HttpStatus.FORBIDDEN)
     }
-    return convertAppTypeToAppTypeListResponse(AppType.entries.toSet())
+    return convertAppTypeToAppTypeListResponse(establishment.appTypes)
   }
 
   private fun convertEstablishmentToEstablishmentDto(establishment: Establishment): EstablishmentDto = EstablishmentDto(
     id = establishment.id,
     name = establishment.name,
+    establishment.appTypes,
   )
 
   private fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment = Establishment(
     id = establishmentDto.id,
     name = establishmentDto.name,
+    establishmentDto.appTypes,
   )
 
   private fun convertAppTypeToAppTypeListResponse(appTypes: Set<AppType>): List<AppTypeResponse> {
