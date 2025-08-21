@@ -32,6 +32,6 @@ data class AppListViewDto(
   val requestedByFirstName: String,
   val requestedByLastName: String,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-  val requestedDate: LocalDateTime,
+  val createdDate: LocalDateTime,
   val assignedGroup: Any,
 )
