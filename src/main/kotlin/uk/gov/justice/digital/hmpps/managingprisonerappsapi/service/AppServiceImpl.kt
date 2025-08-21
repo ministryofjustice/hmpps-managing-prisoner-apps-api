@@ -434,7 +434,7 @@ class AppServiceImpl(
         app.requestedBy,
         app.requestedByFirstName,
         app.requestedByLastName,
-        app.requestedDate,
+        app.createdDate,
         groupAppListviewDto,
       )
       list.add(appResponseDto)
