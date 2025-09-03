@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Service
 class GroupsServiceImpl(
@@ -66,6 +67,34 @@ class GroupsServiceImpl(
     return findGroupsByEstablishmentId(staff.establishmentId)
   }
 
+  override fun getGroupsByLoggedStaffEstablishmentIdAndAppType(loggedUserId: String, appType: AppType): List<AssignedGroupDto> {
+    // TODO("Not yet implemented")
+    val staff = staffService.getStaffById(loggedUserId).orElseThrow {
+      ApiException("Staff with id $loggedUserId not found", HttpStatus.NOT_FOUND)
+    }
+    val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+      ApiException("Establishment ${staff.establishmentId} not onboarded yet", HttpStatus.FORBIDDEN)
+    }
+    val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(staff.establishmentId)
+    val groupList: MutableList<Groups> = mutableListOf()
+    for (group in groups) {
+      if (group.initialsApps.contains(appType)) {
+        groupList.add(group)
+      }
+    }
+    if (groupList.size <= 1) {
+      if (groupList.size == 1) {
+        groupList.removeLast()
+      }
+      groupList.addAll(groups)
+    }
+    val departments = ArrayList<AssignedGroupDto>()
+    for (g in groupList) {
+      departments.add(convertGroupsToAssignedGroupsDto(g, establishmentDto))
+    }
+    return departments
+  }
+
   override fun convertGroupsToAssignedGroupsDto(
     groups: Groups,
     establishmentDto: EstablishmentDto,
@@ -85,13 +114,14 @@ class GroupsServiceImpl(
     groupsRequestDto.type,
   )
 
-  override fun getGroupByInitialAppType(establishmentId: String, appType: AppType): Groups {
+  override fun getGroupByInitialAppType(establishmentId: String, appType: AppType): List<Groups> {
     val groupList = groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentId, appType)
-    if (groupList.isEmpty()) {
+    /*if (groupList.isEmpty()) {
       throw ApiException("Groups list is empty", HttpStatus.BAD_REQUEST)
     } else {
-      return groupList.first()
-    }
+      return groupList
+    }*/
+    return groupList
   }
 
   private fun findGroupsByEstablishmentId(establishmentId: String): List<AssignedGroupDto> {

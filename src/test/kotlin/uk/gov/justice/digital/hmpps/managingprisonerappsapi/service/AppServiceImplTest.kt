@@ -145,6 +145,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
+          null,
         ),
       )
     }
@@ -169,6 +170,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
+          null,
         ),
       )
     }
@@ -193,6 +195,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
+          null,
         ),
       )
     }
@@ -209,12 +212,14 @@ class AppServiceImplTest {
     )
     Mockito.`when`(establishmentService.getEstablishmentById(staff.establishmentId)).thenReturn(Optional.of(establishment))
     Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.appType)).thenReturn(
-      Groups(
-        groupId,
-        "Test Group",
-        establishmentId,
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
-        GroupType.WING,
+      listOf(
+        Groups(
+          groupId,
+          "Test Group",
+          establishmentId,
+          listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+          GroupType.WING,
+        ),
       ),
     )
     Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(
@@ -239,6 +244,7 @@ class AppServiceImplTest {
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstName,
         requestedByLastName,
+        null,
       ),
     )
     assertApp(app, appResponse)
@@ -253,12 +259,14 @@ class AppServiceImplTest {
       Optional.of(prisoner),
     )
     Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.appType)).thenReturn(
-      Groups(
-        groupId,
-        "Test Group",
-        establishmentId,
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
-        GroupType.WING,
+      listOf(
+        Groups(
+          groupId,
+          "Test Group",
+          establishmentId,
+          listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+          GroupType.WING,
+        ),
       ),
     )
     Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(
@@ -285,6 +293,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(),
           false,
+          null,
         ),
       )
     }
@@ -312,6 +321,7 @@ class AppServiceImplTest {
               },
           ),
           false,
+          null,
         ),
       )
     }
