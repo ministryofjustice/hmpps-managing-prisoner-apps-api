@@ -1,5 +1,6 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "8.3.4"
+  id("org.owasp.dependencycheck") version "12.1.3"
   kotlin("plugin.spring") version "2.1.21"
   kotlin("plugin.jpa") version "2.1.21"
 }
@@ -37,6 +38,10 @@ dependencies {
 
 kotlin {
   jvmToolchain(21)
+}
+
+dependencyCheck {
+  nvd.datafeedUrl = "file:///opt/vulnz/cache"
 }
 
 tasks {
