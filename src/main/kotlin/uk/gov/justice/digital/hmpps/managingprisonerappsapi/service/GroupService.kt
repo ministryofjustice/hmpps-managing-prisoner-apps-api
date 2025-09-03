@@ -23,7 +23,9 @@ interface GroupService {
 
   fun getGroupsByLoggedStaffEstablishmentId(loggedUserId: String): List<AssignedGroupDto>
 
-  fun getGroupByInitialAppType(establishmentId: String, appType: AppType): Groups
+  fun getGroupsByLoggedStaffEstablishmentIdAndAppType(loggedUserId: String, appType: AppType): List<AssignedGroupDto>
+
+  fun getGroupByInitialAppType(establishmentId: String, appType: AppType): List<Groups>
 
   fun convertGroupsToAssignedGroupsDto(groups: Groups, establishmentDto: EstablishmentDto): AssignedGroupDto
 }

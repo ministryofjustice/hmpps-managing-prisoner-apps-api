@@ -140,10 +140,29 @@ class AppServiceImpl(
     if (!establishment.appTypes.contains(AppType.getAppType(appRequestDto.type))) {
       throw ApiException("The type: ${appRequestDto.type} is not enabled for ${establishment.name}", HttpStatus.FORBIDDEN)
     }
-    val group =
-      groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
-    var app = convertAppRequestToAppEntity(prisoner, staff, group.id, appRequestDto)
-    val assignedGroup = groupsService.getGroupById(group.id)
+    var department: UUID? = null
+    if (appRequestDto.department != null) {
+      groupsService.getGroupById(appRequestDto.department)
+      val departments = groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
+      if (departments.isEmpty()) {
+        department = appRequestDto.department
+      } else {
+        departments.forEach { d ->
+          if (d.id == appRequestDto.department) {
+            department = d.id
+          }
+        }
+      }
+      if (department == null) {
+        throw ApiException("Department  with id ${appRequestDto.department} is not found", HttpStatus.FORBIDDEN)
+      }
+    } else {
+      department = groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type)).first().id
+    }
+    // val group =
+    //  groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
+    var app = convertAppRequestToAppEntity(prisoner, staff, department!!, appRequestDto)
+    val assignedGroup = groupsService.getGroupById(department!!)
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)

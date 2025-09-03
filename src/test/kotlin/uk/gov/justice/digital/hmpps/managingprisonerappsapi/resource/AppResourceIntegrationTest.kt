@@ -103,6 +103,7 @@ class AppResourceIntegrationTest(
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
+          null,
         ),
       )
       .exchange()
@@ -162,6 +163,60 @@ class AppResourceIntegrationTest(
   }
 
   @Test
+  fun `submit an app with assigned department`() {
+    val response = webTestClient.post()
+      .uri("/v1/prisoners/$requestedByFirst/apps")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(
+        DataGenerator.generateAppRequestDto(
+          AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP,
+          null,
+          requestedByFirstMainName,
+          requestedBySecondSurname,
+          assignedGroupFirst,
+        ),
+      )
+      .exchange()
+      .expectStatus().isCreated
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<AssignedGroupDto, Any>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponseDto<AssignedGroupDto, Any>
+
+    Assertions.assertEquals(AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP, response.appType)
+    Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
+    Assertions.assertEquals(requestedByFirst, response.requestedBy)
+    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(false, response.firstNightCenter)
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertNotNull(response.requests.get(0)["id"])
+    Assertions.assertEquals(response.requests.get(0)["contact-number"], CONTACT_NUMBER)
+  }
+
+  @Test
+  fun `submit app with assigned department which do not exist`() {
+    webTestClient.post()
+      .uri("/v1/prisoners/$requestedByFirst/apps")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(
+        DataGenerator.generateAppRequestDto(
+          AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP,
+          null,
+          requestedByFirstMainName,
+          requestedBySecondSurname,
+          UUID.randomUUID(),
+        ),
+      )
+      .exchange()
+      .expectStatus().isNotFound
+  }
+
+  @Test
   fun `test submit app request with first night center true for pin hone add new social contact app type`() {
     var appRequest = AppRequestDto(
       "Testing",
@@ -177,6 +232,7 @@ class AppResourceIntegrationTest(
           },
       ),
       true,
+      null,
     )
     var response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
@@ -219,6 +275,7 @@ class AppResourceIntegrationTest(
           },
       ),
       false,
+      null,
     )
     val response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
@@ -252,6 +309,7 @@ class AppResourceIntegrationTest(
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstMainName,
       requestedBySecondSurname,
+      null,
     )
     val response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
@@ -427,6 +485,7 @@ class AppResourceIntegrationTest(
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedByFirstSurname,
+          null,
         ),
       )
       .exchange()
@@ -564,7 +623,7 @@ class AppResourceIntegrationTest(
         assignedGroupFirst,
         establishmentIdFirst,
         assignedGroupFirstName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
         GroupType.WING,
       ),
     )

@@ -120,6 +120,7 @@ class DataGenerator {
       requestedDate: LocalDateTime?,
       requestedByFirstName: String,
       requestedByLastName: String,
+      departmentId: UUID?,
     ): AppRequestDto = AppRequestDto(
       "Testing",
       appType.toString(),
@@ -134,6 +135,7 @@ class DataGenerator {
           },
       ),
       null,
+      departmentId,
     )
   }
 }
