@@ -144,7 +144,7 @@ class AppServiceImpl(
     if (appRequestDto.department != null) {
       groupsService.getGroupById(appRequestDto.department)
       val departments = groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
-      if (departments.isEmpty()) {
+      if (departments.size <= 1) {
         department = appRequestDto.department
       } else {
         departments.forEach { d ->
