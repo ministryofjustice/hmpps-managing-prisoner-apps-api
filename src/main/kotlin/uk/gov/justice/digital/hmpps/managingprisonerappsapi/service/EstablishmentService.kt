@@ -93,6 +93,14 @@ class EstablishmentService(
             "Add new legal PIN phone contact",
           ),
         )
+      } else if (appType == AppType.PIN_PHONE_REMOVE_CONTACT) {
+        appTypesList.add(
+          AppTypeResponse(
+            appType.name,
+            "remove-pin-phone-contact",
+            "Remove PIN phone contact",
+          ),
+        )
       } else if (appType == AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP) {
         appTypesList.add(
           AppTypeResponse(
