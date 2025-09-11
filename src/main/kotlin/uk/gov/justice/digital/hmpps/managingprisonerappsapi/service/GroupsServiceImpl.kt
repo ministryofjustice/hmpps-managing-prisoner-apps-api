@@ -64,18 +64,22 @@ class GroupsServiceImpl(
     val staff = staffService.getStaffById(loggedUserId).orElseThrow {
       ApiException("Staff with id $loggedUserId not found", HttpStatus.NOT_FOUND)
     }
-    return findGroupsByEstablishmentId(staff.establishmentId)
+    val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+      ApiException("Establishment ${staff.establishmentId} not onboarded yet", HttpStatus.FORBIDDEN)
+    }
+    val establishmentId = if (establishmentDto.defaultDepartments)  "DEFAULT" else staff.establishmentId
+    return findGroupsByEstablishmentId(establishmentId)
   }
 
   override fun getGroupsByLoggedStaffEstablishmentIdAndAppType(loggedUserId: String, appType: AppType): List<AssignedGroupDto> {
-    // TODO("Not yet implemented")
     val staff = staffService.getStaffById(loggedUserId).orElseThrow {
       ApiException("Staff with id $loggedUserId not found", HttpStatus.NOT_FOUND)
     }
     val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
       ApiException("Establishment ${staff.establishmentId} not onboarded yet", HttpStatus.FORBIDDEN)
     }
-    val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(staff.establishmentId)
+    val establishmentId = if (establishmentDto.defaultDepartments)  "DEFAULT" else staff.establishmentId
+    val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(establishmentId)
     val groupList: MutableList<Groups> = mutableListOf()
     for (group in groups) {
       if (group.initialsApps.contains(appType)) {

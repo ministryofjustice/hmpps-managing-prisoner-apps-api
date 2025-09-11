@@ -140,10 +140,11 @@ class AppServiceImpl(
     if (!establishment.appTypes.contains(AppType.getAppType(appRequestDto.type))) {
       throw ApiException("The type: ${appRequestDto.type} is not enabled for ${establishment.name}", HttpStatus.FORBIDDEN)
     }
+    val establishmentId = if (establishment.defaultDepartments)  "DEFAULT" else staff.establishmentId
     var department: UUID? = null
     if (appRequestDto.department != null) {
       groupsService.getGroupById(appRequestDto.department)
-      val departments = groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
+      val departments = groupsService.getGroupByInitialAppType(establishmentId, AppType.getAppType(appRequestDto.type))
       if (departments.size <= 1) {
         department = appRequestDto.department
       } else {

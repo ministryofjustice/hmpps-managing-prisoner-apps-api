@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
-import java.util.*
 
 class GroupResourceIntegrationTest(
   @Autowired private val groupRepository: GroupRepository,
@@ -137,7 +136,12 @@ class GroupResourceIntegrationTest(
   }
 
   private fun populateEstablishments() {
-    establishmentRepository.save(Establishment(establishmentIdFirst, establishmentIdFirst, AppType.entries.toSet()))
+    establishmentRepository.save(Establishment(
+      establishmentIdFirst,
+      establishmentIdFirst,
+      AppType.entries.toSet(),
+      false
+    ))
   }
 
   private fun populateGroups() {

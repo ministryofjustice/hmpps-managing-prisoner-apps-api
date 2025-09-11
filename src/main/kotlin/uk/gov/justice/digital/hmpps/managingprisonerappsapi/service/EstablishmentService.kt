@@ -66,12 +66,14 @@ class EstablishmentService(
     id = establishment.id,
     name = establishment.name,
     establishment.appTypes,
+    establishment.defaultDepartments,
   )
 
   private fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment = Establishment(
     id = establishmentDto.id,
     name = establishmentDto.name,
     establishmentDto.appTypes,
+    false,
   )
 
   private fun convertAppTypeToAppTypeListResponse(appTypes: Set<AppType>): List<AppTypeResponse> {

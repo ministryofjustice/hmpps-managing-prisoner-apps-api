@@ -100,7 +100,7 @@ class AppServiceImplTest {
       "Staff",
       UUID.randomUUID(),
     )
-    establishment = EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet())
+    establishment = EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet(), false)
     prisoner = Prisoner(
       requestedBy,
       UUID.randomUUID().toString(),
@@ -230,6 +230,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           AppType.entries.toSet(),
+          false,
         ),
         AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
@@ -277,6 +278,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           AppType.entries.toSet(),
+          false,
         ),
         AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
@@ -345,6 +347,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           AppType.entries.toSet(),
+          false,
         ),
         AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
@@ -411,6 +414,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           AppType.entries.toSet(),
+          false,
         ),
         AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
         GroupType.WING,
