@@ -225,10 +225,7 @@ class AppResourceIntegrationTest(
       listOf(
         HashMap<String, Any>()
           .apply {
-            // put("amount", 10)
             put("contact-number", CONTACT_NUMBER)
-            // put("firstName", "John")
-            // put("lastName", "Smith")
           },
       ),
       true,
@@ -260,7 +257,7 @@ class AppResourceIntegrationTest(
   }
 
   @Test
-  fun `test submit app request with first night center false for pin hone add new social contact app type`() {
+  fun `test submit app request with first night center false for pin phone add new social contact app type`() {
     val appRequest = AppRequestDto(
       "Testing",
       AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
@@ -268,10 +265,7 @@ class AppResourceIntegrationTest(
       listOf(
         HashMap<String, Any>()
           .apply {
-            // put("amount", 10)
             put("contact-number", CONTACT_NUMBER)
-            // put("firstName", "John")
-            // put("lastName", "Smith")
           },
       ),
       false,
