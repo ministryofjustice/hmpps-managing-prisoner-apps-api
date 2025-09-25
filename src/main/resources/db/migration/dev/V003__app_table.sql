@@ -1,4 +1,4 @@
-create table public.app
+create table  if not exists public.app
 (
     id                      uuid not null
         primary key,
