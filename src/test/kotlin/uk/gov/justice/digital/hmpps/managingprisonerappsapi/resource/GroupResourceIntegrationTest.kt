@@ -112,7 +112,6 @@ class GroupResourceIntegrationTest(
       .responseBody as List<AssignedGroupDto>
 
     Assertions.assertEquals(2, response.size)
-    // Assertions.assertEquals(assignedGroupSecondName, response.get(0).name)
 
     response = webTestClient.get()
       .uri("/v1/groups/app/types/${AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS}")
@@ -128,12 +127,6 @@ class GroupResourceIntegrationTest(
       .responseBody as List<AssignedGroupDto>
 
     Assertions.assertEquals(2, response.size)
-    /*Assertions.assertEquals(assignedGroupFirst, response.get(0).id)
-    Assertions.assertEquals(assignedGroupFirstName, response.get(0).name)
-    Assertions.assertEquals(establishmentIdFirst, response.get(0).establishment.name)
-    Assertions.assertEquals(assignedGroupSecond, response.get(1).id)
-    Assertions.assertEquals(assignedGroupSecondName, response.get(1).name)
-    Assertions.assertEquals(establishmentIdFirst, response.get(1).establishment.name)*/
   }
 
   private fun populateEstablishments() {
@@ -150,15 +143,6 @@ class GroupResourceIntegrationTest(
         GroupType.WING,
       ),
     )
-    /*groupRepository.save(
-        DataGenerator.generateGroups(
-            assignedGroupFirst,
-            establishmentIdFirst,
-            assignedGroupFirstName,
-            listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
-            GroupType.WING
-        )
-    )*/
     groupRepository.save(
       DataGenerator.generateGroups(
         assignedGroupSecond,

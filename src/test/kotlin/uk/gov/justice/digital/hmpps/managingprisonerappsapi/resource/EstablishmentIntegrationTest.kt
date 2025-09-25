@@ -61,7 +61,7 @@ class EstablishmentIntegrationTest(
 
   @Test
   fun `get app types by establishments`() {
-    val response = webTestClient.get()
+    var response = webTestClient.get()
       .uri("/v1/establishments/apps/types")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISON")))
       .header("Content-Type", "application/json")
@@ -75,6 +75,23 @@ class EstablishmentIntegrationTest(
       .responseBody as List<AppTypeResponse>
     assertEquals(1, response.size)
     assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(), response.get(0).key)
+
+    // set all apptypes
+    establishmentRepository.save(Establishment(establishmentIdFirst, "ESTABLISHMENT_NAME_1", AppType.entries.toSet()))
+
+    response = webTestClient.get()
+      .uri("/v1/establishments/apps/types")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISON")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<List<AppTypeResponse>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as List<AppTypeResponse>
+    assertEquals(AppType.entries.size, response.size)
   }
 
   private fun populateEstablishments() {

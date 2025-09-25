@@ -44,6 +44,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
   fun `save app`() {
     val response = appRepository.save(DataGenerator.generateApp())
     Assertions.assertNotNull(response)
+    Assertions.assertEquals(false, response.firstNightCenter)
   }
 
   @Test
