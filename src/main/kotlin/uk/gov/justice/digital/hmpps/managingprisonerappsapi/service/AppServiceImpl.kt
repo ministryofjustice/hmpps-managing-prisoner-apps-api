@@ -354,7 +354,7 @@ class AppServiceImpl(
       }
     }
     val appsList = convertAppToAppListDto(pageResult.content, staff.establishmentId)
-    val groups = groupsService.getGroupsByEstablishmentId(establishmentId)
+    val groups = groupsService.getGroupsByEstablishmentId(establishmentId, staff.establishmentId)
     return AppResponseListDto(
       pageResult.pageable.pageNumber + 1,
       pageResult.totalElements,

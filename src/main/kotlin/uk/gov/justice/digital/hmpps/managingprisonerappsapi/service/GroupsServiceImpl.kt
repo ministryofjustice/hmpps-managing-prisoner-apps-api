@@ -66,7 +66,7 @@ class GroupsServiceImpl(
     groupRepository.deleteById(id)
   }
 
-  override fun getGroupsByEstablishmentId(establishmentId: String): List<AssignedGroupDto> = findGroupsByEstablishmentId(establishmentId)
+  override fun getGroupsByEstablishmentId(establishmentId: String, staffEstablishmentId: String): List<AssignedGroupDto> = findGroupsByEstablishmentId(establishmentId, staffEstablishmentId)
 
   override fun getGroupsByLoggedStaffEstablishmentId(loggedUserId: String): List<AssignedGroupDto> {
     val staff = staffService.getStaffById(loggedUserId).orElseThrow {
@@ -76,7 +76,7 @@ class GroupsServiceImpl(
       ApiException("Establishment ${staff.establishmentId} not onboarded yet", HttpStatus.FORBIDDEN)
     }
     val establishmentId = if (establishmentDto.defaultDepartments) "DEFAULT" else staff.establishmentId
-    return findGroupsByEstablishmentId(establishmentId)
+    return findGroupsByEstablishmentId(establishmentId, staff.establishmentId)
   }
 
   override fun getGroupsByLoggedStaffEstablishmentIdAndAppType(loggedUserId: String, appType: AppType): List<AssignedGroupDto> {
@@ -136,11 +136,12 @@ class GroupsServiceImpl(
     return groupList
   }
 
-  private fun findGroupsByEstablishmentId(establishmentId: String): List<AssignedGroupDto> {
+  private fun findGroupsByEstablishmentId(establishmentId: String, staffEstablishmentId: String): List<AssignedGroupDto> {
     val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(establishmentId)
     val assignedGroupDto = ArrayList<AssignedGroupDto>()
     groups.forEach { g ->
-      val establishment = establishmentService.getEstablishmentById(g.establishmentId)
+      val agencyId = if (g.establishmentId == "DEFAULT") staffEstablishmentId else g.establishmentId
+      val establishment = establishmentService.getEstablishmentById(agencyId)
         .orElseThrow { ApiException("Establishment with ${g.id} not found", HttpStatus.NOT_FOUND) }
       assignedGroupDto.add(convertGroupsToAssignedGroupsDto(g, establishment))
     }
