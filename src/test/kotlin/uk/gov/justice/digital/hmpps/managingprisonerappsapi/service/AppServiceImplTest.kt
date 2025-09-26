@@ -339,7 +339,7 @@ class AppServiceImplTest {
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy)).thenReturn(
       Optional.of(prisoner),
     )
-    Mockito.`when`(groupService.getGroupById(app.assignedGroup, null)).thenReturn(
+    Mockito.`when`(groupService.getGroupById(app.assignedGroup, staff.establishmentId)).thenReturn(
       AssignedGroupDto(
         groupId,
         "Test Group",
