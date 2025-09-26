@@ -140,7 +140,7 @@ class AppServiceImpl(
     if (!establishment.appTypes.contains(AppType.getAppType(appRequestDto.type))) {
       throw ApiException("The type: ${appRequestDto.type} is not enabled for ${establishment.name}", HttpStatus.FORBIDDEN)
     }
-    val establishmentId = if (establishment.defaultDepartments)  "DEFAULT" else staff.establishmentId
+    val establishmentId = if (establishment.defaultDepartments) "DEFAULT" else staff.establishmentId
     var department: UUID? = null
     if (appRequestDto.department != null) {
       groupsService.getGroupById(appRequestDto.department)
@@ -226,6 +226,10 @@ class AppServiceImpl(
     val app = appRepository.findById(appId)
       .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.FORBIDDEN) }
     validateStaffPermission(staff, app)
+    val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+      ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
+    }
+    val establishmentId = if (establishment.defaultDepartments) "DEFAULT" else staff.establishmentId
     if (groupId == app.assignedGroup) {
       throw ApiException("App already assigned to group $groupId", HttpStatus.BAD_REQUEST)
     }
@@ -290,6 +294,10 @@ class AppServiceImpl(
     val staff = staffService.getStaffById(staffId).orElseThrow {
       throw ApiException("No staff with id $staffId", HttpStatus.BAD_REQUEST)
     }
+    var establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+      ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
+    }
+    val establishmentId = if (establishment.defaultDepartments) "DEFAULT" else staff.establishmentId
     var appTypeDto: List<AppByAppTypeCounts> = listOf()
     var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> = listOf()
     var appByFirstNightCount: Int = 0
@@ -297,7 +305,7 @@ class AppServiceImpl(
     var establishmentAppTypes = emptySet<AppType>()
     runBlocking {
       launch {
-        val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+        establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
           ApiException("", HttpStatus.FORBIDDEN)
         }
         establishmentAppTypes = establishment.appTypes
@@ -346,7 +354,7 @@ class AppServiceImpl(
       }
     }
     val appsList = convertAppToAppListDto(pageResult.content)
-    val groups = groupsService.getGroupsByEstablishmentId(staff.establishmentId)
+    val groups = groupsService.getGroupsByEstablishmentId(establishmentId)
     return AppResponseListDto(
       pageResult.pageable.pageNumber + 1,
       pageResult.totalElements,

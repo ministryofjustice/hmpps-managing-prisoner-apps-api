@@ -38,7 +38,7 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
       ESTABLISHMENT_ID_1,
       ESTABLISHMENT_NAME_1,
       setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
-      false
+      false,
     )
     val entity = establishmentRepository.save(establishment)
     assertEstablishment(establishment, entity)

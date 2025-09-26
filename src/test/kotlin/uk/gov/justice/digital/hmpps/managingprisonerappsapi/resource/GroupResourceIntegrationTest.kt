@@ -136,12 +136,14 @@ class GroupResourceIntegrationTest(
   }
 
   private fun populateEstablishments() {
-    establishmentRepository.save(Establishment(
-      establishmentIdFirst,
-      establishmentIdFirst,
-      AppType.entries.toSet(),
-      false
-    ))
+    establishmentRepository.save(
+      Establishment(
+        establishmentIdFirst,
+        establishmentIdFirst,
+        AppType.entries.toSet(),
+        false,
+      ),
+    )
   }
 
   private fun populateGroups() {

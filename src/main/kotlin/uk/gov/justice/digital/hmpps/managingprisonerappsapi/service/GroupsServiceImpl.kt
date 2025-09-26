@@ -67,7 +67,7 @@ class GroupsServiceImpl(
     val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
       ApiException("Establishment ${staff.establishmentId} not onboarded yet", HttpStatus.FORBIDDEN)
     }
-    val establishmentId = if (establishmentDto.defaultDepartments)  "DEFAULT" else staff.establishmentId
+    val establishmentId = if (establishmentDto.defaultDepartments) "DEFAULT" else staff.establishmentId
     return findGroupsByEstablishmentId(establishmentId)
   }
 
@@ -78,7 +78,7 @@ class GroupsServiceImpl(
     val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
       ApiException("Establishment ${staff.establishmentId} not onboarded yet", HttpStatus.FORBIDDEN)
     }
-    val establishmentId = if (establishmentDto.defaultDepartments)  "DEFAULT" else staff.establishmentId
+    val establishmentId = if (establishmentDto.defaultDepartments) "DEFAULT" else staff.establishmentId
     val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(establishmentId)
     val groupList: MutableList<Groups> = mutableListOf()
     for (group in groups) {

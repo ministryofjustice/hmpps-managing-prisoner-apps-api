@@ -78,23 +78,29 @@ class EstablishmentIntegrationTest(
   }
 
   private fun populateEstablishments() {
-    establishmentRepository.save(Establishment(
-      establishmentIdFirst,
-      "ESTABLISHMENT_NAME_1",
-      setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
-      false
-    ))
-    establishmentRepository.save(Establishment(
-      establishmentIdSecond,
-      "ESTABLISHMENT_NAME_2",
-      AppType.entries.toSet(),
-      false
-    ))
-    establishmentRepository.save(Establishment(
-      establishmentIdThird,
-      "ESTABLISHMENT_NAME_3",
-      AppType.entries.toSet(),
-      false
-    ))
+    establishmentRepository.save(
+      Establishment(
+        establishmentIdFirst,
+        "ESTABLISHMENT_NAME_1",
+        setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        false,
+      ),
+    )
+    establishmentRepository.save(
+      Establishment(
+        establishmentIdSecond,
+        "ESTABLISHMENT_NAME_2",
+        AppType.entries.toSet(),
+        false,
+      ),
+    )
+    establishmentRepository.save(
+      Establishment(
+        establishmentIdThird,
+        "ESTABLISHMENT_NAME_3",
+        AppType.entries.toSet(),
+        false,
+      ),
+    )
   }
 }

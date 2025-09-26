@@ -103,7 +103,7 @@ class DataGenerator {
       "HST",
       "Test Establishment",
       AppType.entries.toSet(),
-      false
+      false,
     )
 
     fun generateGroups(
