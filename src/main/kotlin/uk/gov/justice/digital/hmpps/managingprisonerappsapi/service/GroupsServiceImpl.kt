@@ -28,6 +28,13 @@ class GroupsServiceImpl(
     return convertGroupsToAssignedGroupsDto(groups, establishment)
   }
 
+  override fun getGroupById(id: UUID): Groups {
+    val group = groupRepository.findById(id).orElseThrow {
+      ApiException("Group with id $id not found", HttpStatus.BAD_REQUEST)
+    }
+    return group
+  }
+
   override fun updateGroup(groupRequestDto: GroupsRequestDto): AssignedGroupDto {
     val establishment = establishmentService.getEstablishmentById(groupRequestDto.establishmentId).orElseThrow {
       ApiException("Establishment with id ${groupRequestDto.establishmentId} not found", HttpStatus.BAD_REQUEST)
@@ -44,11 +51,12 @@ class GroupsServiceImpl(
     TODO("Not yet implemented")
   }
 
-  override fun getGroupById(id: UUID): AssignedGroupDto {
+  override fun getGroupById(id: UUID, establishmentId: String?): AssignedGroupDto {
     val groups = groupRepository.findById(id).orElseThrow {
       ApiException("Group with id $id not found", HttpStatus.NOT_FOUND)
     }
-    val establishment = establishmentService.getEstablishmentById(groups.establishmentId).orElseThrow {
+    val estId = if (establishmentId != null) establishmentId else groups.establishmentId
+    val establishment = establishmentService.getEstablishmentById(estId).orElseThrow {
       ApiException("Establishment with id ${groups.establishmentId} not found", HttpStatus.NOT_FOUND)
     }
     return convertGroupsToAssignedGroupsDto(groups, establishment)

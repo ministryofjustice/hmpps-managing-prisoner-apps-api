@@ -222,7 +222,7 @@ class AppServiceImplTest {
         ),
       ),
     )
-    Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(
+    Mockito.`when`(groupService.getGroupById(groupId, null)).thenReturn(
       AssignedGroupDto(
         groupId,
         "Test Group",
@@ -270,7 +270,7 @@ class AppServiceImplTest {
         ),
       ),
     )
-    Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(
+    Mockito.`when`(groupService.getGroupById(groupId, null)).thenReturn(
       AssignedGroupDto(
         groupId,
         "Test Group",
@@ -339,7 +339,7 @@ class AppServiceImplTest {
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy)).thenReturn(
       Optional.of(prisoner),
     )
-    Mockito.`when`(groupService.getGroupById(app.assignedGroup)).thenReturn(
+    Mockito.`when`(groupService.getGroupById(app.assignedGroup, null)).thenReturn(
       AssignedGroupDto(
         groupId,
         "Test Group",
@@ -407,7 +407,7 @@ class AppServiceImplTest {
     Mockito.`when`(establishmentService.getEstablishmentById(staff.establishmentId)).thenReturn(Optional.of(establishment))
     Mockito.`when`(staffService.getStaffById(createdBy)).thenReturn(Optional.of(staff))
     Mockito.`when`(appRepository.findById(app.id)).thenReturn(Optional.of(app))
-    Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(
+    Mockito.`when`(groupService.getGroupById(groupId, null)).thenReturn(
       AssignedGroupDto(
         forwardGroupId,
         "Forward group",

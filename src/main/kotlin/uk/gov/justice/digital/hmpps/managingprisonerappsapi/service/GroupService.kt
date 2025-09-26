@@ -15,7 +15,9 @@ interface GroupService {
 
   fun getGroupsByEstablishment(establishmentId: UUID, name: String)
 
-  fun getGroupById(id: UUID): AssignedGroupDto
+  fun getGroupById(id: UUID): Groups
+
+  fun getGroupById(id: UUID, establishmentId: String?): AssignedGroupDto
 
   fun deleteGroupById(id: UUID)
 
