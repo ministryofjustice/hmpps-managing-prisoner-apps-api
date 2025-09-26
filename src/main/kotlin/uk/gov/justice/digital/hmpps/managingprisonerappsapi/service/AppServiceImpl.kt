@@ -143,7 +143,7 @@ class AppServiceImpl(
     val establishmentId = if (establishment.defaultDepartments) "DEFAULT" else staff.establishmentId
     var department: UUID? = null
     if (appRequestDto.department != null) {
-      groupsService.getGroupById(appRequestDto.department)
+      groupsService.getGroupById(appRequestDto.department, establishmentId)
       val departments = groupsService.getGroupByInitialAppType(establishmentId, AppType.getAppType(appRequestDto.type))
       if (departments.size <= 1) {
         department = appRequestDto.department
@@ -158,12 +158,12 @@ class AppServiceImpl(
         throw ApiException("Department  with id ${appRequestDto.department} is not found", HttpStatus.FORBIDDEN)
       }
     } else {
-      department = groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type)).first().id
+      department = groupsService.getGroupByInitialAppType(establishmentId, AppType.getAppType(appRequestDto.type)).first().id
     }
     // val group =
     //  groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
     var app = convertAppRequestToAppEntity(prisoner, staff, department!!, appRequestDto)
-    val assignedGroup = groupsService.getGroupById(department!!)
+    val assignedGroup = groupsService.getGroupById(department!!, establishmentId)
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
@@ -194,7 +194,7 @@ class AppServiceImpl(
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
     validateStaffPermission(staff, app)
-    val groups = groupsService.getGroupById(app.assignedGroup)
+    val groups = groupsService.getGroupById(app.assignedGroup, null)
     val groupsDto: Any
     if (assignedGroup) {
       groupsDto = groups
@@ -245,7 +245,7 @@ class AppServiceImpl(
         ),
       )
     }
-    val group = groupsService.getGroupById(groupId)
+    val group = groupsService.getGroupById(groupId, establishmentId)
     app.assignedGroup = groupId
     app.lastModifiedDate = LocalDateTime.now(ZoneOffset.UTC)
     app.lastModifiedBy = staffId
@@ -353,7 +353,7 @@ class AppServiceImpl(
         )
       }
     }
-    val appsList = convertAppToAppListDto(pageResult.content)
+    val appsList = convertAppToAppListDto(pageResult.content, establishmentId)
     val groups = groupsService.getGroupsByEstablishmentId(establishmentId)
     return AppResponseListDto(
       pageResult.pageable.pageNumber + 1,
@@ -449,10 +449,10 @@ class AppServiceImpl(
     app.firstNightCenter,
   )
 
-  private fun convertAppToAppListDto(apps: List<App>): List<AppListViewDto> {
+  private fun convertAppToAppListDto(apps: List<App>, establishmentId: String): List<AppListViewDto> {
     val list = ArrayList<AppListViewDto>()
     apps.forEach { app ->
-      val group = groupsService.getGroupById(app.assignedGroup)
+      val group = groupsService.getGroupById(app.assignedGroup, establishmentId)
       val groupAppListviewDto = GroupAppListViewDto(group.id, group.name, null)
       val appResponseDto = AppListViewDto(
         app.id,
