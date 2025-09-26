@@ -61,7 +61,7 @@ class AppServiceImpl(
     appId: UUID,
     appUpdateDto: AppUpdateDto,
   ): AppResponseDto<Any, Any> {
-    if (appUpdateDto.formData.size> 1 || appUpdateDto.formData.isEmpty()) {
+    if (appUpdateDto.formData.size > 1 || appUpdateDto.formData.isEmpty()) {
       throw ApiException("Multiple or zero requests in app is not supported", HttpStatus.FORBIDDEN)
     }
     val staff = staffService.getStaffById(staffId).orElseThrow {
@@ -369,10 +369,10 @@ class AppServiceImpl(
     val staff = staffService.getStaffById(staffId)
       .orElseThrow { throw ApiException("No staff with id $staffId found", HttpStatus.NOT_FOUND) }
     val result = appRepository.searchRequestedByFirstOrLastName(staff.establishmentId, text)
-    if (result.size <=20) {
+    if (result.size <= 20) {
       return result
     } else {
-      return result.subList(0,19)
+      return result.subList(0, 19)
     }
   }
 

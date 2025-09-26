@@ -132,7 +132,7 @@ class AppResourceIntegrationTest(
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
-        AppUpdateDto(false,listOf(map)),
+        AppUpdateDto(false, listOf(map)),
       )
       .exchange()
       .expectStatus().isOk
