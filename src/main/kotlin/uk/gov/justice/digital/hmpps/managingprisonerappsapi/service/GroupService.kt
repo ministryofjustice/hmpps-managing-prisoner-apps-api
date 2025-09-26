@@ -21,7 +21,7 @@ interface GroupService {
 
   fun deleteGroupById(id: UUID)
 
-  fun getGroupsByEstablishmentId(establishmentId: String): List<AssignedGroupDto>
+  fun getGroupsByEstablishmentId(establishmentId: String, staffEstablishmentId: String): List<AssignedGroupDto>
 
   fun getGroupsByLoggedStaffEstablishmentId(loggedUserId: String): List<AssignedGroupDto>
 
