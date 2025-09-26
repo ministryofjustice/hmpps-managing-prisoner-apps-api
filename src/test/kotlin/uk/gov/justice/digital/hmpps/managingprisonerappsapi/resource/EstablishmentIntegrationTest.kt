@@ -77,7 +77,7 @@ class EstablishmentIntegrationTest(
     assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(), response.get(0).key)
 
     // set all apptypes
-    establishmentRepository.save(Establishment(establishmentIdFirst, "ESTABLISHMENT_NAME_1", AppType.entries.toSet()))
+    establishmentRepository.save(Establishment(establishmentIdFirst, "ESTABLISHMENT_NAME_1", AppType.entries.toSet(), false))
 
     response = webTestClient.get()
       .uri("/v1/establishments/apps/types")
