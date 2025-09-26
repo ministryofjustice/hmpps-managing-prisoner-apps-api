@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseListDto
@@ -16,7 +17,7 @@ interface AppService {
 
   fun saveApp(app: App): App
 
-  fun updateAppFormData(prisonerId: String, staffId: String, appId: UUID, requestFormData: List<Map<String, Any>>): AppResponseDto<Any, Any>
+  fun updateAppFormData(prisonerId: String, staffId: String, appId: UUID, appUpdateDto: AppUpdateDto): AppResponseDto<Any, Any>
 
   fun getAppById(appId: UUID): Optional<App>
 

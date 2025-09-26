@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
@@ -105,12 +106,12 @@ class AppResource(var appService: AppService) {
   fun updateAppRequestData(
     @PathVariable prisonerId: String,
     @PathVariable appId: UUID,
-    @RequestBody appFormData: List<Map<String, Any>>,
+    @RequestBody appUpdateDto: AppUpdateDto,
     authentication: Authentication,
   ): ResponseEntity<AppResponseDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for updating app requests data for $prisonerId by ${authentication.principal}")
-    val appResponseDto = appService.updateAppFormData(prisonerId, authentication.principal, appId, appFormData)
+    val appResponseDto = appService.updateAppFormData(prisonerId, authentication.principal, appId, appUpdateDto)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
