@@ -14,6 +14,7 @@ data class Establishment(
   val name: String,
   @JdbcTypeCode(SqlTypes.JSON)
   val appTypes: Set<AppType>,
+  val defaultDepartments: Boolean,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

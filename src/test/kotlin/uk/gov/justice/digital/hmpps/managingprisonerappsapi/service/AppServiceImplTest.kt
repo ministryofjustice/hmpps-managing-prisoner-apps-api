@@ -100,7 +100,7 @@ class AppServiceImplTest {
       "Staff",
       UUID.randomUUID(),
     )
-    establishment = EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet())
+    establishment = EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet(), false)
     prisoner = Prisoner(
       requestedBy,
       UUID.randomUUID().toString(),
@@ -230,6 +230,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           AppType.entries.toSet(),
+          false,
         ),
         AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
@@ -277,6 +278,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           AppType.entries.toSet(),
+          false,
         ),
         AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
@@ -345,6 +347,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           AppType.entries.toSet(),
+          false,
         ),
         AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
         GroupType.WING,
@@ -401,6 +404,7 @@ class AppServiceImplTest {
   @Test
   fun `forward app to group`() {
     val forwardGroupId = UUID.randomUUID()
+    Mockito.`when`(establishmentService.getEstablishmentById(staff.establishmentId)).thenReturn(Optional.of(establishment))
     Mockito.`when`(staffService.getStaffById(createdBy)).thenReturn(Optional.of(staff))
     Mockito.`when`(appRepository.findById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(
@@ -411,6 +415,7 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           AppType.entries.toSet(),
+          false,
         ),
         AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
         GroupType.WING,

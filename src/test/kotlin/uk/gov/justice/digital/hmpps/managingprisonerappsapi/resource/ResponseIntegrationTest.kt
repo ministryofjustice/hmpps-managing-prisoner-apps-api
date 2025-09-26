@@ -196,7 +196,14 @@ class ResponseIntegrationTest(
   }
 
   private fun populateEstablishments() {
-    establishmentRepository.save(Establishment(establishmentIdFirst, "ESTABLISHMENT_NAME_1", AppType.entries.toSet()))
+    establishmentRepository.save(
+      Establishment(
+        establishmentIdFirst,
+        "ESTABLISHMENT_NAME_1",
+        AppType.entries.toSet(),
+        false,
+      ),
+    )
   }
 
   private fun populateGroups() {

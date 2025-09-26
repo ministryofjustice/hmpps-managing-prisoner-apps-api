@@ -16,4 +16,5 @@ data class EstablishmentDto(
   val id: String,
   val name: String,
   val appTypes: Set<AppType>,
+  val defaultDepartments: Boolean,
 )
