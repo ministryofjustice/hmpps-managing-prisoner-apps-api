@@ -61,7 +61,7 @@ class AppServiceImpl(
     appId: UUID,
     appUpdateDto: AppUpdateDto,
   ): AppResponseDto<Any, Any> {
-    if (appUpdateDto.formDat.size> 1 || appUpdateDto.formDat.isEmpty()) {
+    if (appUpdateDto.formData.size> 1 || appUpdateDto.formData.isEmpty()) {
       throw ApiException("Multiple or zero requests in app is not supported", HttpStatus.FORBIDDEN)
     }
     val staff = staffService.getStaffById(staffId).orElseThrow {
@@ -74,7 +74,7 @@ class AppServiceImpl(
     if (app.status != AppStatus.PENDING) {
       throw ApiException("App is closed and cannot be updated", HttpStatus.FORBIDDEN)
     }
-    appUpdateDto.formDat.forEach { l ->
+    appUpdateDto.formData.forEach { l ->
       app.requests.forEach { req ->
         if (req["id"] == l["id"] && req["responseId"] == null) {
           req.keys.forEach { key ->
