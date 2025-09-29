@@ -63,7 +63,10 @@ class ManagingPrisonerAppsApiExceptionHandler {
         userMessage = "Unexpected error: ${e.message}",
         developerMessage = e.message,
       ),
-    ).also { log.error("Unexpected exception: {}", e.message) }
+    ).also {
+      log.error("Unexpected exception: {}", e)
+      log.error("Unexpected exception: {}", e.message)
+    }
 
   @ExceptionHandler(ApiException::class)
   fun handleApiException(e: ApiException): ResponseEntity<ErrorResponse> {
