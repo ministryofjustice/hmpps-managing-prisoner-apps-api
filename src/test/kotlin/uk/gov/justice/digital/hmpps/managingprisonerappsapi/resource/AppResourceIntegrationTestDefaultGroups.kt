@@ -36,7 +36,7 @@ import java.time.ZoneOffset
 import java.util.*
 import kotlin.collections.HashMap
 
-class AppResourceIntegrationTestDefaultGroups (
+class AppResourceIntegrationTestDefaultGroups(
   @Autowired private val appRepository: AppRepository,
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
@@ -408,7 +408,7 @@ class AppResourceIntegrationTestDefaultGroups (
       .returnResult()
       .responseBody as AppResponseDto<AssignedGroupDto, String>
 
-    val pageResult = commentRepository.getCommentsByAppId(appIdFirst, PageRequest.of(0,1))
+    val pageResult = commentRepository.getCommentsByAppId(appIdFirst, PageRequest.of(0, 1))
     val comment = pageResult.content.get(0)
     Assertions.assertEquals(forwardingMessage, comment.message)
     Assertions.assertEquals(appIdFirst, comment.appId)
