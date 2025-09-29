@@ -164,6 +164,7 @@ class AppServiceImpl(
     //  groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
     var app = convertAppRequestToAppEntity(prisoner, staff, department!!, appRequestDto)
     val assignedGroup = groupsService.getGroupById(department!!, staff.establishmentId)
+    logger.info("Saving app request in db")
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
