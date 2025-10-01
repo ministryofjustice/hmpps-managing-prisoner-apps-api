@@ -10,6 +10,7 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
@@ -131,7 +132,7 @@ class AppResourceIntegrationTest(
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
-        listOf(map),
+        AppUpdateDto(false, listOf(map)),
       )
       .exchange()
       .expectStatus().isOk

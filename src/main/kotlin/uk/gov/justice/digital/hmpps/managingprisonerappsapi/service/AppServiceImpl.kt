@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppListViewDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
@@ -58,9 +59,9 @@ class AppServiceImpl(
     prisonerId: String,
     staffId: String,
     appId: UUID,
-    requestFormData: List<Map<String, Any>>,
+    appUpdateDto: AppUpdateDto,
   ): AppResponseDto<Any, Any> {
-    if (requestFormData.size > 1 || requestFormData.isEmpty()) {
+    if (appUpdateDto.formData.size > 1 || appUpdateDto.formData.isEmpty()) {
       throw ApiException("Multiple or zero requests in app is not supported", HttpStatus.FORBIDDEN)
     }
     val staff = staffService.getStaffById(staffId).orElseThrow {
@@ -73,7 +74,7 @@ class AppServiceImpl(
     if (app.status != AppStatus.PENDING) {
       throw ApiException("App is closed and cannot be updated", HttpStatus.FORBIDDEN)
     }
-    requestFormData.forEach { l ->
+    appUpdateDto.formData.forEach { l ->
       app.requests.forEach { req ->
         if (req["id"] == l["id"] && req["responseId"] == null) {
           req.keys.forEach { key ->
@@ -86,6 +87,7 @@ class AppServiceImpl(
     }
     app.lastModifiedDate = LocalDateTime.now()
     app.lastModifiedBy = staffId
+    app.firstNightCenter = appUpdateDto.firstNightCenter
     app = appRepository.save(app)
     activityService.addActivity(
       app.id,
@@ -376,7 +378,12 @@ class AppServiceImpl(
     }
     val staff = staffService.getStaffById(staffId)
       .orElseThrow { throw ApiException("No staff with id $staffId found", HttpStatus.NOT_FOUND) }
-    return appRepository.searchRequestedByFirstOrLastName(staff.establishmentId, text)
+    val result = appRepository.searchRequestedByFirstOrLastName(staff.establishmentId, text)
+    if (result.size <= 20) {
+      return result
+    } else {
+      return result.subList(0, 19)
+    }
   }
 
   private fun convertAppRequestToAppEntity(

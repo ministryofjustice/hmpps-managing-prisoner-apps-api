@@ -102,7 +102,7 @@ interface AppRepository : JpaRepository<App, UUID> {
   @Query(
     value = "select  DISTINCT a.requestedBy as requestedBy, a.requestedByFirstName as requestedByFirstName, a.requestedByLastName as requestedByLastName FROM App a" +
       " where a.establishmentId = :establishmentId" +
-      " AND (a.requestedByFirstName ilike  %:searchText% OR a.requestedByLastName ilike  %:searchText%)" +
+      " AND (a.requestedByFirstName ilike  %:searchText% OR a.requestedByLastName ilike  %:searchText% OR a.requestedBy ilike  %:searchText%)" +
       " Order By a.requestedByFirstName, a.requestedByLastName",
     nativeQuery = false,
   )
