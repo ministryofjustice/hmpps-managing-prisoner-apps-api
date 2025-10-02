@@ -6,7 +6,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExcept
 enum class AppType {
   PIN_PHONE_EMERGENCY_CREDIT_TOP_UP,
   PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
-  PIN_PHONE_ADD_NEW_LEGAL_CONTACT,
+  PIN_PHONE_ADD_NEW_OFFICIAL_CONTACT,
   PIN_PHONE_REMOVE_CONTACT,
   PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
   PIN_PHONE_SUPPLY_LIST_OF_CONTACTS,
@@ -20,8 +20,8 @@ enum class AppType {
       if (type == PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString()) {
         return PIN_PHONE_ADD_NEW_SOCIAL_CONTACT
       }
-      if (type == PIN_PHONE_ADD_NEW_LEGAL_CONTACT.toString()) {
-        return PIN_PHONE_ADD_NEW_LEGAL_CONTACT
+      if (type == PIN_PHONE_ADD_NEW_OFFICIAL_CONTACT.toString()) {
+        return PIN_PHONE_ADD_NEW_OFFICIAL_CONTACT
       }
       if (type == PIN_PHONE_REMOVE_CONTACT.toString()) {
         return PIN_PHONE_REMOVE_CONTACT

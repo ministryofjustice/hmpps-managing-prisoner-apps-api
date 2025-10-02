@@ -87,12 +87,12 @@ class EstablishmentService(
             "Add new social PIN phone contact",
           ),
         )
-      } else if (appType == AppType.PIN_PHONE_ADD_NEW_LEGAL_CONTACT) {
+      } else if (appType == AppType.PIN_PHONE_ADD_NEW_OFFICIAL_CONTACT) {
         appTypesList.add(
           AppTypeResponse(
             appType.name,
-            "add-legal-pin-phone-contact",
-            "Add new legal PIN phone contact",
+            "add-official-pin-phone-contact",
+            "Add new official PIN phone contact",
           ),
         )
       } else if (appType == AppType.PIN_PHONE_REMOVE_CONTACT) {

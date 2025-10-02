@@ -1,0 +1,1 @@
+ALTER TABLE if exists groups_initials_apps DROP CONSTRAINT if exists groups_initials_apps_initials_apps_check;
