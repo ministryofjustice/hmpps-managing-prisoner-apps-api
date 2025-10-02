@@ -400,7 +400,7 @@ class AppServiceImpl(
     return App(
       Generators.timeBasedEpochGenerator().generate(), // id
       appRequest.reference, // reference
-      groupId, // group id
+      groupId, // group id or department
       AppType.getAppType(appRequest.type),
       appRequest.requestedDate ?: localDateTime,
       localDateTime, // created date
