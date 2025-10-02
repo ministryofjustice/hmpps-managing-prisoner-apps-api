@@ -1,0 +1,3 @@
+UPDATE public.app
+set app_type = 'PIN_PHONE_ADD_NEW_OFFICIAL_CONTACT'
+WHERE app_type = 'PIN_PHONE_ADD_NEW_LEGAL_CONTACT'
