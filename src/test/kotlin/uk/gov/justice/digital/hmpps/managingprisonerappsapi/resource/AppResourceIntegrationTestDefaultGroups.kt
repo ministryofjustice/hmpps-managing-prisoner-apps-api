@@ -35,7 +35,6 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
-import kotlin.collections.HashMap
 
 class AppResourceIntegrationTestDefaultGroups(
   @Autowired private val appRepository: AppRepository,
@@ -616,6 +615,8 @@ class AppResourceIntegrationTestDefaultGroups(
         "ESTABLISHMENT_NAME_1",
         AppType.entries.toSet(),
         true,
+        listOf(),
+        listOf(),
       ),
     )
     establishmentRepository.save(
@@ -624,6 +625,8 @@ class AppResourceIntegrationTestDefaultGroups(
         "ESTABLISHMENT_NAME_2",
         AppType.entries.toSet(),
         true,
+        listOf(),
+        listOf(),
       ),
     )
     establishmentRepository.save(
@@ -632,6 +635,8 @@ class AppResourceIntegrationTestDefaultGroups(
         "ESTABLISHMENT_NAME_3",
         AppType.entries.toSet(),
         true,
+        listOf(),
+        listOf(),
       ),
     )
   }

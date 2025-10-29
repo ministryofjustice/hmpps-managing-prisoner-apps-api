@@ -3,16 +3,23 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppTypeResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import java.util.*
 
 @Service
 class EstablishmentService(
   private val establishmentRepository: EstablishmentRepository,
+  private val applicationGroupRepository: ApplicationGroupRepository,
+  private val applicationTypeRepository: ApplicationTypeRepository,
   private val staffService: StaffService,
 ) {
 
@@ -62,6 +69,16 @@ class EstablishmentService(
     return convertAppTypeToAppTypeListResponse(establishment.appTypes)
   }
 
+  fun getAppGroupsAndTypesByLoggedUserEstablishment(staffId: String): List<ApplicationGroupResponse> {
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
+    }
+    val establishment = establishmentRepository.findById(staff.establishmentId).orElseThrow {
+      ApiException("Establishment: ${staff.establishmentId} not enabled", HttpStatus.FORBIDDEN)
+    }
+    return convertApplicationGroupsToAppGroupsResponse(applicationGroupRepository.findAll(), establishment.blackListedAppGroups, establishment.blackListedAppTypes)
+  }
+
   private fun convertEstablishmentToEstablishmentDto(establishment: Establishment): EstablishmentDto = EstablishmentDto(
     id = establishment.id,
     name = establishment.name,
@@ -74,7 +91,29 @@ class EstablishmentService(
     name = establishmentDto.name,
     establishmentDto.appTypes,
     false,
+    listOf(),
+    listOf(),
   )
+
+  private fun convertApplicationGroupsToAppGroupsResponse(applicationGroups: List<ApplicationGroup>, blackListedAppGroups: List<Long>, blacklistedAppTypes: List<Long>): List<ApplicationGroupResponse> {
+    val appGroupsResponse = ArrayList<ApplicationGroupResponse>()
+    applicationGroups.forEach { appGroup ->
+      if (!blackListedAppGroups.contains(appGroup.id)) {
+        val appTypes = ArrayList<ApplicationTypeResponse>()
+        appGroup.applicationTypes.forEach { appType ->
+          if (!blacklistedAppTypes.contains(appType.id)) {
+            appTypes.add(
+              ApplicationTypeResponse(appType.id, appType.name, appType.genericType, appType.logDetailRequired),
+            )
+          }
+        }
+        appGroupsResponse.add(
+          ApplicationGroupResponse(appGroup.id, appGroup.name, appTypes),
+        )
+      }
+    }
+    return appGroupsResponse
+  }
 
   private fun convertAppTypeToAppTypeListResponse(appTypes: Set<AppType>): List<AppTypeResponse> {
     val appTypesList = ArrayList<AppTypeResponse>(appTypes.size)

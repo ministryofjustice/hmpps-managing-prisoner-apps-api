@@ -135,6 +135,8 @@ class GroupResourceIntegrationTest(
         establishmentIdFirst,
         AppType.entries.toSet(),
         false,
+        listOf(),
+        listOf(),
       ),
     )
   }

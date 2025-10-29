@@ -104,6 +104,8 @@ class DataGenerator {
       "Test Establishment",
       AppType.entries.toSet(),
       false,
+      listOf(),
+      listOf(),
     )
 
     fun generateGroups(

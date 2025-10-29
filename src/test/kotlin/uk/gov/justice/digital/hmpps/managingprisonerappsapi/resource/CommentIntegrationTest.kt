@@ -233,6 +233,8 @@ class CommentIntegrationTest(
         "ESTABLISHMENT_NAME_1",
         AppType.entries.toSet(),
         false,
+        listOf(),
+        listOf(),
       ),
     )
   }
