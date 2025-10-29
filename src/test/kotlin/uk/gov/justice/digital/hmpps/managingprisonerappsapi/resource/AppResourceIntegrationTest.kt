@@ -613,6 +613,8 @@ class AppResourceIntegrationTest(
         "ESTABLISHMENT_NAME_1",
         AppType.entries.toSet(),
         false,
+        listOf(),
+        listOf(),
       ),
     )
     establishmentRepository.save(
@@ -621,6 +623,8 @@ class AppResourceIntegrationTest(
         "ESTABLISHMENT_NAME_2",
         AppType.entries.toSet(),
         false,
+        listOf(),
+        listOf(),
       ),
     )
     establishmentRepository.save(
@@ -629,6 +633,8 @@ class AppResourceIntegrationTest(
         "ESTABLISHMENT_NAME_3",
         AppType.entries.toSet(),
         false,
+        listOf(),
+        listOf(),
       ),
     )
   }

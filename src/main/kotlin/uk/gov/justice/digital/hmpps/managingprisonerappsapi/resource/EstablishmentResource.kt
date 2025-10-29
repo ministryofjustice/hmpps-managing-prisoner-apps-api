@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppTypeResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.EstablishmentService
@@ -24,7 +25,7 @@ import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestController
-@RequestMapping("v1/")
+@RequestMapping("")
 class EstablishmentResource(private val establishmentService: EstablishmentService) {
   companion object {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -107,7 +108,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
       ),
     ],
   )
-  @GetMapping("/establishments/{id}")
+  @GetMapping("/v1/establishments/{id}")
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getEstablishmentById(@PathVariable id: String): ResponseEntity<EstablishmentDto> {
     val establishmentDto = establishmentService.getEstablishmentById(id)
@@ -136,7 +137,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
       ),
     ],
   )
-  @GetMapping("/establishments")
+  @GetMapping("/v1/establishments")
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getEstablishments(): ResponseEntity<Set<String>> {
     val establishments = establishmentService.getEstablishments()
@@ -162,12 +163,21 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
       ),
     ],
   )
-  @GetMapping("/establishments/apps/types", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @GetMapping("/v1/establishments/apps/types", produces = [MediaType.APPLICATION_JSON_VALUE])
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getAppTypesByEstablishment(authentication: Authentication): ResponseEntity<List<AppTypeResponse>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for get app types by ${authentication.principal}")
     val appTypes = establishmentService.getAppTypesByLoggedUserEstablishment(authentication.principal)
+    return ResponseEntity.status(HttpStatus.OK).body(appTypes)
+  }
+
+  @GetMapping("/v2/establishments/apps/groups", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  fun getAppGroupsByEstablishment(authentication: Authentication): ResponseEntity<List<ApplicationGroupResponse>> {
+    authentication as AuthAwareAuthenticationToken
+    logger.info("Request received for get app types by ${authentication.principal}")
+    val appTypes = establishmentService.getAppGroupsAndTypesByLoggedUserEstablishment(authentication.principal)
     return ResponseEntity.status(HttpStatus.OK).body(appTypes)
   }
 }

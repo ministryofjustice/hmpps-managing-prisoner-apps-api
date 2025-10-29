@@ -15,6 +15,10 @@ data class Establishment(
   @JdbcTypeCode(SqlTypes.JSON)
   val appTypes: Set<AppType>,
   val defaultDepartments: Boolean,
+  @JdbcTypeCode(SqlTypes.JSON)
+  val blackListedAppGroups: List<Long>,
+  @JdbcTypeCode(SqlTypes.JSON)
+  val blackListedAppTypes: List<Long>,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
