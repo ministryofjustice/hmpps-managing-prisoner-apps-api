@@ -36,8 +36,8 @@ import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.*
 
 @RestController
-@RequestMapping("v2")
-class AppResource(@Qualifier("appServiceV2") var appService: AppService) {
+@RequestMapping("v1")
+class AppResourceV2(@Qualifier("appServiceV2") var appService: AppService) {
 
   companion object {
     private val logger = LoggerFactory.getLogger(this::class.java)

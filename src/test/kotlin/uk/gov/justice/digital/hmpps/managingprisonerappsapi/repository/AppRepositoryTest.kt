@@ -30,6 +30,18 @@ import java.util.*
 @ActiveProfiles("test")
 class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
 
+  private val applicationGroupOne = 1L
+  private val applicationTypeOne = 1L
+  private val applicationTypeTwo = 2L
+  private val applicationTypeThree = 3L
+  private val applicationTypeFour = 4L
+
+  private val applicationGroupOneName = "Bt PIN PHONES"
+  private val applicationTypeOneName = "Add new Social Contact"
+  private val applicationTypeTwoName = "Add new Official Contact"
+  private val applicationTypeThreeName = "Remove Contact"
+  private val applicationTypeFourName = "Add Generic Pin Phone enquiry"
+
   @BeforeEach
   fun setUp() {
     appRepository.deleteAll()
@@ -54,7 +66,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       createdApp.id,
       "new reference 123",
       createdApp.assignedGroup,
-      createdApp.appType,
+      null,
+      applicationTypeOne,
+      applicationGroupOne,
       createdApp.requestedDate,
       createdApp.createdDate,
       createdApp.createdBy,
@@ -108,7 +122,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
@@ -121,7 +137,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
@@ -134,7 +152,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC).minusDays(1),
         requestedByFirstMainName,
@@ -147,7 +167,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
         requestedBySecond,
         LocalDateTime.now(ZoneOffset.UTC).minusDays(2),
         requestedBySecondMainName,
@@ -160,7 +182,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdSecond,
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
@@ -173,7 +197,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdSecond,
-        AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
@@ -186,7 +212,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdSecond,
-        AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
@@ -199,7 +227,9 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     appRepository.save(
       DataGenerator.generateApp(
         establishmentIdThird,
-        AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
         requestedByThird,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
@@ -222,7 +252,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(4, countResult.get(0).getCount())
     //   Assertions.assertEquals(1, countResult.get(1).getCount())
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, countResult.get(0).getAppType())
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, countResult.get(0).getApplicationType())
     //   Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, countResult.get(1).getAppType())
 
     var countResultByAssignedGroup = appRepository.countBySearchFilterGroupByAssignedGroup(
@@ -252,19 +282,19 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdSecond,
       setOf(AppStatus.PENDING),
-      setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+      setOf(1L),
       null,
       null,
       null,
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(1, countResult.get(0).getCount())
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, countResult.get(0).getAppType())
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, countResult.get(0).getApplicationType())
 
     pageResult = appRepository.appsBySearchFilter(
       establishmentIdSecond,
       setOf(AppStatus.PENDING),
-      setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+      setOf(1L),
       null,
       null,
       null,
@@ -283,7 +313,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(3, countResult.get(0).getCount())
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, countResult.get(0).getAppType())
+    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, countResult.get(0).getApplicationType())
 
     pageResult = appRepository.appsBySearchFilter(
       establishmentIdFirst,
@@ -321,19 +351,19 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdSecond,
       setOf(AppStatus.PENDING),
-      setOf(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
+      setOf(1L),
       requestedByThird,
       setOf(assignedGroupSecond),
       false,
     )
     Assertions.assertEquals(countResult.size, 1)
     Assertions.assertEquals(2, countResult.get(0).getCount())
-    Assertions.assertEquals(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS, countResult.get(0).getAppType())
+    Assertions.assertEquals(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS, countResult.get(0).getApplicationType())
 
     var pageResult1 = appRepository.appsBySearchFilter(
       establishmentIdSecond,
       setOf(AppStatus.PENDING),
-      setOf(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS),
+      setOf(1L),
       requestedByThird,
       setOf(assignedGroupSecond),
       false,

@@ -15,7 +15,7 @@ data class SarContent(
 data class PrnApp(
   val id: UUID,
   val status: AppStatus,
-  val type: AppType,
+  val type: Long,
   val requestedDate: LocalDateTime,
   val lastModifiedDate: LocalDateTime,
   val establishment: String,

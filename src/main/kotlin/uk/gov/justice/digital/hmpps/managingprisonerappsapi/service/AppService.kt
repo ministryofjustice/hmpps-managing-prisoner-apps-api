@@ -8,7 +8,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
 import java.util.*
 
@@ -30,7 +29,7 @@ interface AppService {
   fun searchAppsByColumnsFilter(
     staffId: String,
     status: Set<AppStatus>,
-    appTypes: Set<AppType>?,
+    appTypes: Set<Long>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
     firstNightCenter: Boolean?,

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
@@ -38,9 +37,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
+import java.util.UUID
 
-class AppResourceIntegrationTestDefaultGroups(
+class AppResourceIntegrationTestV2(
   @Autowired private val appRepository: AppRepository,
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
@@ -66,9 +65,6 @@ class AppResourceIntegrationTestDefaultGroups(
   private val requestedByThirdMainName = "Test"
   private val requestedByThirdSurname = "User"
 
-  private lateinit var appIdFirst: UUID
-  private lateinit var appIdSecond: UUID
-
   private val applicationGroupOne = 1L
   private val applicationTypeOne = 1L
   private val applicationTypeTwo = 2L
@@ -81,11 +77,16 @@ class AppResourceIntegrationTestDefaultGroups(
   private val applicationTypeThreeName = "Remove Contact"
   private val applicationTypeFourName = "Add Generic Pin Phone enquiry"
 
+  private lateinit var appIdFirst: UUID
+  private lateinit var appIdSecond: UUID
+
   @BeforeEach
   fun setUp() {
     appRepository.deleteAll()
     groupRepository.deleteAll()
     establishmentRepository.deleteAll()
+    applicationGroupRepository.deleteAll()
+    applicationTypeRepository.deleteAll()
 
     populateEstablishments()
     populateGroups()
@@ -109,7 +110,6 @@ class AppResourceIntegrationTestDefaultGroups(
     appRepository.deleteAll()
     groupRepository.deleteAll()
     establishmentRepository.deleteAll()
-    commentRepository.deleteAll()
   }
 
   @Test
@@ -122,8 +122,8 @@ class AppResourceIntegrationTestDefaultGroups(
       .bodyValue(
         DataGenerator.generateAppRequestDto(
           null,
+          1,
           applicationTypeOne,
-          applicationGroupOne,
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
@@ -232,8 +232,8 @@ class AppResourceIntegrationTestDefaultGroups(
       .bodyValue(
         DataGenerator.generateAppRequestDto(
           null,
-          applicationTypeOne,
-          applicationGroupOne,
+          1,
+          3,
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
@@ -291,8 +291,8 @@ class AppResourceIntegrationTestDefaultGroups(
     val appRequest = AppRequestDto(
       "Testing",
       null,
-      applicationTypeOne,
       applicationGroupOne,
+      applicationTypeOne,
       LocalDateTime.now(),
       listOf(
         HashMap<String, Any>()
@@ -417,6 +417,7 @@ class AppResourceIntegrationTestDefaultGroups(
   fun `forward app request to other group`() {
     // groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentIdFirst)
     val forwardingMessage = "Forwarding  to group $assignedGroupSecondName"
+
     webTestClient.post()
       .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupFirst")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
@@ -439,8 +440,7 @@ class AppResourceIntegrationTestDefaultGroups(
       .returnResult()
       .responseBody as AppResponseDto<AssignedGroupDto, String>
 
-    val pageResult = commentRepository.getCommentsByAppId(appIdFirst, PageRequest.of(0, 1))
-    val comment = pageResult.content.get(0)
+    val comment = commentRepository.findAll().get(0)
     Assertions.assertEquals(forwardingMessage, comment.message)
     Assertions.assertEquals(appIdFirst, comment.appId)
     Assertions.assertEquals(loggedUserId, comment.createdBy)
@@ -536,8 +536,8 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstSurname,
         AppStatus.PENDING,
         groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
-          "DEFAULT",
-          applicationTypeOne,
+          establishmentIdFirst,
+          1,
         ).get(0).id,
         false,
       ),
@@ -576,8 +576,8 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstSurname,
         AppStatus.PENDING,
         groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
-          "DEFAULT",
-          applicationTypeOne,
+          establishmentIdFirst,
+          1,
         ).get(0).id,
         false,
       ),
@@ -619,8 +619,8 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstSurname,
         AppStatus.PENDING,
         groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
-          "DEFAULT",
-          applicationTypeOne,
+          establishmentIdFirst,
+          1,
         ).get(0).id,
         false,
       ),
@@ -638,7 +638,7 @@ class AppResourceIntegrationTestDefaultGroups(
       .returnResult()
       .responseBody as AppResponseDto<AssignedGroupDto, String>
     val assignedGroupDto = response.assignedGroup
-    Assertions.assertEquals(app.appType, response.appType)
+    Assertions.assertEquals(app.applicationType, response.applicationType.id)
     Assertions.assertEquals(app.id, response.id)
     Assertions.assertEquals(app.requestedBy, response.requestedBy)
     Assertions.assertEquals(app.status, response.status)
@@ -653,7 +653,7 @@ class AppResourceIntegrationTestDefaultGroups(
         establishmentIdFirst,
         "ESTABLISHMENT_NAME_1",
         AppType.entries.toSet(),
-        true,
+        false,
         setOf(),
         setOf(),
       ),
@@ -663,7 +663,7 @@ class AppResourceIntegrationTestDefaultGroups(
         establishmentIdSecond,
         "ESTABLISHMENT_NAME_2",
         AppType.entries.toSet(),
-        true,
+        false,
         setOf(),
         setOf(),
       ),
@@ -673,7 +673,7 @@ class AppResourceIntegrationTestDefaultGroups(
         establishmentIdThird,
         "ESTABLISHMENT_NAME_3",
         AppType.entries.toSet(),
-        true,
+        false,
         setOf(),
         setOf(),
       ),
@@ -684,7 +684,7 @@ class AppResourceIntegrationTestDefaultGroups(
     groupRepository.save(
       DataGenerator.generateGroups(
         assignedGroupFirst,
-        "DEFAULT",
+        establishmentIdFirst,
         assignedGroupFirstName,
         listOf(1L),
         GroupType.WING,
@@ -702,7 +702,7 @@ class AppResourceIntegrationTestDefaultGroups(
     groupRepository.save(
       DataGenerator.generateGroups(
         assignedGroupSecond,
-        "DEFAULT",
+        establishmentIdFirst,
         assignedGroupSecondName,
         listOf(1L, 2L),
         GroupType.WING,

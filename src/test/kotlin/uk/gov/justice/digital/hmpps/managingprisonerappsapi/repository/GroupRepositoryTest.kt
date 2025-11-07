@@ -12,11 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
-import java.util.*
 
 @SpringBootTest(classes = [GroupRepository::class, EstablishmentRepository::class])
 @EnableAutoConfiguration
@@ -37,7 +35,7 @@ class GroupRepositoryTest(
   @Test
   fun `save groups`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
+    val initialApps = listOf(1L)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         Generators.timeBasedEpochGenerator().generate(),
@@ -53,7 +51,7 @@ class GroupRepositoryTest(
   @Test
   fun `update groups`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
+    val initialApps = listOf(1L)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         Generators.timeBasedEpochGenerator().generate(),
@@ -69,7 +67,7 @@ class GroupRepositoryTest(
   @Test
   fun `delete groups`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
+    val initialApps = listOf(1L)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         Generators.timeBasedEpochGenerator().generate(),
@@ -88,7 +86,7 @@ class GroupRepositoryTest(
   @Test
   fun `get group by id`() {
     val establishmentId = "HTS"
-    val initialApps = listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT)
+    val initialApps = listOf(1L)
     val groups = groupRepository.save(
       DataGenerator.generateGroups(
         Generators.timeBasedEpochGenerator().generate(),
@@ -112,7 +110,7 @@ class GroupRepositoryTest(
         Generators.timeBasedEpochGenerator().generate(),
         establishmentIdOne,
         "Business Hub",
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        listOf(1L),
         GroupType.WING,
       ),
     )
@@ -121,7 +119,7 @@ class GroupRepositoryTest(
         Generators.timeBasedEpochGenerator().generate(),
         establishmentIdOne,
         "Business Hub",
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        listOf(1L, 2L),
         GroupType.WING,
       ),
     )
@@ -130,7 +128,7 @@ class GroupRepositoryTest(
         Generators.timeBasedEpochGenerator().generate(),
         establishmentIdOne,
         "Business Hub",
-        listOf(AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        listOf(3L),
         GroupType.WING,
       ),
     )
@@ -139,13 +137,13 @@ class GroupRepositoryTest(
         Generators.timeBasedEpochGenerator().generate(),
         establishmentIdTwo,
         "Business Hub",
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        listOf(2L, 3L),
         GroupType.WING,
       ),
     )
-    val findGroups = groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(
+    val findGroups = groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
       establishmentIdOne,
-      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+      1L,
     )
     Assertions.assertEquals(2, findGroups.size)
   }
@@ -155,6 +153,6 @@ class GroupRepositoryTest(
     Assertions.assertNotNull(groups.name)
     Assertions.assertNotNull(groups.establishmentId)
     Assertions.assertNotNull(groups.type)
-    Assertions.assertNotNull(groups.initialsApps)
+    Assertions.assertNotNull(groups.initialsApplicationTypes)
   }
 }

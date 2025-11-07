@@ -7,7 +7,9 @@ import java.util.*
 
 data class AppRequestDto(
   val reference: String? = null,
-  val type: String,
+  val type: String?,
+  val applicationType: Long?,
+  val applicationGroup: Long?,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val requestedDate: LocalDateTime?,
   val requests: List<MutableMap<String, Any>>,

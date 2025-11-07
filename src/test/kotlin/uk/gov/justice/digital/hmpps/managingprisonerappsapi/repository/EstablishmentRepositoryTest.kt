@@ -39,8 +39,8 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
       ESTABLISHMENT_NAME_1,
       setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
       false,
-      listOf(),
-      listOf(),
+      setOf(),
+      setOf(),
     )
     val entity = establishmentRepository.save(establishment)
     assertEstablishment(establishment, entity)
@@ -48,16 +48,16 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
 
   @Test
   fun `update establishment`() {
-    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, AppType.entries.toSet(), false, listOf(), listOf())
+    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, AppType.entries.toSet(), false, setOf(), setOf())
     val entity = establishmentRepository.save(establishment)
-    val updatedEstablishment = Establishment(entity.id, ESTABLISHMENT_NAME_2, AppType.entries.toSet(), false, listOf(), listOf())
+    val updatedEstablishment = Establishment(entity.id, ESTABLISHMENT_NAME_2, AppType.entries.toSet(), false, setOf(), setOf())
     val updatedEntity = establishmentRepository.save(updatedEstablishment)
     assertEstablishment(updatedEstablishment, updatedEntity)
   }
 
   @Test
   fun `get establishment by id`() {
-    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, AppType.entries.toSet(), false, listOf(), listOf())
+    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, AppType.entries.toSet(), false, setOf(), setOf())
     establishmentRepository.save(establishment)
     val entity = establishmentRepository.findById(establishment.id)
     assertEstablishment(establishment, entity.get())
@@ -65,7 +65,7 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
 
   @Test
   fun `delete establishment by id`() {
-    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, AppType.entries.toSet(), false, listOf(), listOf())
+    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, AppType.entries.toSet(), false, setOf(), setOf())
     establishmentRepository.save(establishment)
     establishmentRepository.deleteById(establishment.id)
     val entity = establishmentRepository.findById(establishment.id)

@@ -23,8 +23,9 @@ class ActivityService(
     createdBy: String,
     createdDate: LocalDateTime,
     prisonerId: String,
-    appType: AppType,
+    appType: Any,
   ) {
+    appType as Long
     historyService.updateActivityInHistory(entityId, entityType, appId, activity, establishment, createdBy, createdDate)
     telemetryService.addTelemetryData(entityId, entityType, appId, activity, establishment, createdBy, createdDate, prisonerId, appType)
   }

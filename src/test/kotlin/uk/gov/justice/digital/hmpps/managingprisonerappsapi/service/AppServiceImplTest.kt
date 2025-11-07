@@ -25,6 +25,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ESTABLISHMENT_ID_1
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
@@ -55,6 +57,8 @@ class AppServiceImplTest {
   private lateinit var activityService: ActivityService
   private lateinit var historyService: HistoryService
   private lateinit var establishmentService: EstablishmentService
+  private lateinit var applicationGroupRepository: ApplicationGroupRepository
+  private lateinit var applicationTypeRepository: ApplicationTypeRepository
 
   private lateinit var appService: AppService
   private lateinit var app: App
@@ -70,10 +74,14 @@ class AppServiceImplTest {
     activityService = Mockito.mock(ActivityService::class.java)
     historyService = Mockito.mock(HistoryService::class.java)
     establishmentService = Mockito.mock(EstablishmentService::class.java)
+    applicationTypeRepository = Mockito.mock(ApplicationTypeRepository::class.java)
+    applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
 
     app = DataGenerator.generateApp(
       establishmentId,
-      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+      null,
+      1,
+      1,
       requestedBy,
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstName,
@@ -100,7 +108,7 @@ class AppServiceImplTest {
       "Staff",
       UUID.randomUUID(),
     )
-    establishment = EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet(), false)
+    establishment = EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf())
     prisoner = Prisoner(
       requestedBy,
       UUID.randomUUID().toString(),
@@ -114,7 +122,7 @@ class AppServiceImplTest {
       2,
     )
 
-    appService = AppServiceImpl(appRepository, prisonerService, staffService, groupService, commentRepository, activityService, historyService, establishmentService)
+    appService = AppServiceImplV2(appRepository, prisonerService, staffService, groupService, commentRepository, activityService, historyService, establishmentService, applicationGroupRepository, applicationTypeRepository)
   }
 
   @Test
@@ -142,6 +150,8 @@ class AppServiceImplTest {
         createdBy,
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+          null,
+          null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
@@ -167,6 +177,8 @@ class AppServiceImplTest {
         createdBy,
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+          null,
+          null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
@@ -192,6 +204,8 @@ class AppServiceImplTest {
         createdBy,
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+          null,
+          null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
@@ -211,13 +225,14 @@ class AppServiceImplTest {
       Optional.of(prisoner),
     )
     Mockito.`when`(establishmentService.getEstablishmentById(staff.establishmentId)).thenReturn(Optional.of(establishment))
-    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.appType)).thenReturn(
+    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.applicationType!!)).thenReturn(
       listOf(
         Groups(
           groupId,
           "Test Group",
           establishmentId,
-          listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+          listOf(),
+          listOf(1L),
           GroupType.WING,
         ),
       ),
@@ -231,8 +246,10 @@ class AppServiceImplTest {
           "Test Establishment",
           AppType.entries.toSet(),
           false,
+          setOf(),
+          setOf(),
         ),
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        1L,
         GroupType.WING,
       ),
     )
@@ -241,7 +258,9 @@ class AppServiceImplTest {
       requestedBy,
       createdBy,
       DataGenerator.generateAppRequestDto(
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        1,
+        1,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstName,
         requestedByLastName,
@@ -259,13 +278,14 @@ class AppServiceImplTest {
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy)).thenReturn(
       Optional.of(prisoner),
     )
-    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.appType)).thenReturn(
+    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.applicationType!!)).thenReturn(
       listOf(
         Groups(
           groupId,
           "Test Group",
           establishmentId,
-          listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+          listOf(),
+          listOf(1L),
           GroupType.WING,
         ),
       ),
@@ -279,8 +299,10 @@ class AppServiceImplTest {
           "Test Establishment",
           AppType.entries.toSet(),
           false,
+          setOf(),
+          setOf()
         ),
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        1L,
         GroupType.WING,
       ),
     )
@@ -290,12 +312,14 @@ class AppServiceImplTest {
         requestedBy,
         createdBy,
         AppRequestDto(
-          "Testing",
-          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
-          LocalDateTime.now(ZoneOffset.UTC),
-          listOf(),
-          false,
+            "Testing",
+            AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           null,
+          null,
+            LocalDateTime.now(ZoneOffset.UTC),
+            listOf(),
+            false,
+            null,
         ),
       )
     }
@@ -306,24 +330,26 @@ class AppServiceImplTest {
         requestedBy,
         createdBy,
         AppRequestDto(
-          "Testing",
-          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
-          LocalDateTime.now(ZoneOffset.UTC),
-          listOf(
-            HashMap<String, Any>()
-              .apply {
-                // put("amount", 10)
-                put("contact-number", CONTACT_NUMBER)
-                // put("firstName", "John")
-                // put("lastName", "Smith")
-              },
-            HashMap<String, Any>()
-              .apply {
-                put("contact-number", CONTACT_NUMBER)
-              },
-          ),
-          false,
+            "Testing",
+            AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           null,
+          null,
+            LocalDateTime.now(ZoneOffset.UTC),
+            listOf(
+              HashMap<String, Any>()
+                .apply {
+                  // put("amount", 10)
+                  put("contact-number", CONTACT_NUMBER)
+                  // put("firstName", "John")
+                  // put("lastName", "Smith")
+                },
+              HashMap<String, Any>()
+                .apply {
+                  put("contact-number", CONTACT_NUMBER)
+                },
+            ),
+            false,
+            null,
         ),
       )
     }
@@ -348,8 +374,10 @@ class AppServiceImplTest {
           "Test Establishment",
           AppType.entries.toSet(),
           false,
+          setOf(),
+          setOf(),
         ),
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        1L,
         GroupType.WING,
       ),
     )
@@ -416,8 +444,10 @@ class AppServiceImplTest {
           "Test Establishment",
           AppType.entries.toSet(),
           false,
+          setOf(),
+          setOf()
         ),
-        AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
+        1L,
         GroupType.WING,
       ),
     )

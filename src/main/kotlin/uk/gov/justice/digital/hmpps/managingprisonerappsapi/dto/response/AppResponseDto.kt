@@ -10,7 +10,9 @@ data class AppResponseDto<X, Y>(
   val id: UUID?,
   val reference: String?,
   val assignedGroup: X,
-  val appType: AppType,
+  val appType: AppType?,
+  val applicationType: ApplicationTypeResponse,
+  val applicationGroup: ApplicationGroupResponse,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val requestedDate: LocalDateTime,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")

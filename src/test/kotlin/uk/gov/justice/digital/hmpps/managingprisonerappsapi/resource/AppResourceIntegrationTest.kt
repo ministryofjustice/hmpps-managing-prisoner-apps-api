@@ -40,7 +40,7 @@ class AppResourceIntegrationTest(
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val commentRepository: CommentRepository,
-) : IntegrationTestBase() {
+) /*: IntegrationTestBase() {
 
   private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
   private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
@@ -101,6 +101,8 @@ class AppResourceIntegrationTest(
       .bodyValue(
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS,
+          null,
+          null,
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
@@ -174,6 +176,8 @@ class AppResourceIntegrationTest(
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP,
           null,
+          null,
+          null,
           requestedByFirstMainName,
           requestedBySecondSurname,
           assignedGroupFirst,
@@ -208,6 +212,8 @@ class AppResourceIntegrationTest(
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP,
           null,
+          null,
+          null,
           requestedByFirstMainName,
           requestedBySecondSurname,
           UUID.randomUUID(),
@@ -222,6 +228,8 @@ class AppResourceIntegrationTest(
     var appRequest = AppRequestDto(
       "Testing",
       AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
+      null,
+      null,
       LocalDateTime.now(),
       listOf(
         HashMap<String, Any>()
@@ -262,6 +270,8 @@ class AppResourceIntegrationTest(
     val appRequest = AppRequestDto(
       "Testing",
       AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
+      null,
+      null,
       LocalDateTime.now(),
       listOf(
         HashMap<String, Any>()
@@ -301,6 +311,8 @@ class AppResourceIntegrationTest(
   fun `test submit app request with first night center false for supply list contact app type`() {
     val appRequest = DataGenerator.generateAppRequestDto(
       AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS,
+      null,
+      null,
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstMainName,
       requestedBySecondSurname,
@@ -477,6 +489,8 @@ class AppResourceIntegrationTest(
       .bodyValue(
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+          null,
+          null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedByFirstSurname,
@@ -776,4 +790,4 @@ class AppResourceIntegrationTest(
       ),
     )
   }
-}
+}*/

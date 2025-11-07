@@ -57,6 +57,17 @@ class CommentIntegrationTest(
     val requestedByThird = "C12345"
     val requestedByThirdMainName = "Test"
     val requestedByThirdSurname = "User"
+    val applicationGroupOne = 1L
+    val applicationTypeOne = 1L
+    val applicationTypeTwo = 2L
+    val applicationTypeThree = 3L
+    val applicationTypeFour = 4L
+
+    val applicationGroupOneName = "Bt PIN PHONES"
+    val applicationTypeOneName = "Add new Social Contact"
+    val applicationTypeTwoName = "Add new Official Contact"
+    val applicationTypeThreeName = "Remove Contact"
+    val applicationTypeFourName = "Add Generic Pin Phone enquiry"
   }
 
   @BeforeEach
@@ -233,8 +244,8 @@ class CommentIntegrationTest(
         "ESTABLISHMENT_NAME_1",
         AppType.entries.toSet(),
         false,
-        listOf(),
-        listOf(),
+        setOf(),
+        setOf(),
       ),
     )
   }
@@ -245,7 +256,7 @@ class CommentIntegrationTest(
         assignedGroupFirst,
         establishmentIdFirst,
         assignedGroupFirstName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        listOf(1L, 2L),
         GroupType.WING,
       ),
     )
@@ -254,7 +265,7 @@ class CommentIntegrationTest(
         assignedGroupSecond,
         establishmentIdFirst,
         assignedGroupSecondName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        listOf(1L, 2L),
         GroupType.WING,
       ),
     )
@@ -264,7 +275,9 @@ class CommentIntegrationTest(
     app = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC).minusDays(4),
         requestedByFirstMainName,

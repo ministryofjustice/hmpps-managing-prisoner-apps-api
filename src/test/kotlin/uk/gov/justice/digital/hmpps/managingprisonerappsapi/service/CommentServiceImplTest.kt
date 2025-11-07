@@ -55,7 +55,9 @@ class CommentServiceImplTest {
   fun beforeEach() {
     app = DataGenerator.generateApp(
       establishmentId,
-      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+      null,
+      1,
+      1,
       requestedBy,
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstName,
@@ -177,7 +179,7 @@ class CommentServiceImplTest {
     Mockito.`when`(commentRepository.findById(comment.id)).thenReturn(Optional.of(comment))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false),
+        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
       ),
     )
     val result = commentServiceImpl.getCommentById(requestedBy, createdBy, app.id, true, comment.id)
@@ -218,7 +220,7 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false),
+        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
       ),
     )
     Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5)))

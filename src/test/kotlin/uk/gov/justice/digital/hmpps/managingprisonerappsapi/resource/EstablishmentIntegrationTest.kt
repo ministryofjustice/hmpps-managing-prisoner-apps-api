@@ -91,8 +91,8 @@ class EstablishmentIntegrationTest(
         "ESTABLISHMENT_NAME_1",
         AppType.entries.toSet(),
         false,
-        listOf(),
-        listOf(),
+        setOf(),
+        setOf(),
       ),
     )
 
@@ -159,8 +159,8 @@ class EstablishmentIntegrationTest(
         "ESTABLISHMENT_NAME_1",
         setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
         false,
-        listOf(),
-        listOf(),
+        setOf(),
+        setOf(),
       ),
     )
     establishmentRepository.save(
@@ -169,8 +169,8 @@ class EstablishmentIntegrationTest(
         "ESTABLISHMENT_NAME_2",
         AppType.entries.toSet(),
         false,
-        listOf(),
-        listOf(),
+        setOf(),
+        setOf(),
       ),
     )
     establishmentRepository.save(
@@ -179,8 +179,8 @@ class EstablishmentIntegrationTest(
         "ESTABLISHMENT_NAME_3",
         AppType.entries.toSet(),
         false,
-        listOf(),
-        listOf(),
+        setOf(),
+        setOf(),
       ),
     )
   }
