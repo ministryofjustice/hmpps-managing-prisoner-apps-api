@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -15,7 +14,7 @@ data class SarContent(
 data class PrnApp(
   val id: UUID,
   val status: AppStatus,
-  val type: AppType,
+  val type: Long,
   val requestedDate: LocalDateTime,
   val lastModifiedDate: LocalDateTime,
   val establishment: String,

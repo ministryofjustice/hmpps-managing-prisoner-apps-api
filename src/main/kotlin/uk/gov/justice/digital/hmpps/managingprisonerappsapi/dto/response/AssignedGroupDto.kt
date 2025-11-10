@@ -8,7 +8,7 @@ data class AssignedGroupDto(
   val id: UUID,
   val name: String,
   val establishment: EstablishmentDto,
-  val initialApp: AppType?,
+  val initialApp: Long?,
   val type: GroupType?,
 )
 
@@ -17,4 +17,6 @@ data class EstablishmentDto(
   val name: String,
   val appTypes: Set<AppType>,
   val defaultDepartments: Boolean,
+  val blacklistedAppGroups: Set<Long>,
+  val blacklistedAppTypes: Set<Long>,
 )

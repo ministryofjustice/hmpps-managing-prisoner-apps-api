@@ -84,6 +84,8 @@ class EstablishmentService(
     name = establishment.name,
     establishment.appTypes,
     establishment.defaultDepartments,
+    establishment.blackListedAppGroups,
+    establishment.blackListedAppTypes,
   )
 
   private fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment = Establishment(
@@ -91,11 +93,11 @@ class EstablishmentService(
     name = establishmentDto.name,
     establishmentDto.appTypes,
     false,
-    listOf(),
-    listOf(),
+    setOf(),
+    setOf(),
   )
 
-  private fun convertApplicationGroupsToAppGroupsResponse(applicationGroups: List<ApplicationGroup>, blackListedAppGroups: List<Long>, blacklistedAppTypes: List<Long>): List<ApplicationGroupResponse> {
+  private fun convertApplicationGroupsToAppGroupsResponse(applicationGroups: List<ApplicationGroup>, blackListedAppGroups: Set<Long>, blacklistedAppTypes: Set<Long>): List<ApplicationGroupResponse> {
     val appGroupsResponse = ArrayList<ApplicationGroupResponse>()
     applicationGroups.forEach { appGroup ->
       if (!blackListedAppGroups.contains(appGroup.id)) {
@@ -103,7 +105,7 @@ class EstablishmentService(
         appGroup.applicationTypes.forEach { appType ->
           if (!blacklistedAppTypes.contains(appType.id)) {
             appTypes.add(
-              ApplicationTypeResponse(appType.id, appType.name, appType.genericType, appType.logDetailRequired),
+              ApplicationTypeResponse(appType.id, appType.name, appType.genericType, appType.logDetailRequired, null),
             )
           }
         }

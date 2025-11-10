@@ -18,6 +18,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExcept
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
@@ -25,6 +27,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ESTABLISHMENT_ID_1
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
@@ -55,9 +59,13 @@ class AppServiceImplTest {
   private lateinit var activityService: ActivityService
   private lateinit var historyService: HistoryService
   private lateinit var establishmentService: EstablishmentService
+  private lateinit var applicationGroupRepository: ApplicationGroupRepository
+  private lateinit var applicationTypeRepository: ApplicationTypeRepository
 
   private lateinit var appService: AppService
   private lateinit var app: App
+  private lateinit var applicationGroup: ApplicationGroup
+  private lateinit var applicationType: ApplicationType
   private lateinit var comment: Comment
 
   @BeforeEach
@@ -70,10 +78,14 @@ class AppServiceImplTest {
     activityService = Mockito.mock(ActivityService::class.java)
     historyService = Mockito.mock(HistoryService::class.java)
     establishmentService = Mockito.mock(EstablishmentService::class.java)
+    applicationTypeRepository = Mockito.mock(ApplicationTypeRepository::class.java)
+    applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
 
     app = DataGenerator.generateApp(
       establishmentId,
-      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+      null,
+      1,
+      1,
       requestedBy,
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstName,
@@ -100,7 +112,7 @@ class AppServiceImplTest {
       "Staff",
       UUID.randomUUID(),
     )
-    establishment = EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet(), false)
+    establishment = EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf())
     prisoner = Prisoner(
       requestedBy,
       UUID.randomUUID().toString(),
@@ -114,7 +126,11 @@ class AppServiceImplTest {
       2,
     )
 
-    appService = AppServiceImpl(appRepository, prisonerService, staffService, groupService, commentRepository, activityService, historyService, establishmentService)
+    applicationType = ApplicationType(1, "Add social contact", false, false)
+
+    applicationGroup = ApplicationGroup(1, "Bt Pin Phones", listOf(applicationType))
+
+    appService = AppServiceImplV2(appRepository, prisonerService, staffService, groupService, commentRepository, activityService, historyService, establishmentService, applicationGroupRepository, applicationTypeRepository)
   }
 
   @Test
@@ -142,6 +158,8 @@ class AppServiceImplTest {
         createdBy,
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+          null,
+          null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
@@ -167,6 +185,8 @@ class AppServiceImplTest {
         createdBy,
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+          null,
+          null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
@@ -192,6 +212,8 @@ class AppServiceImplTest {
         createdBy,
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+          null,
+          null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
@@ -211,13 +233,14 @@ class AppServiceImplTest {
       Optional.of(prisoner),
     )
     Mockito.`when`(establishmentService.getEstablishmentById(staff.establishmentId)).thenReturn(Optional.of(establishment))
-    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.appType)).thenReturn(
+    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.applicationType!!)).thenReturn(
       listOf(
         Groups(
           groupId,
           "Test Group",
           establishmentId,
-          listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+          listOf(),
+          listOf(1L),
           GroupType.WING,
         ),
       ),
@@ -231,17 +254,23 @@ class AppServiceImplTest {
           "Test Establishment",
           AppType.entries.toSet(),
           false,
+          setOf(),
+          setOf(),
         ),
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        1L,
         GroupType.WING,
       ),
     )
     Mockito.`when`(appRepository.save(any())).thenReturn(app)
+    Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     val appResponse = appService.submitApp(
       requestedBy,
       createdBy,
       DataGenerator.generateAppRequestDto(
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        1,
+        1,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstName,
         requestedByLastName,
@@ -259,13 +288,14 @@ class AppServiceImplTest {
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy)).thenReturn(
       Optional.of(prisoner),
     )
-    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.appType)).thenReturn(
+    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.applicationType!!)).thenReturn(
       listOf(
         Groups(
           groupId,
           "Test Group",
           establishmentId,
-          listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+          listOf(),
+          listOf(1L),
           GroupType.WING,
         ),
       ),
@@ -279,8 +309,10 @@ class AppServiceImplTest {
           "Test Establishment",
           AppType.entries.toSet(),
           false,
+          setOf(),
+          setOf(),
         ),
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        1L,
         GroupType.WING,
       ),
     )
@@ -292,6 +324,8 @@ class AppServiceImplTest {
         AppRequestDto(
           "Testing",
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
+          null,
+          null,
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(),
           false,
@@ -308,6 +342,8 @@ class AppServiceImplTest {
         AppRequestDto(
           "Testing",
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
+          null,
+          null,
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(
             HashMap<String, Any>()
@@ -348,11 +384,15 @@ class AppServiceImplTest {
           "Test Establishment",
           AppType.entries.toSet(),
           false,
+          setOf(),
+          setOf(),
         ),
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        1L,
         GroupType.WING,
       ),
     )
+    Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     var appResponse = appService.getAppsById(
       requestedBy,
       app.id,
@@ -416,12 +456,16 @@ class AppServiceImplTest {
           "Test Establishment",
           AppType.entries.toSet(),
           false,
+          setOf(),
+          setOf(),
         ),
-        AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS,
+        1L,
         GroupType.WING,
       ),
     )
     Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
+    Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     val appResponse = appService.forwardAppToGroup(createdBy, forwardGroupId, app.id, CommentRequestDto(forwardingComment))
     assertEquals(forwardGroupId, app.assignedGroup)
     assertApp(app, appResponse)

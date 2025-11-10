@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.GroupService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
@@ -161,7 +160,7 @@ class GroupResource(private val groupService: GroupService) {
   @GetMapping("/groups/app/types/{type}", produces = [MediaType.APPLICATION_JSON_VALUE])
   fun getGroupsByAppType(
     authentication: Authentication,
-    @PathVariable("type") type: AppType,
+    @PathVariable("type") type: Long,
   ): ResponseEntity<List<AssignedGroupDto>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received to get groups by ${authentication.principal}")

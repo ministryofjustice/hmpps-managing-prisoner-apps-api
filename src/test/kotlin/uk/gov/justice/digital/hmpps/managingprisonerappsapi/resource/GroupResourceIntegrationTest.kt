@@ -83,7 +83,7 @@ class GroupResourceIntegrationTest(
   @Test
   fun `get groups by apptype`() {
     var response = webTestClient.get()
-      .uri("/v1/groups/app/types/${AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT}")
+      .uri("/v1/groups/app/types/1")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -98,7 +98,7 @@ class GroupResourceIntegrationTest(
     Assertions.assertEquals(2, response.size)
     Assertions.assertEquals(assignedGroupFirstName, response.get(0).name)
     response = webTestClient.get()
-      .uri("/v1/groups/app/types/${AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP}")
+      .uri("/v1/groups/app/types/1")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -113,7 +113,7 @@ class GroupResourceIntegrationTest(
     Assertions.assertEquals(2, response.size)
 
     response = webTestClient.get()
-      .uri("/v1/groups/app/types/${AppType.PIN_PHONE_SUPPLY_LIST_OF_CONTACTS}")
+      .uri("/v1/groups/app/types/1")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -135,8 +135,8 @@ class GroupResourceIntegrationTest(
         establishmentIdFirst,
         AppType.entries.toSet(),
         false,
-        listOf(),
-        listOf(),
+        setOf(),
+        setOf(),
       ),
     )
   }
@@ -147,7 +147,7 @@ class GroupResourceIntegrationTest(
         assignedGroupFirst,
         establishmentIdFirst,
         assignedGroupFirstName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        listOf(1L),
         GroupType.WING,
       ),
     )
@@ -156,7 +156,7 @@ class GroupResourceIntegrationTest(
         assignedGroupSecond,
         establishmentIdFirst,
         assignedGroupSecondName,
-        listOf(AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP),
+        listOf(2L),
         GroupType.WING,
       ),
     )

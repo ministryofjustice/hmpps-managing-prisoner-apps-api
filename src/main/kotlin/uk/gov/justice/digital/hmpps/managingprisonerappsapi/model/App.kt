@@ -19,7 +19,9 @@ data class App(
   val reference: String?,
   var assignedGroup: UUID,
   @Enumerated(EnumType.STRING)
-  val appType: AppType,
+  val appType: AppType?,
+  val applicationGroup: Long?,
+  val applicationType: Long?,
   val requestedDate: LocalDateTime,
   val createdDate: LocalDateTime,
   val createdBy: String,

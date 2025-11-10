@@ -10,7 +10,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAppTypeCo
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedGroupCounts
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByFirstNightCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
 import java.util.*
 
@@ -20,20 +19,20 @@ interface AppRepository : JpaRepository<App, UUID> {
   fun findAppsByIdAndRequestedBy(id: UUID, requestedBy: String): Optional<App>
 
   @Query(
-    value = "SELECT COUNT(*) as count, a.appType as appType FROM App a " +
+    value = "SELECT COUNT(*) as count, a.applicationType as applicationType FROM App a " +
       " WHERE a.establishmentId = :establishmentId " +
       " AND a.status IN (:status)" +
-      " AND (:appTypes IS NULL OR a.appType IN (:appTypes))" +
+      " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
       " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
-      " GROUP BY a.appType ORDER BY a.appType ASC",
+      " GROUP BY a.applicationType ORDER BY a.applicationType ASC",
     nativeQuery = false,
   )
   fun countBySearchFilterGroupByAppType(
     establishmentId: String,
     status: Set<AppStatus>,
-    appTypes: Set<AppType>?,
+    appTypes: Set<Long>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
     firstNightCenter: Boolean?,
@@ -43,7 +42,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     value = "SELECT COUNT(*) as count, a.assignedGroup as assignedGroup FROM App a " +
       " WHERE a.establishmentId = :establishmentId " +
       " AND a.status IN (:status)" +
-      " AND (:appTypes IS NULL OR a.appType IN (:appTypes))" +
+      " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
       " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
@@ -53,7 +52,7 @@ interface AppRepository : JpaRepository<App, UUID> {
   fun countBySearchFilterGroupByAssignedGroup(
     establishmentId: String,
     status: Set<AppStatus>,
-    appTypes: Set<AppType>?,
+    appTypes: Set<Long>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
     firstNightCenter: Boolean?,
@@ -63,7 +62,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     value = "SELECT COUNT(*) as count FROM App a " +
       " WHERE a.establishmentId = :establishmentId " +
       " AND a.status IN (:status)" +
-      " AND (:appTypes IS NULL OR a.appType IN (:appTypes))" +
+      " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
       " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
       " AND (a.firstNightCenter =:firstNightCenter)",
@@ -72,7 +71,7 @@ interface AppRepository : JpaRepository<App, UUID> {
   fun countBySearchFilterGroupByFirstNightCenter(
     establishmentId: String,
     status: Set<AppStatus>,
-    appTypes: Set<AppType>?,
+    appTypes: Set<Long>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
     firstNightCenter: Boolean,
@@ -82,7 +81,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     value = "SELECT a FROM App a" +
       " WHERE a.establishmentId = :establishmentId" +
       " AND a.status IN (:status)" +
-      " AND (:appTypes IS NULL OR a.appType IN (:appTypes))" +
+      " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
       " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
@@ -92,7 +91,7 @@ interface AppRepository : JpaRepository<App, UUID> {
   fun appsBySearchFilter(
     establishmentId: String,
     status: Set<AppStatus>,
-    appTypes: Set<AppType>?,
+    appTypes: Set<Long>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
     firstNightCenter: Boolean?,

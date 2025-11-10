@@ -4,7 +4,6 @@ import com.microsoft.applicationinsights.TelemetryClient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -18,7 +17,7 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
     private val logger = LoggerFactory.getLogger(TelemetryService::class.java)
   }
 
-  fun addTelemetryData(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime, prisonerId: String, appType: AppType) {
+  fun addTelemetryData(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime, prisonerId: String, appType: Long) {
     try {
       val map = LinkedHashMap<String, String>()
       map["requestedBy"] = prisonerId

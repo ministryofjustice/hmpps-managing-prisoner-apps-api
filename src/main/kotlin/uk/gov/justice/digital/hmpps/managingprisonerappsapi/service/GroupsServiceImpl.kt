@@ -7,11 +7,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.GroupsRe
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Service
 class GroupsServiceImpl(
@@ -79,7 +77,7 @@ class GroupsServiceImpl(
     return findGroupsByEstablishmentId(establishmentId, staff.establishmentId)
   }
 
-  override fun getGroupsByLoggedStaffEstablishmentIdAndAppType(loggedUserId: String, appType: AppType): List<AssignedGroupDto> {
+  override fun getGroupsByLoggedStaffEstablishmentIdAndAppType(loggedUserId: String, appType: Long): List<AssignedGroupDto> {
     val staff = staffService.getStaffById(loggedUserId).orElseThrow {
       ApiException("Staff with id $loggedUserId not found", HttpStatus.NOT_FOUND)
     }
@@ -90,7 +88,7 @@ class GroupsServiceImpl(
     val groups = groupRepository.getGroupsByEstablishmentIdOrderByName(establishmentId)
     val groupList: MutableList<Groups> = mutableListOf()
     for (group in groups) {
-      if (group.initialsApps.contains(appType)) {
+      if (group.initialsApplicationTypes.contains(appType)) {
         groupList.add(group)
       }
     }
@@ -114,7 +112,7 @@ class GroupsServiceImpl(
     groups.id,
     groups.name,
     establishmentDto,
-    if (groups.initialsApps.isNotEmpty()) groups.initialsApps.first() else null,
+    if (groups.initialsApplicationTypes.isNotEmpty()) groups.initialsApplicationTypes.first() else null,
     groups.type,
   )
 
@@ -122,12 +120,13 @@ class GroupsServiceImpl(
     Generators.timeBasedEpochGenerator().generate(),
     groupsRequestDto.name,
     groupsRequestDto.establishmentId,
+    listOf(),
     groupsRequestDto.initialsApps,
     groupsRequestDto.type,
   )
 
-  override fun getGroupByInitialAppType(establishmentId: String, appType: AppType): List<Groups> {
-    val groupList = groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentId, appType)
+  override fun getGroupByInitialAppType(establishmentId: String, appType: Long): List<Groups> {
+    val groupList = groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(establishmentId, appType)
     /*if (groupList.isEmpty()) {
       throw ApiException("Groups list is empty", HttpStatus.BAD_REQUEST)
     } else {

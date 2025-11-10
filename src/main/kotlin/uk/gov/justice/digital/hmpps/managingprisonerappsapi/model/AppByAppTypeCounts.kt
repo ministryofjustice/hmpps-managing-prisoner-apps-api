@@ -6,6 +6,6 @@ interface AppByAppTypeCounts {
   @Value("#{target.count}")
   fun getCount(): Int
 
-  @Value("#{target.appType}")
-  fun getAppType(): AppType
+  @Value("#{target.applicationType}")
+  fun getApplicationType(): Long
 }

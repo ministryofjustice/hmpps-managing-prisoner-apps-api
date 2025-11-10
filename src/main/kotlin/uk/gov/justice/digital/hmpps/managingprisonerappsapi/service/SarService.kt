@@ -54,7 +54,7 @@ class SarService(val appRepository: AppRepository, val historyRepository: Histor
       val prnApp = PrnApp(
         app.id,
         app.status,
-        app.appType,
+        app.applicationType!!,
         app.requestedDate,
         app.lastModifiedDate,
         app.establishmentId,

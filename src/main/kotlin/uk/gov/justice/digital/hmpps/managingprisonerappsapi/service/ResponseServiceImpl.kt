@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import com.fasterxml.uuid.Generators
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppDecisionRequestDto
@@ -23,7 +24,7 @@ import java.util.*
 
 @Service
 class ResponseServiceImpl(
-  private val appService: AppService,
+  @Qualifier("appServiceV2") private val appService: AppService,
   private val prisonerService: PrisonerService,
   private val staffService: StaffService,
   private val responseRepository: ResponseRepository,
@@ -77,7 +78,7 @@ class ResponseServiceImpl(
           staffId,
           LocalDateTime.now(ZoneOffset.UTC),
           prisonerId,
-          app.appType,
+          app.applicationType!!,
         )
         req["responseId"] = responseEntity!!.id.toString()
         app.responses.add(responseEntity!!.id)

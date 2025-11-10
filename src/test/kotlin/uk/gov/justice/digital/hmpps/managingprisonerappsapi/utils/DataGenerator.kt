@@ -52,6 +52,8 @@ class DataGenerator {
       UUID.randomUUID().toString(),
       Generators.timeBasedEpochGenerator().generate(),
       AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+      null,
+      null,
       LocalDateTime.now(),
       LocalDateTime.now(),
       "testStaaf@moj",
@@ -70,7 +72,9 @@ class DataGenerator {
 
     fun generateApp(
       establishmentId: String,
-      appType: AppType,
+      appType: AppType?,
+      applicationType: Long?,
+      applicationGroup: Long?,
       requestedBy: String,
       requestedDate: LocalDateTime,
       requestedByFirstName: String,
@@ -83,6 +87,8 @@ class DataGenerator {
       UUID.randomUUID().toString(),
       groupId,
       appType,
+      applicationType,
+      applicationGroup,
       requestedDate,
       LocalDateTime.now(ZoneOffset.UTC),
       "testStaaf@moj",
@@ -104,26 +110,29 @@ class DataGenerator {
       "Test Establishment",
       AppType.entries.toSet(),
       false,
-      listOf(),
-      listOf(),
+      setOf(),
+      setOf(),
     )
 
     fun generateGroups(
       id: UUID,
       establishmentId: String,
       groupName: String,
-      initialApps: List<AppType>,
+      initialApps: List<Long>,
       groupType: GroupType,
     ): Groups = Groups(
       id,
       groupName,
       establishmentId,
+      listOf(),
       initialApps,
       groupType,
     )
 
     fun generateAppRequestDto(
-      appType: AppType,
+      appType: AppType?,
+      applicationType: Long?,
+      applicationGroup: Long?,
       requestedDate: LocalDateTime?,
       requestedByFirstName: String,
       requestedByLastName: String,
@@ -131,6 +140,8 @@ class DataGenerator {
     ): AppRequestDto = AppRequestDto(
       "Testing",
       appType.toString(),
+      applicationType,
+      applicationGroup,
       requestedDate,
       listOf(
         HashMap<String, Any>()

@@ -98,7 +98,9 @@ class ResponseIntegrationTest(
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
         DataGenerator.generateAppRequestDto(
-          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+          null,
+          1,
+          1,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedBySecondSurname,
@@ -202,8 +204,8 @@ class ResponseIntegrationTest(
         "ESTABLISHMENT_NAME_1",
         AppType.entries.toSet(),
         false,
-        listOf(),
-        listOf(),
+        setOf(),
+        setOf(),
       ),
     )
   }
@@ -214,7 +216,7 @@ class ResponseIntegrationTest(
         assignedGroupFirst,
         establishmentIdFirst,
         assignedGroupFirstName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        listOf(1L, 2L),
         GroupType.WING,
       ),
     )
@@ -223,7 +225,7 @@ class ResponseIntegrationTest(
         assignedGroupSecond,
         establishmentIdFirst,
         assignedGroupSecondName,
-        listOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
+        listOf(1L, 2L),
         GroupType.WING,
       ),
     )
@@ -233,7 +235,9 @@ class ResponseIntegrationTest(
     app = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
-        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        1,
+        1,
         requestedByFirst,
         LocalDateTime.now(ZoneOffset.UTC).minusDays(4),
         requestedByFirstMainName,

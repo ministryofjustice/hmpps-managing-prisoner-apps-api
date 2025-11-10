@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import com.fasterxml.uuid.Generators
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -19,12 +20,11 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRe
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Service
 class CommentServiceImpl(
   private val staffService: StaffService,
-  private val appService: AppService,
+  @Qualifier("appServiceV2") private val appService: AppService,
   private val commentRepository: CommentRepository,
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
@@ -62,7 +62,7 @@ class CommentServiceImpl(
       staffId,
       LocalDateTime.now(ZoneOffset.UTC),
       prisonerId,
-      app.appType,
+      app.applicationType!!,
     )
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }

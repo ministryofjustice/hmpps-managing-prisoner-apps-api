@@ -3,7 +3,6 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.analytics.TelemetryService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import java.time.LocalDateTime
 import java.util.*
@@ -23,8 +22,9 @@ class ActivityService(
     createdBy: String,
     createdDate: LocalDateTime,
     prisonerId: String,
-    appType: AppType,
+    appType: Any,
   ) {
+    appType as Long
     historyService.updateActivityInHistory(entityId, entityType, appId, activity, establishment, createdBy, createdDate)
     telemetryService.addTelemetryData(entityId, entityType, appId, activity, establishment, createdBy, createdDate, prisonerId, appType)
   }
