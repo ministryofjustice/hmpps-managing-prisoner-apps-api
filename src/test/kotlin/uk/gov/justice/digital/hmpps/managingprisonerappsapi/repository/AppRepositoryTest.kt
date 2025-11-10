@@ -16,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -252,7 +251,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(4, countResult.get(0).getCount())
     //   Assertions.assertEquals(1, countResult.get(1).getCount())
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, countResult.get(0).getApplicationType())
+    Assertions.assertEquals(1, countResult.get(0).getApplicationType())
     //   Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_CONTACT, countResult.get(1).getAppType())
 
     var countResultByAssignedGroup = appRepository.countBySearchFilterGroupByAssignedGroup(
@@ -288,8 +287,8 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
     )
     Assertions.assertEquals(1, countResult.size)
-    Assertions.assertEquals(1, countResult.get(0).getCount())
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, countResult.get(0).getApplicationType())
+    Assertions.assertEquals(3, countResult.get(0).getCount())
+    Assertions.assertEquals(1, countResult.get(0).getApplicationType())
 
     pageResult = appRepository.appsBySearchFilter(
       establishmentIdSecond,
@@ -300,7 +299,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       PageRequest.of(0, 4),
     )
-    Assertions.assertEquals(pageResult.totalElements, 1)
+    Assertions.assertEquals(pageResult.totalElements, 3)
 
     // By EstablishmentId AND status and requestedBy
     countResult = appRepository.countBySearchFilterGroupByAppType(
@@ -313,7 +312,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     )
     Assertions.assertEquals(1, countResult.size)
     Assertions.assertEquals(3, countResult.get(0).getCount())
-    Assertions.assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT, countResult.get(0).getApplicationType())
+    Assertions.assertEquals(1, countResult.get(0).getApplicationType())
 
     pageResult = appRepository.appsBySearchFilter(
       establishmentIdFirst,
@@ -358,7 +357,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
     )
     Assertions.assertEquals(countResult.size, 1)
     Assertions.assertEquals(2, countResult.get(0).getCount())
-    Assertions.assertEquals(AppType.PIN_PHONE_CREDIT_SWAP_VISITING_ORDERS, countResult.get(0).getApplicationType())
+    Assertions.assertEquals(1, countResult.get(0).getApplicationType())
 
     var pageResult1 = appRepository.appsBySearchFilter(
       establishmentIdSecond,

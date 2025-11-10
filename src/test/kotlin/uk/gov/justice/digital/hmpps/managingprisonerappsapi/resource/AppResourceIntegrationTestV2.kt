@@ -45,7 +45,7 @@ class AppResourceIntegrationTestV2(
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val commentRepository: CommentRepository,
   @Autowired private val applicationGroupRepository: ApplicationGroupRepository,
-  @Autowired private val applicationTypeRepository: ApplicationTypeRepository
+  @Autowired private val applicationTypeRepository: ApplicationTypeRepository,
 ) : IntegrationTestBase() {
 
   private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"

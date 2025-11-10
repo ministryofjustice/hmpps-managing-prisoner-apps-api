@@ -1,42 +1,10 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
-import com.fasterxml.uuid.Generators
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.http.HttpStatus
-import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppListViewDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseListDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.GroupAppListViewDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAppTypeCounts
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedGroupCounts
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource.AppResource
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.*
 
-//@Service("appServiceV1")
+// @Service("appServiceV1")
 class AppServiceImpl(
   private val appRepository: AppRepository,
   private val prisonerService: PrisonerService,
@@ -47,7 +15,9 @@ class AppServiceImpl(
   private val historyService: HistoryService,
   private val establishmentService: EstablishmentService,
 
-) /*: AppService {
+)
+/*
+: AppService {
 
   companion object {
     private val logger = LoggerFactory.getLogger(AppResource::class.java)

@@ -46,7 +46,7 @@ import kotlin.collections.forEach
 import kotlin.collections.set
 
 @Service("appServiceV2")
-class AppServiceImplV2 (
+class AppServiceImplV2(
   private val appRepository: AppRepository,
   private val prisonerService: PrisonerService,
   private val staffService: StaffService,
@@ -58,7 +58,7 @@ class AppServiceImplV2 (
   private val applicationGroupRepository: ApplicationGroupRepository,
   private val applicationTypeRepository: ApplicationTypeRepository,
 
-  ) : AppService {
+) : AppService {
 
   companion object {
     private val logger = LoggerFactory.getLogger(AppResource::class.java)
@@ -475,7 +475,6 @@ class AppServiceImplV2 (
     assignedGroup: Any,
     applicationGroup: ApplicationGroup,
     applicationType: ApplicationType,
-
   ): AppResponseDto<Any, Any> = AppResponseDto(
     app.id,
     app.reference,

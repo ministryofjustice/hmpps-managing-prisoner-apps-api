@@ -18,5 +18,5 @@ data class EstablishmentDto(
   val appTypes: Set<AppType>,
   val defaultDepartments: Boolean,
   val blacklistedAppGroups: Set<Long>,
-  val blacklistedAppTypes: Set<Long>
+  val blacklistedAppTypes: Set<Long>,
 )

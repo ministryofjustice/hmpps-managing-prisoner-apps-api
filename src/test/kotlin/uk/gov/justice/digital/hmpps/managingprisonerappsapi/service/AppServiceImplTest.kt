@@ -18,6 +18,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExcept
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
@@ -62,6 +64,8 @@ class AppServiceImplTest {
 
   private lateinit var appService: AppService
   private lateinit var app: App
+  private lateinit var applicationGroup: ApplicationGroup
+  private lateinit var applicationType: ApplicationType
   private lateinit var comment: Comment
 
   @BeforeEach
@@ -121,6 +125,10 @@ class AppServiceImplTest {
       establishmentId,
       2,
     )
+
+    applicationType = ApplicationType(1, "Add social contact", false, false)
+
+    applicationGroup = ApplicationGroup(1, "Bt Pin Phones", listOf(applicationType))
 
     appService = AppServiceImplV2(appRepository, prisonerService, staffService, groupService, commentRepository, activityService, historyService, establishmentService, applicationGroupRepository, applicationTypeRepository)
   }
@@ -254,6 +262,8 @@ class AppServiceImplTest {
       ),
     )
     Mockito.`when`(appRepository.save(any())).thenReturn(app)
+    Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     val appResponse = appService.submitApp(
       requestedBy,
       createdBy,
@@ -300,7 +310,7 @@ class AppServiceImplTest {
           AppType.entries.toSet(),
           false,
           setOf(),
-          setOf()
+          setOf(),
         ),
         1L,
         GroupType.WING,
@@ -312,14 +322,14 @@ class AppServiceImplTest {
         requestedBy,
         createdBy,
         AppRequestDto(
-            "Testing",
-            AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
+          "Testing",
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           null,
           null,
-            LocalDateTime.now(ZoneOffset.UTC),
-            listOf(),
-            false,
-            null,
+          LocalDateTime.now(ZoneOffset.UTC),
+          listOf(),
+          false,
+          null,
         ),
       )
     }
@@ -330,26 +340,26 @@ class AppServiceImplTest {
         requestedBy,
         createdBy,
         AppRequestDto(
-            "Testing",
-            AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
+          "Testing",
+          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           null,
           null,
-            LocalDateTime.now(ZoneOffset.UTC),
-            listOf(
-              HashMap<String, Any>()
-                .apply {
-                  // put("amount", 10)
-                  put("contact-number", CONTACT_NUMBER)
-                  // put("firstName", "John")
-                  // put("lastName", "Smith")
-                },
-              HashMap<String, Any>()
-                .apply {
-                  put("contact-number", CONTACT_NUMBER)
-                },
-            ),
-            false,
-            null,
+          LocalDateTime.now(ZoneOffset.UTC),
+          listOf(
+            HashMap<String, Any>()
+              .apply {
+                // put("amount", 10)
+                put("contact-number", CONTACT_NUMBER)
+                // put("firstName", "John")
+                // put("lastName", "Smith")
+              },
+            HashMap<String, Any>()
+              .apply {
+                put("contact-number", CONTACT_NUMBER)
+              },
+          ),
+          false,
+          null,
         ),
       )
     }
@@ -381,6 +391,8 @@ class AppServiceImplTest {
         GroupType.WING,
       ),
     )
+    Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     var appResponse = appService.getAppsById(
       requestedBy,
       app.id,
@@ -445,13 +457,15 @@ class AppServiceImplTest {
           AppType.entries.toSet(),
           false,
           setOf(),
-          setOf()
+          setOf(),
         ),
         1L,
         GroupType.WING,
       ),
     )
     Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
+    Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     val appResponse = appService.forwardAppToGroup(createdBy, forwardGroupId, app.id, CommentRequestDto(forwardingComment))
     assertEquals(forwardGroupId, app.assignedGroup)
     assertApp(app, appResponse)

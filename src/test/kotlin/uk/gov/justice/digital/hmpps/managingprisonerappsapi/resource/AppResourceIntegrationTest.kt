@@ -1,46 +1,19 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
-import com.fasterxml.uuid.Generators
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSearchQueryDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.CONTACT_NUMBER
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.util.UUID
 
 class AppResourceIntegrationTest(
   @Autowired private val appRepository: AppRepository,
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val commentRepository: CommentRepository,
-) /*: IntegrationTestBase() {
+)
+/*
+: IntegrationTestBase() {
 
   private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
   private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
