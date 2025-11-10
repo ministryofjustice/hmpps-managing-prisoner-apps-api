@@ -437,8 +437,8 @@ class AppServiceImplV2(
       appRequest.reference, // reference
       groupId, // group id or department
       null,
-      appRequest.applicationType,
-      appRequest.applicationGroup, // created date
+      appRequest.applicationGroup,
+      appRequest.applicationType, // created date
       appRequest.requestedDate ?: localDateTime,
       localDateTime, // last modified date
       staff.username, // created by
