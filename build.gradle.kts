@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.0.1"
-  id("org.owasp.dependencycheck") version "12.1.3"
-  kotlin("plugin.spring") version "2.2.10"
-  kotlin("plugin.jpa") version "2.2.10"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "9.1.4"
+  id("org.owasp.dependencycheck") version "12.1.8"
+  kotlin("plugin.spring") version "2.2.21"
+  kotlin("plugin.jpa") version "2.2.21"
 }
 
 configurations {
@@ -10,30 +10,30 @@ configurations {
 }
 
 dependencies {
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.5.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:1.8.1")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
 
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
-  implementation("com.fasterxml.uuid:java-uuid-generator:5.1.0")
-  implementation("org.flywaydb:flyway-core:11.12.0")
-  implementation("org.postgresql:postgresql:42.7.7")
+  implementation("com.fasterxml.uuid:java-uuid-generator:5.1.1")
+  implementation("org.flywaydb:flyway-core:11.16.0")
+  implementation("org.postgresql:postgresql:42.7.8")
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
 
-  implementation("org.flywaydb:flyway-database-postgresql:11.12.0")
+  implementation("org.flywaydb:flyway-database-postgresql:11.16.0")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.5.0")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.8.1")
   testImplementation("org.wiremock:wiremock-standalone:3.13.1")
-  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.33") {
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.35") {
     exclude(group = "io.swagger.core.v3")
   }
-  testImplementation("com.h2database:h2:2.3.232")
+  testImplementation("com.h2database:h2:2.4.240")
 }
 
 kotlin {
