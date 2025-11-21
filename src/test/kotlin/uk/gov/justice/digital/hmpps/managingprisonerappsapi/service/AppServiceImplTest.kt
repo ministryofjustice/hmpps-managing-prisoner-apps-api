@@ -126,7 +126,7 @@ class AppServiceImplTest {
       2,
     )
 
-    applicationType = ApplicationType(1, "Add social contact", false, false)
+    applicationType = ApplicationType(1, "Add social contact", false, false, false)
 
     applicationGroup = ApplicationGroup(1, "Bt Pin Phones", listOf(applicationType))
 
@@ -159,6 +159,7 @@ class AppServiceImplTest {
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
           null,
+          false,
           null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
@@ -186,6 +187,7 @@ class AppServiceImplTest {
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
           null,
+          false,
           null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
@@ -213,6 +215,7 @@ class AppServiceImplTest {
         DataGenerator.generateAppRequestDto(
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
           null,
+          false,
           null,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
@@ -270,6 +273,7 @@ class AppServiceImplTest {
       DataGenerator.generateAppRequestDto(
         null,
         1,
+        false,
         1,
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstName,
@@ -325,6 +329,7 @@ class AppServiceImplTest {
           "Testing",
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           null,
+          false,
           null,
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(),
@@ -343,6 +348,7 @@ class AppServiceImplTest {
           "Testing",
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           null,
+          false,
           null,
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(

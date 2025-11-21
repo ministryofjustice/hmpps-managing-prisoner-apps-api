@@ -123,6 +123,7 @@ class AppResourceIntegrationTestV2(
         DataGenerator.generateAppRequestDto(
           null,
           1,
+          false,
           applicationTypeOne,
           null,
           requestedByFirstMainName,
@@ -197,6 +198,7 @@ class AppResourceIntegrationTestV2(
         DataGenerator.generateAppRequestDto(
           null,
           applicationTypeOne,
+          false,
           applicationGroupOne,
           null,
           requestedByFirstMainName,
@@ -233,6 +235,7 @@ class AppResourceIntegrationTestV2(
         DataGenerator.generateAppRequestDto(
           null,
           1,
+          false,
           3,
           null,
           requestedByFirstMainName,
@@ -250,6 +253,7 @@ class AppResourceIntegrationTestV2(
       "Testing",
       null,
       applicationTypeOne,
+      false,
       applicationGroupOne,
       LocalDateTime.now(),
       listOf(
@@ -292,6 +296,7 @@ class AppResourceIntegrationTestV2(
       "Testing",
       null,
       applicationGroupOne,
+      false,
       applicationTypeOne,
       LocalDateTime.now(),
       listOf(
@@ -333,6 +338,7 @@ class AppResourceIntegrationTestV2(
     val appRequest = DataGenerator.generateAppRequestDto(
       null,
       applicationTypeOne,
+      false,
       applicationGroupOne,
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstMainName,
@@ -511,6 +517,7 @@ class AppResourceIntegrationTestV2(
         DataGenerator.generateAppRequestDto(
           null,
           applicationTypeOne,
+          false,
           applicationGroupOne,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
@@ -711,10 +718,10 @@ class AppResourceIntegrationTestV2(
   }
 
   private fun populateApplicationGroupsAndTypes() {
-    val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false)
-    val removeContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false)
-    val addOfficialContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false)
-    val addGenericPinPhoneEnquiry = ApplicationType(applicationTypeFour, applicationTypeFourName, true, true)
+    val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false, false)
+    val removeContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false, false)
+    val addOfficialContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false, false)
+    val addGenericPinPhoneEnquiry = ApplicationType(applicationTypeFour, applicationTypeFourName, true, false, true)
     applicationTypeRepository.saveAll<ApplicationType>(listOf<ApplicationType>(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
     val applicationGroupOne = ApplicationGroup(applicationGroupOne, applicationGroupOneName, listOf(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
     applicationGroupRepository.save<ApplicationGroup>(applicationGroupOne)

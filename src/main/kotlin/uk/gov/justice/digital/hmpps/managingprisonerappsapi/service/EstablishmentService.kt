@@ -105,7 +105,7 @@ class EstablishmentService(
         appGroup.applicationTypes.forEach { appType ->
           if (!blacklistedAppTypes.contains(appType.id)) {
             appTypes.add(
-              ApplicationTypeResponse(appType.id, appType.name, appType.genericType, appType.logDetailRequired, null),
+              ApplicationTypeResponse(appType.id, appType.name, appType.genericType, appType.genericForm, appType.logDetailRequired, null),
             )
           }
         }

@@ -28,16 +28,40 @@ class ApplicationGroupRepositoryTest(
 
   @Test
   fun `save application group`() {
-    val applicationGroup = ApplicationGroup(1, "MDI", listOf(ApplicationType(1, "Add new social PIN phone contact", false, false)))
+    val applicationGroup = ApplicationGroup(
+      1,
+      "MDI",
+      listOf(
+        ApplicationType(
+          1,
+          "Add new social PIN phone contact",
+          false,
+          false,
+          false,
+        ),
+      ),
+    )
     applicationGroupRepository.save<ApplicationGroup>(applicationGroup)
     Assertions.assertNotNull(applicationGroupRepository.findById(1).get())
   }
 
   @Test
   fun `update application group`() {
-    val applicationType = ApplicationType(1, "Add new social PIN phone contact", false, false)
+    val applicationType = ApplicationType(1, "Add new social PIN phone contact", false, false, false)
     applicationTypeRepository.save<ApplicationType>(applicationType)
-    val applicationGroup = ApplicationGroup(1, "MDI", listOf(ApplicationType(1, "Add new social PIN phone contact", false, false)))
+    val applicationGroup = ApplicationGroup(
+      1,
+      "MDI",
+      listOf(
+        ApplicationType(
+          1,
+          "Add new social PIN phone contact",
+          false,
+          false,
+          false,
+        ),
+      ),
+    )
     applicationGroupRepository.save<ApplicationGroup>(applicationGroup)
     applicationType.applicationGroup = applicationGroup
     applicationGroup.applicationTypes = listOf(applicationType)

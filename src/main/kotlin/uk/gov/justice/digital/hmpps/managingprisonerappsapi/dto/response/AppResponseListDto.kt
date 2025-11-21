@@ -27,6 +27,7 @@ data class AppListViewDto(
   val establishmentId: String,
   val status: String,
   val appType: ApplicationTypeResponse,
+  val genericForm: Boolean,
   val requestedBy: String,
   val requestedByFirstName: String,
   val requestedByLastName: String,

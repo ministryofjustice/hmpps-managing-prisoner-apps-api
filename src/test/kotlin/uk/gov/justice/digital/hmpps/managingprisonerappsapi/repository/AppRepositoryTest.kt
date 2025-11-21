@@ -68,6 +68,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       null,
       applicationTypeOne,
       applicationGroupOne,
+      false,
       createdApp.requestedDate,
       createdApp.createdDate,
       createdApp.createdBy,

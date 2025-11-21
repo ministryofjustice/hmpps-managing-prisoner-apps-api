@@ -9,6 +9,8 @@ data class ApplicationTypeResponse(
   @JsonInclude(Include.NON_NULL)
   val genericType: Boolean?,
   @JsonInclude(Include.NON_NULL)
+  val genericForm: Boolean?,
+  @JsonInclude(Include.NON_NULL)
   val logDetailRequired: Boolean?,
   @JsonInclude(Include.NON_NULL)
   val count: Long?,
