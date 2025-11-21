@@ -100,6 +100,7 @@ class ResponseIntegrationTest(
         DataGenerator.generateAppRequestDto(
           null,
           1,
+          false,
           1,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,

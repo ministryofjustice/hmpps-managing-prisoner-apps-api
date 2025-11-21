@@ -129,15 +129,15 @@ class EstablishmentIntegrationTest(
   }
 
   private fun populateApplicationGroupsAndTypes() {
-    val at1 = ApplicationType(1, "Add new social PIN phone contact", false, false)
+    val at1 = ApplicationType(1, "Add new social PIN phone contact", false, false, false)
 
-    val at2 = ApplicationType(2, "Add new official PIN phone contact", false, false)
-    val at3 = ApplicationType(3, "Remove PIN phone contact", false, false)
-    val at4 = ApplicationType(4, "Add generic contact request", true, true)
+    val at2 = ApplicationType(2, "Add new official PIN phone contact", false, false, false)
+    val at3 = ApplicationType(3, "Remove PIN phone contact", false, false, false)
+    val at4 = ApplicationType(4, "Add generic contact request", true, false, true)
 
-    val at5 = ApplicationType(5, "Add emergency PIN phone credit", false, false)
-    val at6 = ApplicationType(6, "Swap visiting orders (VOs) for PIN credit", false, false)
-    val at7 = ApplicationType(7, "Generic credit and Visit", true, false)
+    val at5 = ApplicationType(5, "Add emergency PIN phone credit", false, false, false)
+    val at6 = ApplicationType(6, "Swap visiting orders (VOs) for PIN credit", false, false, false)
+    val at7 = ApplicationType(7, "Generic credit and Visit", true, false, false)
     applicationTypeRepository.saveAll<ApplicationType>(listOf(at1, at2, at3, at4, at5, at6, at7, at7))
     val applicationGroup1 = ApplicationGroup(1, "Pin Phone Contact Apps", listOf<ApplicationType>(at1, at2, at3, at4))
     val applicationGroup2 = ApplicationGroup(2, "Emergency Credit and Vist", listOf(at5, at6, at7))

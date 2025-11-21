@@ -13,6 +13,7 @@ data class ApplicationType(
   val name: String,
 
   val genericType: Boolean,
+  val genericForm: Boolean = false,
   val logDetailRequired: Boolean,
 ) {
 

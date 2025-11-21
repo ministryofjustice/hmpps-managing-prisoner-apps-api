@@ -439,9 +439,10 @@ class AppServiceImplV2(
       null,
       appRequest.applicationGroup,
       appRequest.applicationType, // created date
-      appRequest.requestedDate ?: localDateTime,
-      localDateTime, // last modified date
-      staff.username, // created by
+      appRequest.genericForm,
+      appRequest.requestedDate ?: localDateTime, // last modified date
+      localDateTime, // created by
+      staff.username,
       localDateTime,
       staff.username,
       mutableListOf(),
@@ -480,7 +481,8 @@ class AppServiceImplV2(
     app.reference,
     assignedGroup,
     null,
-    ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null),
+    ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null, null),
+    app.genericForm,
     ApplicationGroupResponse(applicationGroup.id, applicationGroup.name, null),
     app.requestedDate,
     app.createdDate,
@@ -510,7 +512,8 @@ class AppServiceImplV2(
         app.id,
         app.establishmentId,
         app.status.toString(),
-        ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null),
+        ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null, null),
+        app.genericForm,
         app.requestedBy,
         app.requestedByFirstName,
         app.requestedByLastName,
@@ -529,14 +532,21 @@ class AppServiceImplV2(
       val applicationType = applicationTypeRepository.findById(appTypeCount.getApplicationType()).orElseThrow {
         ApiException("No app type with id $appTypeCount", HttpStatus.NOT_FOUND)
       }
-      map[applicationType.id] = ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, appTypeCount.getCount().toLong())
+      map[applicationType.id] = ApplicationTypeResponse(
+        applicationType.id,
+        applicationType.name,
+        null,
+        null,
+        null,
+        appTypeCount.getCount().toLong(),
+      )
       appTypes = appTypes.minus(appTypeCount.getApplicationType())
     }
     appTypes.forEach { appType ->
       val applicationType = applicationTypeRepository.findById(appType).orElseThrow {
         ApiException("No app type with id $appType", HttpStatus.NOT_FOUND)
       }
-      map[appType] = ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null)
+      map[appType] = ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null, null)
     }
     return map
   }

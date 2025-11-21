@@ -13,7 +13,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.UUID
+import java.util.*
 
 class DataGenerator {
   companion object {
@@ -54,6 +54,7 @@ class DataGenerator {
       AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
       null,
       null,
+      false,
       LocalDateTime.now(),
       LocalDateTime.now(),
       "testStaaf@moj",
@@ -89,6 +90,7 @@ class DataGenerator {
       appType,
       applicationType,
       applicationGroup,
+      false,
       requestedDate,
       LocalDateTime.now(ZoneOffset.UTC),
       "testStaaf@moj",
@@ -132,6 +134,7 @@ class DataGenerator {
     fun generateAppRequestDto(
       appType: AppType?,
       applicationType: Long?,
+      genericForm: Boolean,
       applicationGroup: Long?,
       requestedDate: LocalDateTime?,
       requestedByFirstName: String,
@@ -141,6 +144,7 @@ class DataGenerator {
       "Testing",
       appType.toString(),
       applicationType,
+      genericForm,
       applicationGroup,
       requestedDate,
       listOf(

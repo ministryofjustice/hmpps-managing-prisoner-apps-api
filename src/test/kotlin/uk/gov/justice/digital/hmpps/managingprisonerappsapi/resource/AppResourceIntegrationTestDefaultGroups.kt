@@ -123,6 +123,7 @@ class AppResourceIntegrationTestDefaultGroups(
         DataGenerator.generateAppRequestDto(
           null,
           applicationTypeOne,
+          true,
           applicationGroupOne,
           null,
           requestedByFirstMainName,
@@ -141,6 +142,7 @@ class AppResourceIntegrationTestDefaultGroups(
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(true, response.genericForm)
     Assertions.assertEquals(false, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
@@ -197,6 +199,7 @@ class AppResourceIntegrationTestDefaultGroups(
         DataGenerator.generateAppRequestDto(
           null,
           applicationTypeOne,
+          false,
           applicationGroupOne,
           null,
           requestedByFirstMainName,
@@ -233,6 +236,7 @@ class AppResourceIntegrationTestDefaultGroups(
         DataGenerator.generateAppRequestDto(
           null,
           applicationTypeOne,
+          false,
           applicationGroupOne,
           null,
           requestedByFirstMainName,
@@ -250,6 +254,7 @@ class AppResourceIntegrationTestDefaultGroups(
       "Testing",
       null,
       applicationTypeOne,
+      false,
       applicationGroupOne,
       LocalDateTime.now(),
       listOf(
@@ -292,6 +297,7 @@ class AppResourceIntegrationTestDefaultGroups(
       "Testing",
       null,
       applicationTypeOne,
+      false,
       applicationGroupOne,
       LocalDateTime.now(),
       listOf(
@@ -333,6 +339,7 @@ class AppResourceIntegrationTestDefaultGroups(
     val appRequest = DataGenerator.generateAppRequestDto(
       null,
       applicationTypeOne,
+      false,
       applicationGroupOne,
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstMainName,
@@ -511,6 +518,7 @@ class AppResourceIntegrationTestDefaultGroups(
         DataGenerator.generateAppRequestDto(
           null,
           applicationTypeOne,
+          false,
           applicationGroupOne,
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
@@ -711,10 +719,10 @@ class AppResourceIntegrationTestDefaultGroups(
   }
 
   private fun populateApplicationGroupsAndTypes() {
-    val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false)
-    val removeContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false)
-    val addOfficialContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false)
-    val addGenericPinPhoneEnquiry = ApplicationType(applicationTypeFour, applicationTypeFourName, true, true)
+    val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false, false)
+    val removeContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false, false)
+    val addOfficialContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false, false)
+    val addGenericPinPhoneEnquiry = ApplicationType(applicationTypeFour, applicationTypeFourName, true, false, true)
     applicationTypeRepository.saveAll<ApplicationType>(listOf<ApplicationType>(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
     val applicationGroupOne = ApplicationGroup(applicationGroupOne, applicationGroupOneName, listOf(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
     applicationGroupRepository.save<ApplicationGroup>(applicationGroupOne)

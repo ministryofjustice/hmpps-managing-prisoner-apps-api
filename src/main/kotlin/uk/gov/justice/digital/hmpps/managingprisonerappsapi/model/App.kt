@@ -22,6 +22,7 @@ data class App(
   val appType: AppType?,
   val applicationGroup: Long?,
   val applicationType: Long?,
+  val genericForm: Boolean = false,
   val requestedDate: LocalDateTime,
   val createdDate: LocalDateTime,
   val createdBy: String,

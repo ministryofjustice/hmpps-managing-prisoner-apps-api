@@ -12,6 +12,7 @@ data class AppResponseDto<X, Y>(
   val assignedGroup: X,
   val appType: AppType?,
   val applicationType: ApplicationTypeResponse,
+  val genericForm: Boolean,
   val applicationGroup: ApplicationGroupResponse,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val requestedDate: LocalDateTime,
