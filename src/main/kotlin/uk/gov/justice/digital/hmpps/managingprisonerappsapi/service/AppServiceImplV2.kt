@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
@@ -39,11 +40,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRe
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource.AppResource
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.Optional
-import java.util.TreeMap
-import java.util.UUID
-import kotlin.collections.forEach
-import kotlin.collections.set
+import java.util.*
 
 @Service("appServiceV2")
 class AppServiceImplV2(
@@ -328,6 +325,7 @@ class AppServiceImplV2(
     firstNightCenter: Boolean?,
     pageNumber: Long,
     pageSize: Long,
+    oldestFirst: Boolean,
   ): AppResponseListDto {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       throw ApiException("No staff with id $staffId", HttpStatus.BAD_REQUEST)
@@ -379,7 +377,14 @@ class AppServiceImplV2(
         ).getCount()
       }
       launch {
-        val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt())
+        println(appRepository.findAll())
+        var sortDirection: Sort.Direction? = null
+        if (oldestFirst) {
+          sortDirection = Sort.Direction.ASC
+        } else {
+          sortDirection = Sort.Direction.DESC
+        }
+        val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(sortDirection, "requestedDate")
         pageResult = appRepository.appsBySearchFilter(
           staff.establishmentId,
           status,

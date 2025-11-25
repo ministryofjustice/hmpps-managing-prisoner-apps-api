@@ -372,14 +372,17 @@ class AppResourceIntegrationTestV2(
 
   @Test
   fun `search apps by query filters`() {
+    appRepository.deleteAll()
+    populateApps()
     val searchQueryDto = AppsSearchQueryDto(
       1,
       10,
       setOf(AppStatus.PENDING),
       setOf(),
-      requestedByFirst,
+      null,
       setOf(),
       null,
+      true,
     )
     webTestClient.post()
       .uri("/v1/prisoners/apps/search")

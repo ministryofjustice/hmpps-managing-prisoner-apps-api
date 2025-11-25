@@ -380,7 +380,7 @@ class AppResourceIntegrationTestDefaultGroups(
       setOf(),
       requestedByFirst,
       setOf(),
-      null,
+      oldestAppFirst = false,
     )
     webTestClient.post()
       .uri("/v1/prisoners/apps/search")

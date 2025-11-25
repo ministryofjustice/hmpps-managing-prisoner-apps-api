@@ -84,8 +84,8 @@ interface AppRepository : JpaRepository<App, UUID> {
       " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
       " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
-      " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
-      " ORDER BY a.requestedDate DESC",
+      " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)", // +
+    // " ORDER BY a.requestedDate DESC",
     nativeQuery = false,
   )
   fun appsBySearchFilter(
