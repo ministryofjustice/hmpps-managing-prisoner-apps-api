@@ -268,6 +268,7 @@ class AppResource(@Qualifier("appServiceV2") var appService: AppService) {
       appsSearchQueryDto.firstNightCenter,
       appsSearchQueryDto.page,
       appsSearchQueryDto.size,
+      appsSearchQueryDto.oldestAppFirst!!,
     )
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }

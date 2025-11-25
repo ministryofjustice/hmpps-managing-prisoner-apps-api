@@ -259,6 +259,7 @@ class AppResourceV2(@Qualifier("appServiceV2") var appService: AppService) {
     if (appsSearchQueryDto.assignedGroups != null && appsSearchQueryDto.assignedGroups!!.isEmpty()) {
       appsSearchQueryDto.assignedGroups = null
     }
+    val oldestFirst = if (appsSearchQueryDto.oldestAppFirst != null) appsSearchQueryDto.oldestAppFirst else false
     val appResponseDto = appService.searchAppsByColumnsFilter(
       authentication.principal,
       appsSearchQueryDto.status,
@@ -268,6 +269,7 @@ class AppResourceV2(@Qualifier("appServiceV2") var appService: AppService) {
       appsSearchQueryDto.firstNightCenter,
       appsSearchQueryDto.page,
       appsSearchQueryDto.size,
+      oldestFirst,
     )
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }

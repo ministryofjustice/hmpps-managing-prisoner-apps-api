@@ -12,7 +12,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.*
 
 class DataGenerator {
@@ -92,9 +91,9 @@ class DataGenerator {
       applicationGroup,
       false,
       requestedDate,
-      LocalDateTime.now(ZoneOffset.UTC),
+      requestedDate,
       "testStaaf@moj",
-      LocalDateTime.now(ZoneOffset.UTC),
+      requestedDate,
       "testStaaf@moj",
       arrayListOf(Generators.timeBasedEpochGenerator().generate()),
       listOf(HashMap<String, Any>().apply { put("contact", 123456) }),

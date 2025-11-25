@@ -11,4 +11,5 @@ data class AppsSearchQueryDto(
   val requestedBy: String? = null,
   var assignedGroups: Set<UUID>? = null,
   val firstNightCenter: Boolean? = null,
+  val oldestAppFirst: Boolean? = null,
 )

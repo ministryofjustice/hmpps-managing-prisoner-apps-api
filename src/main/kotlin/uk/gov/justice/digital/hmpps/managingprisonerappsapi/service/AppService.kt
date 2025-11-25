@@ -35,6 +35,7 @@ interface AppService {
     firstNightCenter: Boolean?,
     pageNumber: Long,
     pageSize: Long,
+    oldestFirst: Boolean,
   ): AppResponseListDto
 
   fun searchRequestedByTextSearch(
