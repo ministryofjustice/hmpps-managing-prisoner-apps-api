@@ -73,7 +73,7 @@ class AppServiceImplV2(
       throw ApiException("Multiple or zero requests in app is not supported", HttpStatus.FORBIDDEN)
     }
     val staff = staffService.getStaffById(staffId).orElseThrow {
-      ApiException("Staff with id $staffId not found", HttpStatus.NOT_FOUND)
+      ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
     var app = appRepository.findAppsByIdAndRequestedBy(appId, prisonerId)
       .orElseThrow<ApiException> { throw ApiException("No app exist with id $appId", HttpStatus.NOT_FOUND) }
@@ -107,6 +107,7 @@ class AppServiceImplV2(
       LocalDateTime.now(ZoneOffset.UTC),
       prisonerId,
       app.applicationType!!,
+      app.applicationGroup!!,
     )
     val applicationGroup = applicationGroupRepository.findById(app.applicationGroup).orElseThrow {
       throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
@@ -147,6 +148,7 @@ class AppServiceImplV2(
     if (prisoner.establishmentId != staff.establishmentId) {
       throw ApiException("Staff and prisoner is from two different establishment", HttpStatus.FORBIDDEN)
     }
+    validateApplicationGroupAndType(appRequestDto.applicationGroup!!, appRequestDto.applicationType!!)
     if (appRequestDto.requests.size != 1) {
       throw ApiException("Only one requests in app is supported", HttpStatus.BAD_REQUEST)
     }
@@ -194,6 +196,7 @@ class AppServiceImplV2(
       createdDate,
       prisonerId,
       app.applicationType!!,
+      app.applicationGroup!!,
     )
     val applicationGroup = applicationGroupRepository.findById(app.applicationGroup).orElseThrow {
       throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
@@ -293,6 +296,7 @@ class AppServiceImplV2(
       createdDate,
       app.requestedBy,
       app.applicationType!!,
+      app.applicationGroup!!,
     )
     if (comment != null) {
       activityService.addActivity(
@@ -305,6 +309,7 @@ class AppServiceImplV2(
         createdDate,
         app.requestedBy,
         app.applicationType!!,
+        app.applicationGroup!!,
       )
     }
     val applicationGroup = applicationGroupRepository.findById(app.applicationGroup).orElseThrow {
@@ -578,6 +583,15 @@ class AppServiceImplV2(
   private fun validateStaffPermission(staff: Staff, app: App) {
     if (staff.establishmentId != app.establishmentId) {
       throw ApiException("Staff with id ${staff.username} do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
+    }
+  }
+
+  private fun validateApplicationGroupAndType(appGroupId: Long, appTypeId: Long) {
+    applicationGroupRepository.findById(appGroupId).orElseThrow {
+      ApiException("Application group with id $appGroupId does not exist", HttpStatus.FORBIDDEN)
+    }
+    applicationTypeRepository.findById(appTypeId).orElseThrow {
+      ApiException("Application type with id $appTypeId does not exist", HttpStatus.FORBIDDEN)
     }
   }
 }
