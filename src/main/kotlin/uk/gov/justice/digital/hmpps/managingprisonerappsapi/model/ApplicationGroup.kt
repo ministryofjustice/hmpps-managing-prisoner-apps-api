@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OrderBy
 
 @Entity
 data class ApplicationGroup(
@@ -14,6 +15,7 @@ data class ApplicationGroup(
   val name: String,
 
   @OneToMany(mappedBy = "applicationGroup", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+  @OrderBy("name")
   var applicationTypes: List<ApplicationType> = listOf<ApplicationType>(),
 ) {
   override fun equals(other: Any?): Boolean {

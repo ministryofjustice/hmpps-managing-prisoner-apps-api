@@ -79,6 +79,7 @@ class ResponseServiceImpl(
           LocalDateTime.now(ZoneOffset.UTC),
           prisonerId,
           app.applicationType!!,
+          app.applicationGroup!!,
         )
         req["responseId"] = responseEntity!!.id.toString()
         app.responses.add(responseEntity!!.id)

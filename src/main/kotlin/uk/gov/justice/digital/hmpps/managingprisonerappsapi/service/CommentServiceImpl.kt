@@ -63,6 +63,7 @@ class CommentServiceImpl(
       LocalDateTime.now(ZoneOffset.UTC),
       prisonerId,
       app.applicationType!!,
+      app.applicationGroup!!,
     )
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }

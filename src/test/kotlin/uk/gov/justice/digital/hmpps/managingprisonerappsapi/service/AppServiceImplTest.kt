@@ -320,6 +320,8 @@ class AppServiceImplTest {
         GroupType.WING,
       ),
     )
+    Mockito.`when`(applicationTypeRepository.findById(app.applicationType)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(app.applicationGroup)).thenReturn(Optional.of(applicationGroup))
     Mockito.`when`(appRepository.save(any())).thenReturn(app)
     var exception = assertThrows(ApiException::class.java) {
       appService.submitApp(
@@ -327,10 +329,10 @@ class AppServiceImplTest {
         createdBy,
         AppRequestDto(
           "Testing",
-          AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
           null,
+          app.applicationType,
           false,
-          null,
+          app.applicationGroup,
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(),
           false,
@@ -347,9 +349,9 @@ class AppServiceImplTest {
         AppRequestDto(
           "Testing",
           AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(),
-          null,
+          app.applicationType,
           false,
-          null,
+          app.applicationGroup,
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(
             HashMap<String, Any>()
