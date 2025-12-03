@@ -382,7 +382,6 @@ class AppServiceImplV2(
         ).getCount()
       }
       launch {
-        println(appRepository.findAll())
         var sortDirection: Sort.Direction? = null
         if (oldestFirst) {
           sortDirection = Sort.Direction.ASC
