@@ -36,8 +36,9 @@ dependencies {
   testImplementation("com.h2database:h2:2.4.240")
 }
 
-kotlin {
-  jvmToolchain(21)
+java {
+  sourceCompatibility = JavaVersion.VERSION_24
+  targetCompatibility = JavaVersion.VERSION_24
 }
 
 dependencyCheck {
@@ -46,6 +47,6 @@ dependencyCheck {
 
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+    compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_24
   }
 }
