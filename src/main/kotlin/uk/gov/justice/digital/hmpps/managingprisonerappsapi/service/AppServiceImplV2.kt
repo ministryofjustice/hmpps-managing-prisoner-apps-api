@@ -266,7 +266,7 @@ class AppServiceImplV2(
       throw ApiException("App already assigned to group $groupId", HttpStatus.BAD_REQUEST)
     }
     var comment: Comment? = null
-    if (commentRequestDto != null) {
+    if (commentRequestDto != null && commentRequestDto.message.isNotEmpty()) {
       comment = commentRepository.save(
         Comment(
           Generators.timeBasedEpochGenerator().generate(),
