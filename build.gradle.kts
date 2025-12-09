@@ -36,6 +36,10 @@ dependencies {
   testImplementation("com.h2database:h2:2.4.240")
 }
 
+kotlin {
+  jvmToolchain(25)
+}
+
 java {
   sourceCompatibility = JavaVersion.VERSION_24
   targetCompatibility = JavaVersion.VERSION_24
