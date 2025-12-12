@@ -252,7 +252,7 @@ class AppResourceIntegrationTest(
     var appRequest = AppRequestDto(
       "Testing",
       null,
-      applicationTypeOne,
+      applicationTypeThree,
       false,
       applicationGroupOne,
       LocalDateTime.now(),
@@ -281,7 +281,7 @@ class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<Any, Any>
 
-    Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
+    Assertions.assertEquals(applicationTypeThree, response.applicationType.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.PENDING, response.status)
     Assertions.assertEquals(true, response.firstNightCenter)
@@ -696,7 +696,7 @@ class AppResourceIntegrationTest(
         assignedGroupFirst,
         establishmentIdFirst,
         assignedGroupFirstName,
-        listOf(1L),
+        listOf(1L,3L),
         GroupType.WING,
       ),
     )
