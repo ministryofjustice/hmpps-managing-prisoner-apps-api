@@ -696,7 +696,7 @@ class AppResourceIntegrationTest(
         assignedGroupFirst,
         establishmentIdFirst,
         assignedGroupFirstName,
-        listOf(1L,3L),
+        listOf(1L, 3L),
         GroupType.WING,
       ),
     )

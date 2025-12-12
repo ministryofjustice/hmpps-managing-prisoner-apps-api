@@ -694,7 +694,7 @@ class AppResourceIntegrationTestDefaultGroups(
         assignedGroupFirst,
         "DEFAULT",
         assignedGroupFirstName,
-        listOf(1L,3L),
+        listOf(1L, 3L),
         GroupType.WING,
       ),
     )
