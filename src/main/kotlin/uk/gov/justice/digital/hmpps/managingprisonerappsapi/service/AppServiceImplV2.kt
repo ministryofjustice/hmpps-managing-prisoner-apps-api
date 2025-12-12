@@ -438,7 +438,7 @@ class AppServiceImplV2(
   ): App {
     val localDateTime = LocalDateTime.now(ZoneOffset.UTC)
     var firstNightCenter = false
-    if (appRequest.applicationType == 1L && appRequest.firstNightCenter != null) {
+    if (appRequest.applicationType == 3L && appRequest.firstNightCenter != null) {
       firstNightCenter = appRequest.firstNightCenter
     }
     return App(
