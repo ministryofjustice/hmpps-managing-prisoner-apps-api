@@ -55,7 +55,7 @@ class ResponseServiceImpl(
     var responseEntity: Response? = null
     app.requests.forEach { request ->
       val req = request.toMutableMap()
-      if (response.appliesTo.contains(UUID.fromString(request.get("id") as String))) {
+      if (response.appliesTo.contains(UUID.fromString(request.get("id") as String)) && req["responseId"] == null) {
         if (request.get("responseId") != null) {
           throw ApiException("Response already added for request id: ${request.get("id")}", HttpStatus.BAD_REQUEST)
         }
