@@ -17,14 +17,14 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("com.fasterxml.uuid:java-uuid-generator:5.2.0")
-  implementation("org.flywaydb:flyway-core:11.20.3")
+  implementation("org.flywaydb:flyway-core:12.0.0")
   implementation("org.postgresql:postgresql:42.7.9")
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
 
-  implementation("org.flywaydb:flyway-database-postgresql:11.20.3")
+  implementation("org.flywaydb:flyway-database-postgresql:12.0.0")
 
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux")
