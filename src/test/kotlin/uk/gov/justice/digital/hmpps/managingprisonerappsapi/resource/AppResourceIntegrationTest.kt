@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppReque
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.FileRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
@@ -26,6 +27,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationTyp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
@@ -46,6 +48,7 @@ class AppResourceIntegrationTest(
   @Autowired private val commentRepository: CommentRepository,
   @Autowired private val applicationGroupRepository: ApplicationGroupRepository,
   @Autowired private val applicationTypeRepository: ApplicationTypeRepository,
+  @Autowired private val appFileRepository: AppFileRepository,
 ) : IntegrationTestBase() {
 
   private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
@@ -87,6 +90,7 @@ class AppResourceIntegrationTest(
     establishmentRepository.deleteAll()
     applicationGroupRepository.deleteAll()
     applicationTypeRepository.deleteAll()
+    appFileRepository.deleteAll()
 
     populateEstablishments()
     populateGroups()
@@ -129,6 +133,7 @@ class AppResourceIntegrationTest(
           requestedByFirstMainName,
           requestedBySecondSurname,
           null,
+          listOf(FileRequestDto(UUID.randomUUID(), "Image file", "PDF")),
         ),
       )
       .exchange()
@@ -204,6 +209,7 @@ class AppResourceIntegrationTest(
           requestedByFirstMainName,
           requestedBySecondSurname,
           assignedGroupFirst,
+          listOf(),
         ),
       )
       .exchange()
@@ -241,6 +247,7 @@ class AppResourceIntegrationTest(
           requestedByFirstMainName,
           requestedBySecondSurname,
           UUID.randomUUID(),
+          listOf(),
         ),
       )
       .exchange()
@@ -264,6 +271,7 @@ class AppResourceIntegrationTest(
       ),
       true,
       null,
+      listOf(),
     )
     var response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
@@ -307,6 +315,7 @@ class AppResourceIntegrationTest(
       ),
       false,
       null,
+      listOf(),
     )
     val response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
@@ -344,6 +353,7 @@ class AppResourceIntegrationTest(
       requestedByFirstMainName,
       requestedBySecondSurname,
       null,
+      listOf(),
     )
     val response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
@@ -526,6 +536,7 @@ class AppResourceIntegrationTest(
           requestedByFirstMainName,
           requestedByFirstSurname,
           null,
+          listOf(),
         ),
       )
       .exchange()

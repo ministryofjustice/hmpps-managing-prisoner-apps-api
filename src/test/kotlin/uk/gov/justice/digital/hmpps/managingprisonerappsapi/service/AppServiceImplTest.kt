@@ -165,6 +165,7 @@ class AppServiceImplTest {
           requestedByFirstName,
           requestedByLastName,
           null,
+          listOf(),
         ),
       )
     }
@@ -193,6 +194,7 @@ class AppServiceImplTest {
           requestedByFirstName,
           requestedByLastName,
           null,
+          listOf(),
         ),
       )
     }
@@ -221,6 +223,7 @@ class AppServiceImplTest {
           requestedByFirstName,
           requestedByLastName,
           null,
+          listOf(),
         ),
       )
     }
@@ -279,6 +282,7 @@ class AppServiceImplTest {
         requestedByFirstName,
         requestedByLastName,
         null,
+        listOf(),
       ),
     )
     assertApp(app, appResponse)
@@ -337,6 +341,7 @@ class AppServiceImplTest {
           listOf(),
           false,
           null,
+          listOf(),
         ),
       )
     }
@@ -368,6 +373,7 @@ class AppServiceImplTest {
           ),
           false,
           null,
+          listOf(),
         ),
       )
     }

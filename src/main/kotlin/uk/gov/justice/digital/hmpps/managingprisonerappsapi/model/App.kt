@@ -1,10 +1,13 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
@@ -41,6 +44,8 @@ data class App(
   @ElementCollection
   var responses: MutableList<UUID>,
   var firstNightCenter: Boolean,
+  @OneToMany(mappedBy = "app", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+  var appAppFiles: MutableList<AppFile> = mutableListOf<AppFile>(),
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

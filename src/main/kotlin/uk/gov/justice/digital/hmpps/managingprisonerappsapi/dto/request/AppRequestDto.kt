@@ -20,4 +20,5 @@ data class AppRequestDto(
   )
   val firstNightCenter: Boolean?,
   val department: UUID?,
+  val fileRequestDtos: List<FileRequestDto>,
 )

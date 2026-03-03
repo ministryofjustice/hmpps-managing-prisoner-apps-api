@@ -15,6 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
@@ -27,7 +28,7 @@ import java.util.*
 @EntityScan("uk.gov.justice.digital.hmpps.managingprisonerappsapi.model")
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("test")
-class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
+class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired val appFileRepository: AppFileRepository) {
 
   private val applicationGroupOne = 1L
   private val applicationTypeOne = 1L
@@ -59,6 +60,28 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
   }
 
   @Test
+  fun `save app with app file`() {
+    val app = DataGenerator.generateApp()
+    val documentId = UUID.randomUUID()
+    val appFile = AppFile(
+      Generators.timeBasedEpochGenerator().generate(),
+      documentId.toString(),
+      "Image file",
+      LocalDateTime.now(ZoneOffset.UTC),
+      "AX1234",
+      "PDF",
+      null,
+    )
+    app.appAppFiles = mutableListOf(appFile)
+
+    val response = appRepository.save(app)
+    val imageFile = appFileRepository.findById(documentId)
+    Assertions.assertNotNull(imageFile)
+    Assertions.assertEquals(1, response.appAppFiles.size)
+    Assertions.assertEquals("Image file", response.appAppFiles[0].fileName)
+  }
+
+  @Test
   fun `update app`() {
     val createdApp = appRepository.save(DataGenerator.generateApp())
     var app = App(
@@ -83,6 +106,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository) {
       Generators.timeBasedEpochGenerator().generate().toString(),
       mutableListOf(),
       false,
+      mutableListOf(),
     )
     app = appRepository.save(app)
     Assertions.assertEquals("new reference 123", app.reference)
