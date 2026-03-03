@@ -98,14 +98,14 @@ class ResponseIntegrationTest(
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
         DataGenerator.generateAppRequestDto(
-            null,
-            1,
-            false,
-            1,
-            LocalDateTime.now(ZoneOffset.UTC),
-            requestedByFirstMainName,
-            requestedBySecondSurname,
-            null,
+          null,
+          1,
+          false,
+          1,
+          LocalDateTime.now(ZoneOffset.UTC),
+          requestedByFirstMainName,
+          requestedBySecondSurname,
+          null,
           listOf(),
         ),
       )
