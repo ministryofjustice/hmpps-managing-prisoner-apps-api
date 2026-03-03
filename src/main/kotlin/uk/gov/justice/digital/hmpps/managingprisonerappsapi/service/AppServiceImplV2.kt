@@ -12,12 +12,14 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.FileRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppListViewDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseListDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.FileResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.GroupAppListViewDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
@@ -25,6 +27,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAppTypeCounts
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedGroupCounts
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
@@ -93,7 +96,7 @@ class AppServiceImplV2(
         }
       }
     }
-    app.lastModifiedDate = LocalDateTime.now()
+    app.lastModifiedDate = LocalDateTime.now(ZoneOffset.UTC)
     app.lastModifiedBy = staffId
     app.firstNightCenter = appUpdateDto.firstNightCenter
     app = appRepository.save(app)
@@ -463,6 +466,7 @@ class AppServiceImplV2(
       prisoner.establishmentId!!,
       mutableListOf(),
       firstNightCenter,
+      convertAppFilestoAppFileEnityList(appRequest.fileRequestDtos, staff.username) as MutableList<AppFile>,
     )
   }
 
@@ -507,6 +511,7 @@ class AppServiceImplV2(
     app.establishmentId,
     app.responses,
     app.firstNightCenter,
+    convertEntityFilesToFiles(app.appAppFiles),
   )
 
   private fun convertAppToAppListDto(apps: List<App>, establishmentId: String): List<AppListViewDto> {
@@ -558,6 +563,40 @@ class AppServiceImplV2(
       map[appType] = ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null, null)
     }
     return map
+  }
+
+  private fun convertAppFilestoAppFileEnityList(appFileRequestDtos: List<FileRequestDto>, createdBy: String): List<AppFile> {
+    val files = ArrayList<AppFile>()
+    appFileRequestDtos.forEach { file ->
+      files.add(
+        AppFile(
+          Generators.timeBasedEpochGenerator().generate(),
+          file.documentId.toString(),
+          file.fileName,
+          LocalDateTime.now(ZoneOffset.UTC),
+          createdBy,
+          file.fileType,
+        ),
+      )
+    }
+    return files
+  }
+
+  private fun convertEntityFilesToFiles(appFiles: List<AppFile>): List<FileResponseDto> {
+    val files = ArrayList<FileResponseDto>()
+    appFiles.forEach { file ->
+      files.add(
+        FileResponseDto(
+          file.id,
+          UUID.fromString(file.documentId),
+          file.fileName,
+          LocalDateTime.now(ZoneOffset.UTC),
+          file.createdBy,
+          file.fileType,
+        ),
+      )
+    }
+    return files
   }
 
   private fun convertAssignedGroupCountsToGroupAppListViewDto(

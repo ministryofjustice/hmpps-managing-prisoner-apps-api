@@ -48,8 +48,6 @@ class HistoryServiceImpl(
         createdDate,
       ),
     )
-    println("history = $history")
-    println("history list = ${historyRepository.findByAppIdAndEstablishmentOrderByCreatedDate(appId, establishment)}")
   }
 
   private fun convertHistoryEntityToHistory1(history: List<History>): List<HistoryResponse> {

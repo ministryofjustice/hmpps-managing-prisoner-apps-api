@@ -129,6 +129,7 @@ class AppResourceIntegrationTestDefaultGroups(
           requestedByFirstMainName,
           requestedBySecondSurname,
           null,
+          listOf(),
         ),
       )
       .exchange()
@@ -205,6 +206,7 @@ class AppResourceIntegrationTestDefaultGroups(
           requestedByFirstMainName,
           requestedBySecondSurname,
           assignedGroupFirst,
+          listOf(),
         ),
       )
       .exchange()
@@ -242,6 +244,7 @@ class AppResourceIntegrationTestDefaultGroups(
           requestedByFirstMainName,
           requestedBySecondSurname,
           UUID.randomUUID(),
+          listOf(),
         ),
       )
       .exchange()
@@ -265,6 +268,7 @@ class AppResourceIntegrationTestDefaultGroups(
       ),
       true,
       null,
+      listOf(),
     )
     var response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
@@ -308,6 +312,7 @@ class AppResourceIntegrationTestDefaultGroups(
       ),
       false,
       null,
+      listOf(),
     )
     val response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
@@ -345,6 +350,7 @@ class AppResourceIntegrationTestDefaultGroups(
       requestedByFirstMainName,
       requestedBySecondSurname,
       null,
+      listOf(),
     )
     val response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
@@ -524,6 +530,7 @@ class AppResourceIntegrationTestDefaultGroups(
           requestedByFirstMainName,
           requestedByFirstSurname,
           null,
+          listOf(),
         ),
       )
       .exchange()

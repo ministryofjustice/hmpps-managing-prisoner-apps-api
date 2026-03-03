@@ -2,7 +2,9 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils
 
 import com.fasterxml.uuid.Generators
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.FileRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
@@ -68,6 +70,7 @@ class DataGenerator {
       Generators.timeBasedEpochGenerator().generate().toString(),
       mutableListOf(),
       false,
+      mutableListOf<AppFile>(),
     )
 
     fun generateApp(
@@ -104,6 +107,7 @@ class DataGenerator {
       establishmentId,
       mutableListOf(),
       firstNightCenter,
+      mutableListOf<AppFile>(),
     )
 
     fun generateEstablishment(): Establishment = Establishment(
@@ -139,6 +143,7 @@ class DataGenerator {
       requestedByFirstName: String,
       requestedByLastName: String,
       departmentId: UUID?,
+      files: List<FileRequestDto>,
     ): AppRequestDto = AppRequestDto(
       "Testing",
       appType.toString(),
@@ -157,6 +162,7 @@ class DataGenerator {
       ),
       null,
       departmentId,
+      files,
     )
   }
 }
