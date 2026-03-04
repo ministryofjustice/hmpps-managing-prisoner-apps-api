@@ -186,6 +186,7 @@ class AppServiceImplV2(
     var app = convertAppRequestToAppEntity(prisoner, staff, department!!, appRequestDto)
     val assignedGroup = groupsService.getGroupById(department!!, staff.establishmentId)
     logger.info("Saving app request in db")
+    app.appFiles.forEach { file -> file.app = app }
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
@@ -511,7 +512,7 @@ class AppServiceImplV2(
     app.establishmentId,
     app.responses,
     app.firstNightCenter,
-    convertEntityFilesToFiles(app.appAppFiles),
+    convertEntityFilesToFiles(app.appFiles),
   )
 
   private fun convertAppToAppListDto(apps: List<App>, establishmentId: String): List<AppListViewDto> {

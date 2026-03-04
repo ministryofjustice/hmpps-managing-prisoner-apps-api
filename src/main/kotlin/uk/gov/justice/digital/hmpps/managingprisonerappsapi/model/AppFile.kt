@@ -19,7 +19,7 @@ data class AppFile(
   val fileType: String,
   @ManyToOne(fetch = FetchType.EAGER)
   @JsonIgnore
-  val app: App? = null,
+  var app: App? = null,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
