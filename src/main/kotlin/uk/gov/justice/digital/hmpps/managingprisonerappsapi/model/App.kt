@@ -45,7 +45,7 @@ data class App(
   var responses: MutableList<UUID>,
   var firstNightCenter: Boolean,
   @OneToMany(mappedBy = "app", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-  var appAppFiles: MutableList<AppFile> = mutableListOf<AppFile>(),
+  var appFiles: MutableList<AppFile> = mutableListOf<AppFile>(),
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

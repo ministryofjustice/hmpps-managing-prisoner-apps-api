@@ -72,13 +72,13 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
       "PDF",
       null,
     )
-    app.appAppFiles = mutableListOf(appFile)
+    app.appFiles = mutableListOf(appFile)
 
     val response = appRepository.save(app)
     val imageFile = appFileRepository.findById(documentId)
     Assertions.assertNotNull(imageFile)
-    Assertions.assertEquals(1, response.appAppFiles.size)
-    Assertions.assertEquals("Image file", response.appAppFiles[0].fileName)
+    Assertions.assertEquals(1, response.appFiles.size)
+    Assertions.assertEquals("Image file", response.appFiles[0].fileName)
   }
 
   @Test
