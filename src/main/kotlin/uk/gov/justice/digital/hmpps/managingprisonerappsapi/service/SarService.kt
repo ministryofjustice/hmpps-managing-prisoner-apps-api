@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
@@ -17,7 +18,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 @Service
-class SarService(val appRepository: AppRepository, val historyRepository: HistoryRepository, val appFileRepository: AppFileRepository) : HmppsPrisonSubjectAccessRequestService {
+class SarService(val appRepository: AppRepository, val applicationTypeRepository: ApplicationTypeRepository, val historyRepository: HistoryRepository, val appFileRepository: AppFileRepository) : HmppsPrisonSubjectAccessRequestService {
   override fun getPrisonContentFor(
     prn: String,
     fromDate: LocalDate?,
@@ -49,14 +50,15 @@ class SarService(val appRepository: AppRepository, val historyRepository: Histor
           PrnAppHistory(
             convertActivityToStatement(history.activity, history.entityId),
             history.createdDate,
-            history.createdBy,
+            // history.createdBy,
           ),
         )
       }
+      val type = applicationTypeRepository.findById(app.applicationType!!)
       val prnApp = PrnApp(
         app.id,
         app.status,
-        app.applicationType!!,
+        type.get().name,
         app.requestedDate,
         app.lastModifiedDate,
         app.establishmentId,
@@ -87,11 +89,10 @@ class SarService(val appRepository: AppRepository, val historyRepository: Histor
       val file = appFileRepository.findById(entityId)
       var fileName = ""
       if (file.isPresent) {
-        fileName =  file.get().fileName
+        fileName = file.get().fileName
       }
-      return "File ${fileName} added to app request"
-    }
-      else {
+      return "File $fileName added to app request"
+    } else {
       throw ApiException("Activity not found", HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
