@@ -9,13 +9,14 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExcept
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.LocalDate
 
 @Service
-class SarService(val appRepository: AppRepository, val historyRepository: HistoryRepository) : HmppsPrisonSubjectAccessRequestService {
+class SarService(val appRepository: AppRepository, val applicationTypeRepository: ApplicationTypeRepository, val historyRepository: HistoryRepository) : HmppsPrisonSubjectAccessRequestService {
   override fun getPrisonContentFor(
     prn: String,
     fromDate: LocalDate?,
@@ -47,14 +48,15 @@ class SarService(val appRepository: AppRepository, val historyRepository: Histor
           PrnAppHistory(
             convertActivityToStatement(history.activity),
             history.createdDate,
-            history.createdBy,
+            // history.createdBy,
           ),
         )
       }
+      val type = applicationTypeRepository.findById(app.applicationType!!)
       val prnApp = PrnApp(
         app.id,
         app.status,
-        app.applicationType!!,
+        type.get().name,
         app.requestedDate,
         app.lastModifiedDate,
         app.establishmentId,
