@@ -202,6 +202,20 @@ class AppServiceImplV2(
       app.applicationType!!,
       app.applicationGroup!!,
     )
+    app.appFiles.forEach { f ->
+      activityService.addActivity(
+        f.id,
+        EntityType.FILE,
+        app.id,
+        Activity.FILE_ADDED,
+        app.establishmentId,
+        staffId,
+        createdDate,
+        prisonerId,
+        app.applicationType!!,
+        app.applicationGroup!!,
+      )
+    }
     val applicationGroup = applicationGroupRepository.findById(app.applicationGroup).orElseThrow {
       throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
     }

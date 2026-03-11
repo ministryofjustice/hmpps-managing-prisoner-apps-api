@@ -5,4 +5,5 @@ enum class EntityType {
   COMMENT,
   RESPONSE,
   ASSIGNED_GROUP,
+  FILE,
 }
