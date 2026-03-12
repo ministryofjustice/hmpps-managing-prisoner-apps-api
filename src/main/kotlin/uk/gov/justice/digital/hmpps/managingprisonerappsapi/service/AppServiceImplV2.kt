@@ -534,6 +534,7 @@ class AppServiceImplV2(
         app.requestedByLastName,
         app.createdDate,
         groupAppListviewDto,
+        app.comments.size,
       )
       list.add(appResponseDto)
     }
