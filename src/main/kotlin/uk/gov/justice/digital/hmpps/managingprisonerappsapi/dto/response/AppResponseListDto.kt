@@ -34,4 +34,5 @@ data class AppListViewDto(
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val createdDate: LocalDateTime,
   val assignedGroup: Any,
+  val comments: Int,
 )
