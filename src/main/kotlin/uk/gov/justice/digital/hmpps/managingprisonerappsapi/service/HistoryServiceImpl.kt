@@ -88,7 +88,7 @@ class HistoryServiceImpl(
         ApiException("Staff with id ${h.createdBy} does not exist", HttpStatus.NOT_FOUND)
       }
       var groupName: String = ""
-      if (h.activity != Activity.FORWARDING_COMMENT_ADDED && h.activity != Activity.APP_FORWARDED_TO_A_GROUP && h.activity != Activity.APP_SUBMITTED) {
+      if (h.activity != Activity.FORWARDING_COMMENT_ADDED && h.activity != Activity.APP_FORWARDED_TO_A_GROUP && h.activity != Activity.APP_SUBMITTED && h.activity != Activity.FILE_ADDED) {
         map.put(
           "${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}",
           HistoryResponse(

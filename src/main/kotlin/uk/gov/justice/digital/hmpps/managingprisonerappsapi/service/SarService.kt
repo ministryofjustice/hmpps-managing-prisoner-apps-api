@@ -8,15 +8,17 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarCont
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.LocalDate
+import java.util.UUID
 
 @Service
-class SarService(val appRepository: AppRepository, val applicationTypeRepository: ApplicationTypeRepository, val historyRepository: HistoryRepository) : HmppsPrisonSubjectAccessRequestService {
+class SarService(val appRepository: AppRepository, val applicationTypeRepository: ApplicationTypeRepository, val historyRepository: HistoryRepository, val appFileRepository: AppFileRepository) : HmppsPrisonSubjectAccessRequestService {
   override fun getPrisonContentFor(
     prn: String,
     fromDate: LocalDate?,
@@ -46,7 +48,7 @@ class SarService(val appRepository: AppRepository, val applicationTypeRepository
       histories.forEach { history ->
         prnApphistory.add(
           PrnAppHistory(
-            convertActivityToStatement(history.activity),
+            convertActivityToStatement(history.activity, history.entityId),
             history.createdDate,
             // history.createdBy,
           ),
@@ -68,7 +70,7 @@ class SarService(val appRepository: AppRepository, val applicationTypeRepository
     return SarContent(firstName, lastName, prisonerId, list)
   }
 
-  private fun convertActivityToStatement(activity: Activity): String {
+  private fun convertActivityToStatement(activity: Activity, entityId: UUID): String {
     if (activity == Activity.APP_SUBMITTED) {
       return "App request submitted."
     } else if (activity == Activity.APP_DECLINED) {
@@ -83,6 +85,13 @@ class SarService(val appRepository: AppRepository, val applicationTypeRepository
       return "App request forwarded to a approval department."
     } else if (activity == Activity.APP_REQUEST_FORM_DATA_UPDATED) {
       return "App request form data updated"
+    } else if (activity == Activity.FILE_ADDED) {
+      val file = appFileRepository.findById(entityId)
+      var fileName = ""
+      if (file.isPresent) {
+        fileName = file.get().fileName
+      }
+      return "File $fileName added to app request"
     } else {
       throw ApiException("Activity not found", HttpStatus.INTERNAL_SERVER_ERROR)
     }
