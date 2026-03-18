@@ -9,7 +9,10 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppReposi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 
 @Service
-class AppServicePrisonerFacing(val appRepository: AppRepository, val applicationTypeRepository: ApplicationTypeRepository) {
+class AppServicePrisonerFacing(
+  val appRepository: AppRepository,
+  val applicationTypeRepository: ApplicationTypeRepository,
+) {
 
   fun getAppsByPrisonerId(prisonerId: String): List<AppListPrisonerFacing> {
     val apps = appRepository.findAppsByRequestedBy(prisonerId)
@@ -25,7 +28,7 @@ class AppServicePrisonerFacing(val appRepository: AppRepository, val application
   }
 
   fun convertAppToAppListPrisonerFacing(app: App): AppListPrisonerFacing {
-    val applicationType = applicationTypeRepository.findById(app.applicationType).orElseThrow{
+    val applicationType = applicationTypeRepository.findById(app.applicationType).orElseThrow {
       throw ApiException("Application type with id: ${app.applicationType} not found", HttpStatus.INTERNAL_SERVER_ERROR)
     }
     return AppListPrisonerFacing(
