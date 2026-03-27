@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -85,28 +86,28 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
   fun `update app`() {
     val createdApp = appRepository.save(DataGenerator.generateApp())
     var app = App(
-      createdApp.id,
-      "new reference 123",
-      createdApp.assignedGroup,
-      null,
-      applicationTypeOne,
-      applicationGroupOne,
-      false,
-      createdApp.requestedDate,
-      createdApp.createdDate,
-      createdApp.createdBy,
-      createdApp.lastModifiedDate,
-      createdApp.lastModifiedBy,
-      createdApp.comments,
-      listOf(HashMap<String, Any>()),
-      createdApp.requestedBy,
-      createdApp.requestedByFirstName,
-      createdApp.requestedByLastName,
-      createdApp.status,
-      Generators.timeBasedEpochGenerator().generate().toString(),
-      mutableListOf(),
-      false,
-      mutableListOf(),
+        createdApp.id,
+        "new reference 123",
+        createdApp.assignedGroup,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedDate = createdApp.requestedDate,
+        createdDate = createdApp.createdDate,
+        createdBy = createdApp.createdBy,
+        submittedByType = SubmittedByType.STAFF,
+        lastModifiedDate = createdApp.lastModifiedDate,
+        lastModifiedBy = createdApp.lastModifiedBy,
+        comments = createdApp.comments,
+        requests = listOf(HashMap<String, Any>()),
+        requestedBy = createdApp.requestedBy,
+        requestedByFirstName = createdApp.requestedByFirstName,
+        requestedByLastName = createdApp.requestedByLastName,
+        status = createdApp.status,
+        establishmentId = Generators.timeBasedEpochGenerator().generate().toString(),
+        responses = mutableListOf(),
+        firstNightCenter = false,
+        appFiles = mutableListOf(),
     )
     app = appRepository.save(app)
     Assertions.assertEquals("new reference 123", app.reference)

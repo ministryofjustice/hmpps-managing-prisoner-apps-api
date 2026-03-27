@@ -4,7 +4,6 @@ import com.fasterxml.uuid.Generators
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.FileRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
@@ -13,6 +12,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import java.time.LocalDateTime
 import java.util.*
 
@@ -49,28 +49,27 @@ class DataGenerator {
     )
 
     fun generateApp(): App = App(
-      Generators.timeBasedEpochGenerator().generate(),
-      UUID.randomUUID().toString(),
-      Generators.timeBasedEpochGenerator().generate(),
-      AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
-      null,
-      null,
-      false,
-      LocalDateTime.now(),
-      LocalDateTime.now(),
-      "testStaaf@moj",
-      LocalDateTime.now(),
-      "testStaaf@moj",
-      arrayListOf(Generators.timeBasedEpochGenerator().generate()),
-      listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
-      "testprisoner@moj",
-      "Test",
-      "Prisoner",
-      AppStatus.PENDING,
-      Generators.timeBasedEpochGenerator().generate().toString(),
-      mutableListOf(),
-      false,
-      mutableListOf<AppFile>(),
+        Generators.timeBasedEpochGenerator().generate(),
+        UUID.randomUUID().toString(),
+        Generators.timeBasedEpochGenerator().generate(),
+        AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+        null,
+        null,
+        requestedDate = LocalDateTime.now(),
+        createdDate = LocalDateTime.now(),
+        createdBy = "testStaaf@moj",
+        submittedByType = SubmittedByType.STAFF,
+        lastModifiedDate = LocalDateTime.now(),
+        lastModifiedBy = "testStaaf@moj",
+        comments = arrayListOf(Generators.timeBasedEpochGenerator().generate()),
+        requests = listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
+        requestedBy = "testprisoner@moj",
+        requestedByFirstName = "Test",
+        requestedByLastName = "Prisoner",
+        status = AppStatus.PENDING,
+        establishmentId = Generators.timeBasedEpochGenerator().generate().toString(),
+        responses = mutableListOf(),
+        firstNightCenter = false,
     )
 
     fun generateApp(
@@ -86,28 +85,27 @@ class DataGenerator {
       groupId: UUID,
       firstNightCenter: Boolean,
     ): App = App(
-      Generators.timeBasedEpochGenerator().generate(),
-      UUID.randomUUID().toString(),
-      groupId,
-      appType,
-      applicationGroup,
-      applicationType,
-      false,
-      requestedDate,
-      requestedDate,
-      "testStaaf@moj",
-      requestedDate,
-      "testStaaf@moj",
-      arrayListOf(),
-      listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
-      requestedBy,
-      requestedByFirstName,
-      requestedByLastName,
-      appStatus,
-      establishmentId,
-      mutableListOf(),
-      firstNightCenter,
-      mutableListOf<AppFile>(),
+        Generators.timeBasedEpochGenerator().generate(),
+        UUID.randomUUID().toString(),
+        groupId,
+        appType,
+        applicationGroup,
+        applicationType,
+        requestedDate = requestedDate,
+        createdDate = requestedDate,
+        createdBy = "testStaaf@moj",
+        submittedByType = SubmittedByType.STAFF,
+        lastModifiedDate = requestedDate,
+        lastModifiedBy = "testStaaf@moj",
+        comments = arrayListOf(),
+        requests = listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
+        requestedBy = requestedBy,
+        requestedByFirstName = requestedByFirstName,
+        requestedByLastName = requestedByLastName,
+        status = appStatus,
+        establishmentId = establishmentId,
+        responses = mutableListOf(),
+        firstNightCenter = firstNightCenter,
     )
 
     fun generateEstablishment(): Establishment = Establishment(
