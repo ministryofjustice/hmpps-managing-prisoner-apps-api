@@ -28,7 +28,7 @@ class AppServicePrisonerFacing(
   val appRepository: AppRepository,
   val applicationTypeRepository: ApplicationTypeRepository,
   val prisonerService: PrisonerService,
-  val groupService: GroupService
+  val groupService: GroupService,
 ) {
 
   fun getAppsByPrisonerId(prisonerId: String): List<AppListPrisonerFacing> {
@@ -46,36 +46,36 @@ class AppServicePrisonerFacing(
       .orElseThrow { ApiException("No application type found for $appRequest", HttpStatus.BAD_REQUEST) }
     val app = convertAppRequestToAppRequestEntity(appRequest, prisonerId, prisoner, groups[0].id, applicationType.applicationGroup!!.id, applicationType.id)
     val appEntity = appRepository.save(app)
-    return convertAppEntityToAppResponse(appEntity, prisoner,groups[0].id,applicationType.applicationGroup!!, applicationType)
+    return convertAppEntityToAppResponse(appEntity, prisoner, groups[0].id, applicationType.applicationGroup!!, applicationType)
   }
 
   private fun convertAppRequestToAppRequestEntity(appRequest: AppRequestPrisoner, prisonerId: String, prisoner: Prisoner, groupId: UUID, applicationType: Long, applicationGroup: Long): App {
-      val localDateTime = LocalDateTime.now(ZoneOffset.UTC)
-      var firstNightCenter = false
-      return App(
-        Generators.timeBasedEpochGenerator().generate(), // id
-        appRequest.reference, // reference
-        groupId, // group id or department
-        null,
-        applicationGroup,
-        applicationType,
-        appRequest.genericForm,
-        localDateTime, // last modified date
-        localDateTime, // created by
-        prisonerId,
-        SubmittedByType.PRISONER,
-        localDateTime,
-        prisonerId,
-        mutableListOf(),
-        convertRequestsToAppRequests(appRequest.requests),
-        prisoner.username,
-        prisoner.firstName,
-        prisoner.lastName,
-        AppStatus.PENDING,
-        prisoner.establishmentId!!,
-        mutableListOf(),
-        firstNightCenter
-      )
+    val localDateTime = LocalDateTime.now(ZoneOffset.UTC)
+    var firstNightCenter = false
+    return App(
+      Generators.timeBasedEpochGenerator().generate(), // id
+      appRequest.reference, // reference
+      groupId, // group id or department
+      null,
+      applicationGroup,
+      applicationType,
+      appRequest.genericForm,
+      localDateTime, // last modified date
+      localDateTime, // created by
+      prisonerId,
+      SubmittedByType.PRISONER,
+      localDateTime,
+      prisonerId,
+      mutableListOf(),
+      convertRequestsToAppRequests(appRequest.requests),
+      prisoner.username,
+      prisoner.firstName,
+      prisoner.lastName,
+      AppStatus.PENDING,
+      prisoner.establishmentId!!,
+      mutableListOf(),
+      firstNightCenter,
+    )
   }
 
   private fun convertAppEntityToAppResponse(
@@ -84,27 +84,25 @@ class AppServicePrisonerFacing(
     assignedGroup: Any,
     applicationGroup: ApplicationGroup,
     applicationType: ApplicationType,
-  ): AppResponsePrisoner<Any, Any> {
-    return AppResponsePrisoner(
-      app.id,
-      app.reference,
-      assignedGroup,
-      ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null, null),
-      app.genericForm,
-      ApplicationGroupResponse(applicationGroup.id, applicationGroup.name, null),
-      app.requestedDate,
-      app.createdDate,
-      app.createdBy,
-      app.lastModifiedDate,
-      app.lastModifiedBy,
-      app.requests,
-      prisoner,
-      app.requestedByFirstName,
-      app.requestedByLastName,
-      app.status,
-      app.establishmentId,
-    )
-  }
+  ): AppResponsePrisoner<Any, Any> = AppResponsePrisoner(
+    app.id,
+    app.reference,
+    assignedGroup,
+    ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null, null),
+    app.genericForm,
+    ApplicationGroupResponse(applicationGroup.id, applicationGroup.name, null),
+    app.requestedDate,
+    app.createdDate,
+    app.createdBy,
+    app.lastModifiedDate,
+    app.lastModifiedBy,
+    app.requests,
+    prisoner,
+    app.requestedByFirstName,
+    app.requestedByLastName,
+    app.status,
+    app.establishmentId,
+  )
 
   private fun convertRequestsToAppRequests(requests: List<Map<String, Any>>): List<MutableMap<String, Any>> {
     val appRequests = ArrayList<MutableMap<String, Any>>()
@@ -141,12 +139,10 @@ class AppServicePrisonerFacing(
     )
   }
 
-
   private fun validatePrisoner(prisonerId: String): Prisoner {
     val prisoner = prisonerService.getPrisonerById(prisonerId).orElseThrow {
       ApiException("Prison with id $prisonerId not found", HttpStatus.NOT_FOUND)
     }
     return prisoner
   }
-
 }

@@ -35,7 +35,7 @@ class PrisonerFacingResource(private val appServicePrisonerFacing: AppServicePri
 
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   @GetMapping("/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
-  fun getAppsByPrisonerId(@PathVariable prisonerId: String, authentication: Authentication,): ResponseEntity<List<AppListPrisonerFacing>> {
+  fun getAppsByPrisonerId(@PathVariable prisonerId: String, authentication: Authentication): ResponseEntity<List<AppListPrisonerFacing>> {
     authentication as AuthAwareAuthenticationToken
     val apps = appServicePrisonerFacing.getAppsByPrisonerId(prisonerId)
     return ResponseEntity.status(HttpStatus.OK).body(apps)

@@ -29,6 +29,7 @@ data class App(
   val requestedDate: LocalDateTime,
   val createdDate: LocalDateTime,
   val createdBy: String,
+  @Enumerated(EnumType.STRING)
   val submittedByType: SubmittedByType,
   var lastModifiedDate: LocalDateTime,
   var lastModifiedBy: String,
