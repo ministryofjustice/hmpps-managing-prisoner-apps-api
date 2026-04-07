@@ -16,6 +16,30 @@ hmpps:
     api:
       url: http://localhost:8093
       timeout: 10s
+  document:
+    api:
+      url: https://document-api-dev.hmpps.service.justice.gov.uk
+      timeout: 10s
+  sar:
+    template:
+      enabled: true
+      path: /sar/templates/sar_template.mustache
+    tests:
+      # When generate-actual is true the SAR tests write the actual output to
+      # src/test/resources/*.log scratch files AND the @AfterEach tearDown in
+      # SarIntegrationTestBase automatically promotes them into:
+      #   src/test/resources/sar/expected/jpa-entity-schema.json
+      #   src/test/resources/sar/expected/sar-api-response.json
+      #   src/test/resources/sar/expected/sar-report-output.html
+      #
+      # To regenerate expected snapshots:
+      #   1. Set generate-actual: true
+      #   2. Set generate-actual: true
+      generate-actual: false
+      expected-api-response-path: /sar/expected/sar-api-response.json
+      expected-jpa-entity-schema-path: /sar/expected/jpa-entity-schema.json
+      expected-render-result-path: /sar/expected/sar-report-output.html
+      attachments-expected: true
 
 # example client configuration for calling out to other services
 # TODO: Remove / replace this configuration

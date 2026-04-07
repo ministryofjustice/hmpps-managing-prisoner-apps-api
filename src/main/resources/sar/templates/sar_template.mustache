@@ -1,0 +1,129 @@
+<h1 class="title">Managing Prisoner Applications</h1>
+    <h2>Apps</h2>
+    {{#content.apps}}
+        <br/>
+        <h3>App</h3>
+        <table class="data-table">
+            <tr>
+                <td class="data-column-30">Status</td>
+                <td class="data-column-60">Type</td>
+            </tr>
+            <tr>
+                <td>{{ optionalValue status }}</td>
+                <td>{{ optionalValue type }}</td>
+            </tr>
+        </table>
+        <table class="data-table">
+            <tr>
+                <td class="data-column-20">Requested date</td>
+                <td class="data-column-20">Last modified date</td>
+                <td class="data-column-20">Establishment</td>
+                <td class="data-column-30">Assigned To</td>
+            </tr>
+            <tr>
+                <td>{{ optionalValue (formatDate requestedDate) }}</td>
+                <td>{{ optionalValue (formatDate lastModifiedDate) }}</td>
+                <td>{{ getPrisonName establishment }}</td>
+                <td>{{ optionalValue assignedTo }}</td>
+            </tr>
+        </table>
+
+        <h4>Responses</h4>
+        {{#responses}}
+            <table class="data-table">
+                <tr>
+                    <td class="data-column-50">Decision</td>
+                    <td class="data-column-20">Created By</td>
+                    <td class="data-column-20">Reason</td>
+                </tr>
+                <tr>
+                    <td>{{ optionalValue decision }}</td>
+                    <td>{{ optionalValue createdBy }}</td>
+                    <td>{{ optionalValue reason }}</td>
+                </tr>
+            </table>
+        {{/responses}}
+        {{^responses}}
+            <p>No data held</p>
+        {{/responses}}
+
+        <h4>Comments</h4>
+        {{#comments}}
+        <table class="data-table">
+            <tr>
+                <td class="data-column-50">Comment</td>
+                <td class="data-column-20">Created By</td>
+                <td class="data-column-20">Reason</td>
+            </tr>
+            <tr>
+                <td>{{ optionalValue message }}</td>
+                <td>{{ optionalValue ( getUserLastName createdBy) }}</td>
+                <td>{{ optionalValue ( formatDate createdDateTime )}}</td>
+            </tr>
+        </table>
+        {{/comments}}
+        {{^comments}}
+            <p>No data held</p>
+        {{/comments}}
+
+        <h4>History</h4>
+        {{#history}}
+            <table class="data-table">
+                <tr>
+                    <td class="data-column-30">Activity</td>
+                    <td class="data-column-30">Date</td>
+                    <td class="data-column-30">Action by</td>
+                </tr>
+                <tr>
+                    <td>{{ optionalValue activity }}</td>
+                    <td>{{ optionalValue (formatDate date) }}</td>
+                    <td>{{ getUserLastName actionBy }}</td>
+                </tr>
+            </table>
+        {{/history}}
+        {{^history}}
+            <p>No data held</p>
+        {{/history}}
+
+        <h4>Form Data</h4>
+        {{#formDataItems}}
+            <table class="summary-list">
+                <tr>
+                    <td class="data-column-30">{{ optionalValue (convertCamelCase key) }}</td>
+                    <td class="data-column-70">{{ optionalValue value }}</td>
+                </tr>
+            </table>
+        {{/formDataItems}}
+        {{^formDataItems}}
+            <p>No data held</p>
+        {{/formDataItems}}
+
+    {{/content.apps}}
+    {{^content.apps}}
+        <p>No Data Held</p>
+    {{/content.apps}}
+
+    <h2>Attachments</h2>
+    {{#attachments}}
+        <table class="data-table">
+            <tr>
+                <td class="data-column-20">Attachment Number</td>
+                <td class="data-column-20">Name</td>
+                <td class="data-column-20">Content Type</td>
+                <td class="data-column-20">Url</td>
+                <td class="data-column-20">File Name</td>
+                <td class="data-column-20">File Size</td>
+            </tr>
+            <tr>
+                <td>{{ optionalValue attachmentNumber }}</td>
+                <td>{{ optionalValue name }}</td>
+                <td>{{ optionalValue contentType }}</td>
+                <td>{{ optionalValue url }}</td>
+                <td>{{ optionalValue fileName }}</td>
+                <td>{{ optionalValue fileSize }}</td>
+            </tr>
+        </table>
+    {{/attachments}}
+    {{^attachments}}
+        <p>No Data Held</p>
+    {{/attachments}}

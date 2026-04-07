@@ -93,3 +93,11 @@ management:
     info:
       cache:
         time-to-live: 2000ms
+
+hmpps:
+  service:
+    name: hmpps-managing-prisoner-apps
+  sar:
+    template:
+      path: /sar/templates/sar_template.mustache
+      enabled: true

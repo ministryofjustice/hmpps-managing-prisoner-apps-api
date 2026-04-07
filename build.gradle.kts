@@ -29,11 +29,16 @@ dependencies {
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:1.8.2")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.3")
+  testImplementation("net.javacrumbs.json-unit:json-unit-assertj:5.1.1")
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37") {
     exclude(group = "io.swagger.core.v3")
   }
   testImplementation("com.h2database:h2:2.4.240")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.1.2") {
+    exclude(group = "org.springframework.boot", module = "spring-boot-webtestclient")
+  }
 }
 
 kotlin {
@@ -53,4 +58,9 @@ tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25
   }
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
 }
