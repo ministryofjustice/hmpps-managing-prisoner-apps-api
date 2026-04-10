@@ -10,10 +10,12 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
@@ -28,9 +30,11 @@ class AppServicePrisonerFacing(
   val applicationTypeRepository: ApplicationTypeRepository,
   val prisonerService: PrisonerService,
   val groupService: GroupService,
+  val activityService: ActivityService,
 ) {
 
   fun getAppsByPrisonerId(prisonerId: String): List<AppListPrisonerFacing> {
+    validatePrisoner(prisonerId)
     val apps = appRepository.findAppsByRequestedBy(prisonerId)
     return convertAppsToAppResponsePrisonerFacing(apps)
   }
@@ -56,6 +60,33 @@ class AppServicePrisonerFacing(
       .orElseThrow { ApiException("No application type found for $appRequest", HttpStatus.BAD_REQUEST) }
     val app = convertAppRequestToAppRequestEntity(appRequest, prisonerId, prisoner, groups[0].id, applicationType.applicationGroup!!.id, applicationType.id)
     val appEntity = appRepository.save(app)
+    val createdDate = LocalDateTime.now(ZoneOffset.UTC)
+    activityService.addActivity(
+      app.assignedGroup,
+      EntityType.ASSIGNED_GROUP,
+      app.id,
+      Activity.APP_SUBMITTED,
+      app.establishmentId,
+      prisonerId,
+      createdDate,
+      prisonerId,
+      app.applicationType!!,
+      app.applicationGroup!!,
+    )
+    app.appFiles.forEach { f ->
+      activityService.addActivity(
+        f.id,
+        EntityType.FILE,
+        app.id,
+        Activity.FILE_ADDED,
+        app.establishmentId,
+        prisonerId,
+        createdDate,
+        prisonerId,
+        app.applicationType!!,
+        app.applicationGroup!!,
+      )
+    }
     return convertAppEntityToAppResponse(appEntity, prisoner, groups[0].id, applicationType.applicationGroup!!, applicationType)
   }
 

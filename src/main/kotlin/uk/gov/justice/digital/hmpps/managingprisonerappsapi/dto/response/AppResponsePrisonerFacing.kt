@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -27,4 +26,3 @@ data class AppResponsePrisonerFacing<X, Y>(
   val status: AppStatus,
   val establishmentId: String,
 )
-
