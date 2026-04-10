@@ -202,7 +202,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       ),
     )
 
-    val app = App(
+    val app1 = App(
       id = APP_ID,
       reference = "SAR-REF-1",
       assignedGroup = ASSIGNED_GROUP_ID,
@@ -235,7 +235,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       appFiles = mutableListOf(),
     )
 
-    appRepository.save(app)
+    appRepository.save(app1)
 
     commentRepository.saveAll(
       listOf(
@@ -275,7 +275,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           createdDate = LocalDateTime.of(2026, 1, 11, 9, 0),
           createdBy = "staff.one",
           fileType = "image/jpeg",
-          app = app,
+          app = app1,
         ),
         AppFile(
           id = FILE_ID_2,
@@ -284,7 +284,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           createdDate = LocalDateTime.of(2025, 10, 11, 9, 0),
           createdBy = "staff.two",
           fileType = "image/jpeg",
-          app = app,
+          app = app1,
         ),
       ),
     )

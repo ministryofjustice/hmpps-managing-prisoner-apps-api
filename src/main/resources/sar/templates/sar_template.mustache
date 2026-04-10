@@ -98,6 +98,31 @@
             <p>No data held</p>
         {{/formDataItems}}
 
+        <h4>App Attachments</h4>
+        {{#appAttachments}}
+            <table class="data-table">
+                <tr>
+                    <td class="data-column-20">Attachment Number</td>
+                    <td class="data-column-20">Name</td>
+                    <td class="data-column-20">Content Type</td>
+                    <td class="data-column-20">Url</td>
+                    <td class="data-column-20">File Name</td>
+                    <td class="data-column-20">File Size</td>
+                </tr>
+                <tr>
+                    <td>{{ optionalValue attachmentNumber }}</td>
+                    <td>{{ optionalValue name }}</td>
+                    <td>{{ optionalValue contentType }}</td>
+                    <td>{{ optionalValue url }}</td>
+                    <td>{{ optionalValue fileName }}</td>
+                    <td>{{ optionalValue fileSize }}</td>
+                </tr>
+            </table>
+        {{/appAttachments}}
+        {{^appAttachments}}
+            <p>No Data Held</p>
+        {{/appAttachments}}
+
     {{/content.apps}}
     {{^content.apps}}
         <p>No Data Held</p>
