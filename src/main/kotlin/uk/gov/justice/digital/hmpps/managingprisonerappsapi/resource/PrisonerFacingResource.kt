@@ -17,17 +17,14 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppListPrisonerFacing
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisonerFacing
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppServicePrisonerFacing
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("v1")
