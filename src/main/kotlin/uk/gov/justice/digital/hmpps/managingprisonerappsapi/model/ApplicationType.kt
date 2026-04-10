@@ -17,11 +17,14 @@ data class ApplicationType(
   val genericType: Boolean,
   val genericForm: Boolean = false,
   val logDetailRequired: Boolean,
-) {
-
   @ManyToOne(fetch = FetchType.EAGER)
   @JsonIgnore
-  var applicationGroup: ApplicationGroup? = null
+  var applicationGroup: ApplicationGroup? = null,
+) {
+
+  // @ManyToOne(fetch = FetchType.EAGER)
+  // @JsonIgnore
+  // var applicationGroup: ApplicationGroup? = null
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
