@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import com.fasterxml.uuid.Generators
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
@@ -9,6 +11,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisonerFacing
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
@@ -25,26 +28,35 @@ import java.time.ZoneOffset
 import java.util.*
 
 @Service
-class AppServicePrisonerFacing(
-  val appRepository: AppRepository,
-  val applicationTypeRepository: ApplicationTypeRepository,
-  val prisonerService: PrisonerService,
-  val groupService: GroupService,
-  val activityService: ActivityService,
+class AppPrisonerFacingService(
+  private val appRepository: AppRepository,
+  private val applicationTypeRepository: ApplicationTypeRepository,
+  private val prisonerService: PrisonerService,
+  private val groupService: GroupService,
+  private val establishmentService: EstablishmentService,
+  private val activityService: ActivityService,
 ) {
 
-  fun getAppsByPrisonerId(prisonerId: String): List<AppListPrisonerFacing> {
-    validatePrisoner(prisonerId)
-    val apps = appRepository.findAppsByRequestedBy(prisonerId)
-    return convertAppsToAppResponsePrisonerFacing(apps)
+  fun getAppsByPrisonerId(prisonerId: String, pageNumber: Long, pageSize: Long): PrisonerAppsPage {
+    val prisoner = validatePrisoner(prisonerId)
+    validateEstablishment(prisoner.establishmentId!!)
+    val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(Sort.Direction.ASC, "createdDate")
+    val pageResult = appRepository.findAppsByRequestedBy(prisonerId, pageRequest)
+    return PrisonerAppsPage(
+      pageResult.pageable.pageNumber + 1,
+      pageResult.totalElements,
+      pageResult.isLast,
+      convertAppsToAppResponsePrisonerFacing(pageResult.content),
+    )
   }
 
   fun getPrisonerAppById(prisonerId: String, appId: UUID): AppResponsePrisoner<Any, Any> {
     val prisoner = validatePrisoner(prisonerId)
+    validateEstablishment(prisoner.establishmentId!!)
     val app = appRepository.findById(appId).orElseThrow {
       ApiException("Prisoner with id $appId not found", HttpStatus.NOT_FOUND)
     }
-    val group = groupService.getGroupsByLoggedStaffEstablishmentId(app.establishmentId)
+    val group = groupService.getGroupById(app.assignedGroup)
     val applicationType = applicationTypeRepository.findById(app.applicationType!!)
       .orElseThrow { ApiException("No application type found for id: ${app.applicationType}", HttpStatus.BAD_REQUEST) }
     return convertAppEntityToAppResponse(app, prisoner, group, applicationType.applicationGroup!!, applicationType)
@@ -52,6 +64,7 @@ class AppServicePrisonerFacing(
 
   fun submitApp(appRequest: AppRequestPrisoner, prisonerId: String): AppResponsePrisoner<Any, Any> {
     val prisoner = validatePrisoner(prisonerId)
+    validateEstablishment(prisoner.establishmentId!!)
     val groups = groupService.getGroupByInitialAppType(prisoner.establishmentId!!, appRequest.applicationType!!)
     if (groups.isEmpty()) {
       throw ApiException("No department found to assigned app request", HttpStatus.BAD_REQUEST)
@@ -88,6 +101,12 @@ class AppServicePrisonerFacing(
       )
     }
     return convertAppEntityToAppResponse(appEntity, prisoner, groups[0].id, applicationType.applicationGroup!!, applicationType)
+  }
+
+  fun getAppGroupsAndTypesByLoggedUserEstablishment(prisonerId: String): List<ApplicationGroupResponse> {
+    val prisoner = validatePrisoner(prisonerId)
+    validateEstablishment(prisoner.establishmentId!!)
+    return establishmentService.getAppGroupsAndTypesByLoggedUserEstablishment(prisoner.establishmentId)
   }
 
   private fun convertAppRequestToAppRequestEntity(appRequest: AppRequestPrisoner, prisonerId: String, prisoner: Prisoner, groupId: UUID, applicationType: Long, applicationGroup: Long): App {
@@ -184,9 +203,9 @@ class AppServicePrisonerFacing(
   )
 
   private fun convertAppsToAppResponsePrisonerFacing(apps: List<App>): List<AppListPrisonerFacing> {
-    val appList = listOf<AppListPrisonerFacing>()
+    val appList = ArrayList<AppListPrisonerFacing>()
     apps.forEach { app ->
-      appList.plus(convertAppToAppListPrisonerFacing(app))
+      appList.add(convertAppToAppListPrisonerFacing(app))
     }
     return appList
   }
@@ -210,5 +229,11 @@ class AppServicePrisonerFacing(
       ApiException("Prison with id $prisonerId not found", HttpStatus.NOT_FOUND)
     }
     return prisoner
+  }
+
+  private fun validateEstablishment(establishmentId: String) {
+    establishmentService.getEstablishmentById(establishmentId).orElseThrow {
+      ApiException("Establishment with id $establishmentId not onboarded", HttpStatus.FORBIDDEN)
+    }
   }
 }

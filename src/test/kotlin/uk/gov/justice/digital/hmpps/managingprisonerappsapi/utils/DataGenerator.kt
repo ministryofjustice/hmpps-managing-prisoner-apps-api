@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils
 
 import com.fasterxml.uuid.Generators
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.FileRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
@@ -163,4 +164,19 @@ class DataGenerator {
       files,
     )
   }
+
+  fun generateAppRequestPrisonerFacing(applicationType: Long, genericForm: Boolean): AppRequestPrisoner = AppRequestPrisoner(
+    UUID.randomUUID().toString(),
+    applicationType,
+    genericForm,
+    listOf(
+      HashMap<String, Any>()
+        .apply {
+          // put("amount", 10)
+          put("contact-number", CONTACT_NUMBER)
+          // put("firstName", "John")
+          // put("lastName", "Smith")
+        },
+    ),
+  )
 }

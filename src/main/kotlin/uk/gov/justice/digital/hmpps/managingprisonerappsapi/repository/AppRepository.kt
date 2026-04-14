@@ -108,4 +108,6 @@ interface AppRepository : JpaRepository<App, UUID> {
   fun searchRequestedByFirstOrLastName(establishmentId: String, searchText: String): List<RequestedByNameSearchResult>
 
   fun findAppsByRequestedBy(requestedBy: String): List<App>
+
+  fun findAppsByRequestedBy(requestedBy: String, pageable: Pageable): Page<App>
 }
