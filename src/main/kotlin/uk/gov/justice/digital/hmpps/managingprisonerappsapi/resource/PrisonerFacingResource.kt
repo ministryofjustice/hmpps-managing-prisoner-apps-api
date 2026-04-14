@@ -21,14 +21,14 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppListPrisonerFacing
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppServicePrisonerFacing
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppPrisonerFacingService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.*
 
 @RestController
 @RequestMapping("v1")
-class PrisonerFacingResource(private val appServicePrisonerFacing: AppServicePrisonerFacing) {
+class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFacingService) {
 
   companion object {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -38,7 +38,7 @@ class PrisonerFacingResource(private val appServicePrisonerFacing: AppServicePri
   @GetMapping("/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
   fun getPrisonerApps(authentication: Authentication): ResponseEntity<List<AppListPrisonerFacing>> {
     authentication as AuthAwareAuthenticationToken
-    val apps = appServicePrisonerFacing.getAppsByPrisonerId(authentication.principal)
+    val apps = appPrisonerFacingService.getAppsByPrisonerId(authentication.principal)
     return ResponseEntity.status(HttpStatus.OK).body(apps)
   }
 
@@ -68,7 +68,7 @@ class PrisonerFacingResource(private val appServicePrisonerFacing: AppServicePri
     authentication: Authentication,
   ): ResponseEntity<AppResponsePrisoner<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
-    val appResponseDto = appServicePrisonerFacing.getPrisonerAppById(authentication.principal, id)
+    val appResponseDto = appPrisonerFacingService.getPrisonerAppById(authentication.principal, id)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
@@ -103,7 +103,7 @@ class PrisonerFacingResource(private val appServicePrisonerFacing: AppServicePri
   ): ResponseEntity<AppResponsePrisoner<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for submitting app for ${authentication.principal} by prisoner")
-    val appResponseDto = appServicePrisonerFacing.submitApp(appRequestPrisoner, authentication.principal)
+    val appResponseDto = appPrisonerFacingService.submitApp(appRequestPrisoner, authentication.principal)
     return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }
 }

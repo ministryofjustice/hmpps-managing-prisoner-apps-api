@@ -25,22 +25,25 @@ import java.time.ZoneOffset
 import java.util.*
 
 @Service
-class AppServicePrisonerFacing(
-  val appRepository: AppRepository,
-  val applicationTypeRepository: ApplicationTypeRepository,
-  val prisonerService: PrisonerService,
-  val groupService: GroupService,
-  val activityService: ActivityService,
+class AppPrisonerFacingService(
+  private val appRepository: AppRepository,
+  private val applicationTypeRepository: ApplicationTypeRepository,
+  private val prisonerService: PrisonerService,
+  private val groupService: GroupService,
+  private val establishmentService: EstablishmentService,
+  private val activityService: ActivityService,
 ) {
 
   fun getAppsByPrisonerId(prisonerId: String): List<AppListPrisonerFacing> {
-    validatePrisoner(prisonerId)
+    val prisoner = validatePrisoner(prisonerId)
+    validateEstablishment(prisoner.establishmentId!!)
     val apps = appRepository.findAppsByRequestedBy(prisonerId)
     return convertAppsToAppResponsePrisonerFacing(apps)
   }
 
   fun getPrisonerAppById(prisonerId: String, appId: UUID): AppResponsePrisoner<Any, Any> {
     val prisoner = validatePrisoner(prisonerId)
+    validateEstablishment(prisoner.establishmentId!!)
     val app = appRepository.findById(appId).orElseThrow {
       ApiException("Prisoner with id $appId not found", HttpStatus.NOT_FOUND)
     }
@@ -52,6 +55,7 @@ class AppServicePrisonerFacing(
 
   fun submitApp(appRequest: AppRequestPrisoner, prisonerId: String): AppResponsePrisoner<Any, Any> {
     val prisoner = validatePrisoner(prisonerId)
+    validateEstablishment(prisoner.establishmentId!!)
     val groups = groupService.getGroupByInitialAppType(prisoner.establishmentId!!, appRequest.applicationType!!)
     if (groups.isEmpty()) {
       throw ApiException("No department found to assigned app request", HttpStatus.BAD_REQUEST)
@@ -210,5 +214,11 @@ class AppServicePrisonerFacing(
       ApiException("Prison with id $prisonerId not found", HttpStatus.NOT_FOUND)
     }
     return prisoner
+  }
+
+  private fun validateEstablishment(establishmentId: String) {
+    establishmentService.getEstablishmentById(establishmentId).orElseThrow {
+      ApiException("Establishment with id $establishmentId not onboarded", HttpStatus.FORBIDDEN)
+    }
   }
 }
