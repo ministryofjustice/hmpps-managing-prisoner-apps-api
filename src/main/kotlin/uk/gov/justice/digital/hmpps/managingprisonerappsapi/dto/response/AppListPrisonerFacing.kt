@@ -8,7 +8,7 @@ data class PrisonerAppsPage(
   val page: Int,
   val totalRecords: Long,
   val exhausted: Boolean,
-  val apps: List<AppListPrisonerFacing>
+  val apps: List<AppListPrisonerFacing>,
 )
 
 data class AppListPrisonerFacing(

@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import com.fasterxml.uuid.Generators
-import org.hibernate.query.SortDirection
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
@@ -38,18 +37,17 @@ class AppPrisonerFacingService(
   private val activityService: ActivityService,
 ) {
 
-  fun getAppsByPrisonerId(prisonerId: String, pageNumber: Long, pageSize: Long): PrisonerAppsPage{
+  fun getAppsByPrisonerId(prisonerId: String, pageNumber: Long, pageSize: Long): PrisonerAppsPage {
     val prisoner = validatePrisoner(prisonerId)
     validateEstablishment(prisoner.establishmentId!!)
     val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(Sort.Direction.ASC, "createdDate")
     val pageResult = appRepository.findAppsByRequestedBy(prisonerId, pageRequest)
     return PrisonerAppsPage(
-      pageResult.pageable.pageNumber+ 1,
+      pageResult.pageable.pageNumber + 1,
       pageResult.totalElements,
       pageResult.isLast,
-      convertAppsToAppResponsePrisonerFacing(pageResult.content)
+      convertAppsToAppResponsePrisonerFacing(pageResult.content),
     )
-
   }
 
   fun getPrisonerAppById(prisonerId: String, appId: UUID): AppResponsePrisoner<Any, Any> {

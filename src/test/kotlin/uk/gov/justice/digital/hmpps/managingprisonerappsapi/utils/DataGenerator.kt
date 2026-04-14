@@ -165,20 +165,18 @@ class DataGenerator {
     )
   }
 
-  fun generateAppRequestPrisonerFacing(applicationType: Long, genericForm: Boolean): AppRequestPrisoner {
-    return AppRequestPrisoner(
-      UUID.randomUUID().toString(),
-      applicationType,
-      genericForm,
-      listOf(
-        HashMap<String, Any>()
-          .apply {
-            // put("amount", 10)
-            put("contact-number", CONTACT_NUMBER)
-            // put("firstName", "John")
-            // put("lastName", "Smith")
-          },
-      ),
-    )
-  }
+  fun generateAppRequestPrisonerFacing(applicationType: Long, genericForm: Boolean): AppRequestPrisoner = AppRequestPrisoner(
+    UUID.randomUUID().toString(),
+    applicationType,
+    genericForm,
+    listOf(
+      HashMap<String, Any>()
+        .apply {
+          // put("amount", 10)
+          put("contact-number", CONTACT_NUMBER)
+          // put("firstName", "John")
+          // put("lastName", "Smith")
+        },
+    ),
+  )
 }

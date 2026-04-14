@@ -18,16 +18,13 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ESTABLISHMENT_ID_1
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
@@ -58,7 +55,6 @@ class AppPrisonerFacingServiceTest {
   private lateinit var app: App
   private lateinit var applicationGroup: ApplicationGroup
   private lateinit var applicationType: ApplicationType
-
 
   @BeforeEach
   fun setUp() {
@@ -160,7 +156,7 @@ class AppPrisonerFacingServiceTest {
         PageImpl(
           listOf<App>(app),
           PageRequest.of(0, 5).withSort(Sort.Direction.ASC, "createdDate"),
-          listOf<App>(app).size.toLong()
+          listOf<App>(app).size.toLong(),
         ),
       )
     Mockito.`when`(prisonerService.getPrisonerById(prisoner.username)).thenReturn(Optional.of<Prisoner>(prisoner))
@@ -199,5 +195,4 @@ class AppPrisonerFacingServiceTest {
     )
     assertThat(pApp).isNotNull
   }
-
 }

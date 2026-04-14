@@ -108,7 +108,6 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-
   @PostMapping(
     "prisoners/apps",
     produces = [MediaType.APPLICATION_JSON_VALUE],
@@ -143,6 +142,4 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     val appResponseDto = appPrisonerFacingService.submitApp(appRequestPrisoner, authentication.principal)
     return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }
-
-
 }
