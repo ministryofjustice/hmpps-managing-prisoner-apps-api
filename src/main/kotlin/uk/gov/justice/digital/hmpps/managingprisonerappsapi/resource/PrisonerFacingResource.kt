@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppListPrisonerFacing
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppPrisonerFacingService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
@@ -36,9 +38,14 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
 
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   @GetMapping("/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
-  fun getPrisonerApps(authentication: Authentication): ResponseEntity<List<AppListPrisonerFacing>> {
+  fun getPrisonerApps(
+    @RequestParam(value = "pageNum", required = true) pageNum: Long,
+    @RequestParam(value = "pageSize", required = false) pageSize: Long? = 20,
+    @RequestParam(value = "prisonerId", required = false) prisonerId: String,
+    authentication: Authentication,
+  ): ResponseEntity<PrisonerAppsPage> {
     authentication as AuthAwareAuthenticationToken
-    val apps = appPrisonerFacingService.getAppsByPrisonerId(authentication.principal)
+    val apps = appPrisonerFacingService.getAppsByPrisonerId(authentication.principal, pageNum, pageSize!!)
     return ResponseEntity.status(HttpStatus.OK).body(apps)
   }
 
@@ -71,6 +78,36 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     val appResponseDto = appPrisonerFacingService.getPrisonerAppById(authentication.principal, id)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
+
+  @GetMapping("/prisoners/apps/types")
+  @Tag(name = "Apps")
+  @Operation(
+    summary = "Get app by id for a prisoner",
+    description = "This api endpoint to get prisoner app. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "Successfully got app by id."),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  fun getPrisonerAppTypes(
+    authentication: Authentication,
+  ): ResponseEntity<List<ApplicationGroupResponse>> {
+    authentication as AuthAwareAuthenticationToken
+    val appResponseDto = appPrisonerFacingService.getAppGroupsAndTypesByLoggedUserEstablishment(authentication.principal)
+    return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
+  }
+
 
   @PostMapping(
     "prisoners/apps",
@@ -106,4 +143,6 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     val appResponseDto = appPrisonerFacingService.submitApp(appRequestPrisoner, authentication.principal)
     return ResponseEntity.status(HttpStatus.CREATED).body(appResponseDto)
   }
+
+
 }
