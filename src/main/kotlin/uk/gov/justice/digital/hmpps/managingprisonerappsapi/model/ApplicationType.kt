@@ -5,13 +5,12 @@ import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.Id
 import jakarta.persistence.ManyToOne
-import jakarta.persistence.OrderBy
 
 @Entity
 data class ApplicationType(
   @Id
   val id: Long,
-  @OrderBy("name")
+  // @OrderBy("name")
   val name: String,
 
   val genericType: Boolean,

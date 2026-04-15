@@ -36,27 +36,13 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
-  @GetMapping("/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
-  fun getPrisonerApps(
-    @RequestParam(value = "pageNum", required = true) pageNum: Long,
-    @RequestParam(value = "pageSize", required = false) pageSize: Long? = 20,
-    @RequestParam(value = "prisonerId", required = false) prisonerId: String,
-    authentication: Authentication,
-  ): ResponseEntity<PrisonerAppsPage> {
-    authentication as AuthAwareAuthenticationToken
-    val apps = appPrisonerFacingService.getAppsByPrisonerId(authentication.principal, pageNum, pageSize!!)
-    return ResponseEntity.status(HttpStatus.OK).body(apps)
-  }
-
-  @GetMapping("/prisoners/apps/{id}")
-  @Tag(name = "Apps")
+  @Tag(name = "Prisoner Apps")
   @Operation(
-    summary = "Get app by id for a prisoner",
-    description = "This api endpoint to get prisoner app. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    summary = "Get apps for  a prisoner",
+    description = "This api endpoint to get prisoner apps. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
-      ApiResponse(responseCode = "200", description = "Successfully got app by id."),
+      ApiResponse(responseCode = "200", description = "Successfully got prisoner apps."),
       ApiResponse(
         responseCode = "401",
         description = "Unauthorized to access this endpoint",
@@ -70,6 +56,38 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     ],
   )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @GetMapping("/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
+  fun getPrisonerApps(
+    @RequestParam(value = "pageNum", required = true) pageNum: Long,
+    @RequestParam(value = "pageSize", required = false) pageSize: Long? = 20,
+    authentication: Authentication,
+  ): ResponseEntity<PrisonerAppsPage> {
+    authentication as AuthAwareAuthenticationToken
+    val apps = appPrisonerFacingService.getAppsByPrisonerId(authentication.principal, pageNum, pageSize!!)
+    return ResponseEntity.status(HttpStatus.OK).body(apps)
+  }
+
+  @Tag(name = "Prisoner Apps")
+  @Operation(
+    summary = "Get app by app id for a logged prisoner",
+    description = "This api endpoint to get prisoner app by app id . Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "Successfully got app by app id."),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @GetMapping("/prisoners/apps/{id}")
   fun getPrisonerAppByAppId(
     @PathVariable("id") id: UUID,
     authentication: Authentication,
@@ -79,14 +97,13 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-  @GetMapping("/prisoners/apps/types")
-  @Tag(name = "Apps")
+  @Tag(name = "Prisoner Apps")
   @Operation(
-    summary = "Get app by id for a prisoner",
-    description = "This api endpoint to get prisoner app. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    summary = "Get app groups and app types.",
+    description = "This api endpoint to app groups and app types for a logged prisoner. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
-      ApiResponse(responseCode = "200", description = "Successfully got app by id."),
+      ApiResponse(responseCode = "200", description = "App request created."),
       ApiResponse(
         responseCode = "401",
         description = "Unauthorized to access this endpoint",
@@ -100,6 +117,7 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     ],
   )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @GetMapping("/prisoners/apps/types")
   fun getPrisonerAppTypes(
     authentication: Authentication,
   ): ResponseEntity<List<ApplicationGroupResponse>> {
@@ -108,18 +126,13 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
-  @PostMapping(
-    "prisoners/apps",
-    produces = [MediaType.APPLICATION_JSON_VALUE],
-    consumes = [MediaType.APPLICATION_JSON_VALUE],
-  )
-  @Tag(name = "Apps")
+  @Tag(name = "Prisoner Apps")
   @Operation(
     summary = "Submit App request for a prisoner",
-    description = "This api endpoint is for submitting app request for a prisoner. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    description = "This api endpoint is for submitting app request by  a logged prisoner.  Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
-      ApiResponse(responseCode = "200", description = "App request submitted"),
+      ApiResponse(responseCode = "201", description = "App request submitted"),
       ApiResponse(
         responseCode = "401",
         description = "Unauthorized to access this endpoint",
@@ -131,6 +144,11 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
         content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
       ),
     ],
+  )
+  @PostMapping(
+    "prisoners/apps",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+    consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun submitApp(
