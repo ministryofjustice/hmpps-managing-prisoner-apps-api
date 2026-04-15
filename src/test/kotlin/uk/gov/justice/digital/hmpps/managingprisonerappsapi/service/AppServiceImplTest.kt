@@ -324,8 +324,8 @@ class AppServiceImplTest {
         GroupType.WING,
       ),
     )
-    Mockito.`when`(applicationTypeRepository.findById(app.applicationType)).thenReturn(Optional.of(applicationType))
-    Mockito.`when`(applicationGroupRepository.findById(app.applicationGroup)).thenReturn(Optional.of(applicationGroup))
+    Mockito.`when`(applicationTypeRepository.findById(app.applicationType!!)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(app.applicationGroup!!)).thenReturn(Optional.of(applicationGroup))
     Mockito.`when`(appRepository.save(any())).thenReturn(app)
     var exception = assertThrows(ApiException::class.java) {
       appService.submitApp(

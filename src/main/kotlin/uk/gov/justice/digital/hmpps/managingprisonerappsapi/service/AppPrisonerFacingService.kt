@@ -86,20 +86,6 @@ class AppPrisonerFacingService(
       app.applicationType!!,
       app.applicationGroup!!,
     )
-    app.appFiles.forEach { f ->
-      activityService.addActivity(
-        f.id,
-        EntityType.FILE,
-        app.id,
-        Activity.FILE_ADDED,
-        app.establishmentId,
-        prisonerId,
-        createdDate,
-        prisonerId,
-        app.applicationType!!,
-        app.applicationGroup!!,
-      )
-    }
     return convertAppEntityToAppResponse(appEntity, prisoner, groups[0].id, applicationType.applicationGroup!!, applicationType)
   }
 
@@ -211,7 +197,7 @@ class AppPrisonerFacingService(
   }
 
   private fun convertAppToAppListPrisonerFacing(app: App): AppListPrisonerFacing {
-    val applicationType = applicationTypeRepository.findById(app.applicationType).orElseThrow {
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
       throw ApiException("Application type with id: ${app.applicationType} not found", HttpStatus.INTERNAL_SERVER_ERROR)
     }
     return AppListPrisonerFacing(

@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
@@ -105,7 +106,7 @@ class AppResourcePrisonerFacingIntegrationTest(
   }
 
   @Test
-  fun `submit an app by prisoner`() {
+  fun `submit an app by prisoner and get app by id`() {
     var response = webTestClient.post()
       .uri("/v1/prisoners/apps")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
@@ -141,6 +142,39 @@ class AppResourcePrisonerFacingIntegrationTest(
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
     Assertions.assertEquals(response.requests.get(0)["contact-number"], CONTACT_NUMBER)
+
+    // Get app by id
+    response = webTestClient.get()
+      .uri("/v1/prisoners/apps/${response.id}")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponsePrisoner<Any, Prisoner>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponsePrisoner<Any, Prisoner>
+
+    Assertions.assertNotNull(response)
+
+    // get apps
+    val appsResponse = webTestClient.get()
+      .uri("/v1/prisoners/apps?pageNum=1")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<PrisonerAppsPage>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as PrisonerAppsPage
+    Assertions.assertEquals(1, appsResponse.page)
+    Assertions.assertEquals(1, appsResponse.totalRecords)
+    Assertions.assertNotNull(appsResponse.apps[0])
   }
 
   protected fun populateEstablishments() {
