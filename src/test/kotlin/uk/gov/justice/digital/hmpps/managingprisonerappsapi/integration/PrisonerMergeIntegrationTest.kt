@@ -14,9 +14,9 @@ import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AdditionalInformationMerge
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.HMPPSMergeDomainEvent
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.PrisonerEventSubscriberService.Companion.PRISONER_MERGE_EVENT_TYPE
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.AdditionalInformationMerge
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.HMPPSMergeDomainEvent
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.PrisonerEventSubscriberService.Companion.PRISONER_MERGE_EVENT_TYPE
 import java.time.Duration
 import java.time.Instant
 

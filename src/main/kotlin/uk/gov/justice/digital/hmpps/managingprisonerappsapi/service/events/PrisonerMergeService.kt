@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events
 
 interface PrisonerMergeService {
 

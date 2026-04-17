@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events
 
 import com.fasterxml.uuid.Generators
 import jakarta.transaction.Transactional
