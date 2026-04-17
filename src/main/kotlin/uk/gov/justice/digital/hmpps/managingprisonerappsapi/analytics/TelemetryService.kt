@@ -44,4 +44,30 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
       logger.error("Issue sending telemetry data: ${e.message}")
     }
   }
+
+  fun addTelemetryDataForPrisonerMerge(
+    // appId: UUID,
+    activity: Activity,
+    // establishment: String,
+    createdBy: String,
+    createdDate: LocalDateTime,
+    newPrisonerId: String,
+    appType: Long,
+    applicationGroup: Long,
+  ) {
+    try {
+      val map = LinkedHashMap<String, String>()
+      map["requestedBy"] = newPrisonerId
+      // map["appId"] = appId.toString()
+      map["appType"] = appType.toString()
+      map["appGroup"] = applicationGroup.toString()
+      map["dateTime"] = createdDate.format(FORMATTER)
+      map["createdBy"] = createdBy
+      // map["establishment"] = establishment
+
+      telemetryClient.trackEvent(activity.toString(), map, null)
+    } catch (e: Exception) {
+      logger.error("Issue sending merge telemetry data: ${e.message}")
+    }
+  }
 }

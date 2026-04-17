@@ -13,4 +13,3 @@ class EventProcessingComplete {
     // Used by tests to know when async processing is done
   }
 }
-

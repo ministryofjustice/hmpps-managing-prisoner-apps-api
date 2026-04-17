@@ -20,6 +20,7 @@ generic-service:
     SERVER_PORT: "8080"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
     HMPPS_SQS_USE_WEB_TOKEN: "true"
+    HMPPS_SQS_ENABLED: "true"  # Enable SQS in cloud environments
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:

@@ -16,7 +16,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean
 import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.helpers.LocalStackContainer
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.helpers.LocalStackContainer.setLocalStackProperties
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.EventProcessingComplete
 import uk.gov.justice.hmpps.sqs.HmppsQueue
 import uk.gov.justice.hmpps.sqs.HmppsQueueService
@@ -24,7 +23,7 @@ import uk.gov.justice.hmpps.sqs.MissingQueueException
 import uk.gov.justice.hmpps.sqs.countMessagesOnQueue
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles("test", "test-sqs") // Add test-sqs profile for SQS configuration
 @TestPropertySource(properties = ["spring.autoconfigure.exclude="])
 abstract class SqsIntegrationTestBase : IntegrationTestBase() {
 
@@ -48,8 +47,8 @@ abstract class SqsIntegrationTestBase : IntegrationTestBase() {
   protected val domainEventsTopicSnsClient by lazy { domainEventsTopic.snsClient }
   protected val domainEventsTopicArn by lazy { domainEventsTopic.arn }
 
-  protected val domainEventsQueue by lazy { 
-    hmppsQueueService.findByQueueId("domaineventsqueue") as HmppsQueue 
+  protected val domainEventsQueue by lazy {
+    hmppsQueueService.findByQueueId("domaineventsqueue") as HmppsQueue
   }
 
   @BeforeEach
@@ -62,8 +61,7 @@ abstract class SqsIntegrationTestBase : IntegrationTestBase() {
     } matches { it == 0 }
   }
 
-  fun getNumberOfMessagesCurrentlyOnQueue(): Int? = 
-    domainEventsQueue.sqsClient.countMessagesOnQueue(domainEventsQueue.queueUrl).get()
+  fun getNumberOfMessagesCurrentlyOnQueue(): Int? = domainEventsQueue.sqsClient.countMessagesOnQueue(domainEventsQueue.queueUrl).get()
 
   protected fun jsonString(any: Any): String = objectMapper.writeValueAsString(any)
 
@@ -74,8 +72,15 @@ abstract class SqsIntegrationTestBase : IntegrationTestBase() {
     @JvmStatic
     @DynamicPropertySource
     fun testcontainers(registry: DynamicPropertyRegistry) {
-      localStackContainer?.also { setLocalStackProperties(it, registry) }
+      if (localStackContainer != null) {
+        // LocalStack started by testcontainers - use its endpoint
+        LocalStackContainer.setLocalStackProperties(localStackContainer, registry)
+      } else {
+        // LocalStack already running on port 4566 - use localhost
+        registry.add("hmpps.sqs.enabled") { "true" }
+        registry.add("hmpps.sqs.localstackUrl") { "http://localhost:4566" }
+        registry.add("hmpps.sqs.region") { "eu-west-2" }
+      }
     }
   }
 }
-

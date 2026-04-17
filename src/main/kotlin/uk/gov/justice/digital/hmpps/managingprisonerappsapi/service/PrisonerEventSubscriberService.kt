@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.awspring.cloud.sqs.annotation.SqsListener
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 
 @Service
+@ConditionalOnProperty(name = ["hmpps.sqs.enabled"], havingValue = "true")
 class PrisonerEventSubscriberService(
   private val mapper: ObjectMapper,
   private val prisonerMergeService: PrisonerMergeService,
@@ -21,12 +23,12 @@ class PrisonerEventSubscriberService(
   fun onPrisonerDomainEvent(requestJson: String) {
     try {
       val hmppsMessage = mapper.readValue(requestJson, HMPPSMessage::class.java)
-      val eventType = hmppsMessage.messageAttributes.eventType.value
+      val eventType = hmppsMessage.MessageAttributes.eventType.Value
       log.info("Received message type: $eventType")
 
       when (eventType) {
         PRISONER_MERGE_EVENT_TYPE -> {
-          val mergeEvent = mapper.readValue(hmppsMessage.message, HMPPSMergeDomainEvent::class.java)
+          val mergeEvent = mapper.readValue(hmppsMessage.Message, HMPPSMergeDomainEvent::class.java)
           log.info("Processing prisoner merge: ${mergeEvent.additionalInformation.removedNomsNumber} -> ${mergeEvent.additionalInformation.nomsNumber}")
           prisonerMergeService.mergePrisonerNomsNumbers(
             mergeEvent.additionalInformation.nomsNumber,
@@ -38,7 +40,7 @@ class PrisonerEventSubscriberService(
           log.debug("Ignoring message with type $eventType")
         }
       }
-      
+
       eventProcessingComplete.complete()
     } catch (e: Exception) {
       log.error("Error processing prisoner domain event", e)
@@ -60,9 +62,17 @@ data class AdditionalInformationMerge(
   val removedNomsNumber: String,
 )
 
-data class HMPPSEventType(val value: String, val type: String)
-data class HMPPSMessageAttributes(val eventType: HMPPSEventType)
+// SNS notification wrapper - uses Pascal case as per AWS SNS format
+data class HMPPSEventType(
+  val Type: String, // Pascal case for SNS
+  val Value: String, // Pascal case for SNS
+)
+
+data class HMPPSMessageAttributes(
+  val eventType: HMPPSEventType,
+)
+
 data class HMPPSMessage(
-  val message: String,
-  val messageAttributes: HMPPSMessageAttributes,
+  val Message: String, // Pascal case for SNS
+  val MessageAttributes: HMPPSMessageAttributes, // Pascal case for SNS
 )
