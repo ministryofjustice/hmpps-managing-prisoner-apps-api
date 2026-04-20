@@ -36,6 +36,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
@@ -112,10 +113,10 @@ class AppServiceImplV2(
       app.applicationType!!,
       app.applicationGroup!!,
     )
-    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup).orElseThrow {
+    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
       throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
     }
-    val applicationType = applicationTypeRepository.findById(app.applicationType).orElseThrow {
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
       throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
     }
     return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup, applicationGroup, applicationType)
@@ -216,10 +217,10 @@ class AppServiceImplV2(
         app.applicationGroup!!,
       )
     }
-    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup).orElseThrow {
+    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
       throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
     }
-    val applicationType = applicationTypeRepository.findById(app.applicationType).orElseThrow {
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
       throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
     }
     return convertAppToAppResponseDto(app, prisonerId, assignedGroup, applicationGroup, applicationType)
@@ -252,10 +253,10 @@ class AppServiceImplV2(
     } else {
       prisoner = prisonerId
     }
-    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup).orElseThrow {
+    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
       throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
     }
-    val applicationType = applicationTypeRepository.findById(app.applicationType).orElseThrow {
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
       throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
     }
     return convertAppToAppResponseDto(app, prisoner, groupsDto, applicationGroup, applicationType)
@@ -330,10 +331,10 @@ class AppServiceImplV2(
         app.applicationGroup!!,
       )
     }
-    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup).orElseThrow {
+    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
       throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
     }
-    val applicationType = applicationTypeRepository.findById(app.applicationType).orElseThrow {
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
       throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
     }
     return convertAppToAppResponseDto(app, app.requestedBy, group, applicationGroup, applicationType)
@@ -470,6 +471,7 @@ class AppServiceImplV2(
       appRequest.requestedDate ?: localDateTime, // last modified date
       localDateTime, // created by
       staff.username,
+      SubmittedByType.STAFF,
       localDateTime,
       staff.username,
       mutableListOf(),
@@ -534,7 +536,7 @@ class AppServiceImplV2(
     apps.forEach { app ->
       val group = groupsService.getGroupById(app.assignedGroup, establishmentId)
       val groupAppListviewDto = GroupAppListViewDto(group.id, group.name, null)
-      val applicationType = applicationTypeRepository.findById(app.applicationType).orElseThrow {
+      val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
         ApiException("No app type found for ${app.applicationType}", HttpStatus.NOT_FOUND)
       }
       val appResponseDto = AppListViewDto(

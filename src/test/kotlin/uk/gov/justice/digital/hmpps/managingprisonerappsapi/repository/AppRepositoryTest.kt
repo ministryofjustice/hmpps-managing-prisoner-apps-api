@@ -5,18 +5,17 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.autoconfigure.domain.EntityScan
+import org.springframework.boot.persistence.autoconfigure.EntityScan
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -26,10 +25,8 @@ import java.util.*
 @EnableAutoConfiguration
 @EnableJpaRepositories(basePackages = ["uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository"])
 @EntityScan("uk.gov.justice.digital.hmpps.managingprisonerappsapi.model")
-@ExtendWith(SpringExtension::class)
 @ActiveProfiles("test")
 class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired val appFileRepository: AppFileRepository) {
-
   private val applicationGroupOne = 1L
   private val applicationTypeOne = 1L
   private val applicationTypeTwo = 2L
@@ -91,22 +88,22 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
       null,
       applicationTypeOne,
       applicationGroupOne,
-      false,
-      createdApp.requestedDate,
-      createdApp.createdDate,
-      createdApp.createdBy,
-      createdApp.lastModifiedDate,
-      createdApp.lastModifiedBy,
-      createdApp.comments,
-      listOf(HashMap<String, Any>()),
-      createdApp.requestedBy,
-      createdApp.requestedByFirstName,
-      createdApp.requestedByLastName,
-      createdApp.status,
-      Generators.timeBasedEpochGenerator().generate().toString(),
-      mutableListOf(),
-      false,
-      mutableListOf(),
+      requestedDate = createdApp.requestedDate,
+      createdDate = createdApp.createdDate,
+      createdBy = createdApp.createdBy,
+      submittedByType = SubmittedByType.STAFF,
+      lastModifiedDate = createdApp.lastModifiedDate,
+      lastModifiedBy = createdApp.lastModifiedBy,
+      comments = createdApp.comments,
+      requests = listOf(HashMap<String, Any>()),
+      requestedBy = createdApp.requestedBy,
+      requestedByFirstName = createdApp.requestedByFirstName,
+      requestedByLastName = createdApp.requestedByLastName,
+      status = createdApp.status,
+      establishmentId = Generators.timeBasedEpochGenerator().generate().toString(),
+      responses = mutableListOf(),
+      firstNightCenter = false,
+      appFiles = mutableListOf(),
     )
     app = appRepository.save(app)
     Assertions.assertEquals("new reference 123", app.reference)
