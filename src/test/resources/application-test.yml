@@ -16,6 +16,8 @@ hmpps:
     api:
       url: http://localhost:8093
       timeout: 10s
+  sqs:
+    enabled: false  # Disabled by default - enable in test-sqs profile for SQS tests
 
 # example client configuration for calling out to other services
 # TODO: Remove / replace this configuration
@@ -28,6 +30,11 @@ example-api:
 spring:
   application:
     name: hmpps-managing-prisoner-apps-api
+  main:
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude:
+      - uk.gov.justice.hmpps.sqs.HmppsSqsConfiguration  # Exclude SQS for regular tests
   jpa:
     hibernate:
       ddl-auto: update

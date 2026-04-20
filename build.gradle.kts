@@ -26,6 +26,8 @@ dependencies {
 
   implementation("org.flywaydb:flyway-database-postgresql")
 
+  // SQS/SNS dependencies
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:5.2.0") 
   testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
   testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.1.0")
@@ -34,6 +36,10 @@ dependencies {
     exclude(group = "io.swagger.core.v3")
   }
   testImplementation("com.h2database:h2:2.4.240")
+
+  // Localstack
+  testImplementation("org.testcontainers:localstack:1.20.4")
+  testImplementation("org.awaitility:awaitility-kotlin:4.2.2")
 }
 
 kotlin {

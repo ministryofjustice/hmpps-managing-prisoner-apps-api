@@ -5,6 +5,10 @@ info.app:
 spring:
   application:
     name: hmpps-managing-prisoner-apps-api
+  profiles:
+    group:
+      test-sqs:
+        - "localstack"
   codec:
     max-in-memory-size: 10MB
 

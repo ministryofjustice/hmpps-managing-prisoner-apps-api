@@ -1,0 +1,17 @@
+# LocalStack-specific configuration for local development and testing
+# This profile is automatically activated when using 'dev' or 'test' profiles
+
+hmpps:
+  sqs:
+    provider: localstack
+    localstackUrl: http://localhost:4566
+    region: eu-west-2
+    queues:
+      domaineventsqueue:
+        queueName: domainevents-queue
+        dlqName: domainevents-queue-dlq
+        subscribeTopicId: domainevents
+    topics:
+      domainevents:
+        arn: arn:aws:sns:eu-west-2:000000000000:domainevents-topic
+
