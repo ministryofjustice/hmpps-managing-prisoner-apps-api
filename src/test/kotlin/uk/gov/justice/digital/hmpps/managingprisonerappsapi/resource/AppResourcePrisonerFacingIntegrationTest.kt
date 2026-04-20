@@ -188,7 +188,7 @@ class AppResourcePrisonerFacingIntegrationTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<List<ApplicationGroupResponse> >() {})
+      .expectBody(object : ParameterizedTypeReference<List<ApplicationGroupResponse>>() {})
       .consumeWith(System.out::println)
       .returnResult()
       .responseBody as List<ApplicationGroupResponse>
