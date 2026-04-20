@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
@@ -175,6 +176,23 @@ class AppResourcePrisonerFacingIntegrationTest(
     Assertions.assertEquals(1, appsResponse.page)
     Assertions.assertEquals(1, appsResponse.totalRecords)
     Assertions.assertNotNull(appsResponse.apps[0])
+  }
+
+  @Test
+  fun `get app groups and types for logged prisoner`() {
+    val appsResponse = webTestClient.get()
+      .uri("/v1/prisoners/apps/groups")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<List<ApplicationGroupResponse>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as List<ApplicationGroupResponse>
+    Assertions.assertNotNull(appsResponse.get(0))
   }
 
   protected fun populateEstablishments() {

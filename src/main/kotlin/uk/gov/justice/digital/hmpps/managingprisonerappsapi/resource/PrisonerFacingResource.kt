@@ -117,7 +117,7 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     ],
   )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
-  @GetMapping("/prisoners/apps/types")
+  @GetMapping("/prisoners/apps/groups")
   fun getPrisonerAppTypes(
     authentication: Authentication,
   ): ResponseEntity<List<ApplicationGroupResponse>> {

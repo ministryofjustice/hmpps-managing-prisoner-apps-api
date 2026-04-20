@@ -92,7 +92,7 @@ class AppPrisonerFacingService(
   fun getAppGroupsAndTypesByLoggedUserEstablishment(prisonerId: String): List<ApplicationGroupResponse> {
     val prisoner = validatePrisoner(prisonerId)
     validateEstablishment(prisoner.establishmentId!!)
-    return establishmentService.getAppGroupsAndTypesByLoggedUserEstablishment(prisoner.establishmentId)
+    return establishmentService.getAppGroupsAndTypesForPrisonerEstablishment(prisoner.establishmentId)
   }
 
   private fun convertAppRequestToAppRequestEntity(appRequest: AppRequestPrisoner, prisonerId: String, prisoner: Prisoner, groupId: UUID, applicationType: Long, applicationGroup: Long): App {

@@ -79,6 +79,13 @@ class EstablishmentService(
     return convertApplicationGroupsToAppGroupsResponse(applicationGroupRepository.findAll(), establishment.blackListedAppGroups, establishment.blackListedAppTypes)
   }
 
+  fun getAppGroupsAndTypesForPrisonerEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
+    val establishment = establishmentRepository.findById(establishmentId).orElseThrow {
+      ApiException("Establishment: $establishmentId not enabled", HttpStatus.FORBIDDEN)
+    }
+    return convertApplicationGroupsToAppGroupsResponse(applicationGroupRepository.findAll(), establishment.blackListedAppGroups, establishment.blackListedAppTypes)
+  }
+
   private fun convertEstablishmentToEstablishmentDto(establishment: Establishment): EstablishmentDto = EstablishmentDto(
     id = establishment.id,
     name = establishment.name,
