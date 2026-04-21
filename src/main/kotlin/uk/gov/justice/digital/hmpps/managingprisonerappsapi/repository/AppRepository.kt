@@ -110,4 +110,15 @@ interface AppRepository : JpaRepository<App, UUID> {
   fun findAppsByRequestedBy(requestedBy: String): List<App>
 
   fun findAppsByRequestedBy(requestedBy: String, pageable: Pageable): Page<App>
+
+  @Query(
+    value = "SELECT COUNT(*) as count, a.applicationType as applicationType FROM App a " +
+      " WHERE (a.establishmentId = :establishmentId)" +
+      " AND (a.status = :status)" +
+      " AND (a.applicationType = :applicationType)" +
+      " AND (a.createdBy = :createdBy)" +
+      " GROUP BY a.applicationType ORDER BY a.applicationType ASC",
+    nativeQuery = false,
+  )
+  fun countAppsByStatusAndApplicationTypeAndCreatedBy(establishmentId: String, status: AppStatus, applicationType: Long, createdBy: String): Optional<AppByAppTypeCounts>
 }
