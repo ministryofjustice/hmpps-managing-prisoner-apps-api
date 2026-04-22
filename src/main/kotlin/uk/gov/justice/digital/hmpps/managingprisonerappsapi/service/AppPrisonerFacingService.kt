@@ -64,13 +64,17 @@ class AppPrisonerFacingService(
   }
 
   fun submitApp(appRequest: AppRequestPrisoner, prisonerId: String): AppResponsePrisoner<Any, Any> {
+    // validate prisoner exist
     val prisoner = validatePrisoner(prisonerId)
+    // validate establishment onboarded
     validateEstablishment(prisoner.establishmentId!!)
+    // validate no app request for give aplication type is in pending status.
     val applicationTypeCount = appRepository.countAppsByStatusAndApplicationTypeAndCreatedBy(
       prisoner.establishmentId!!,
       AppStatus.PENDING,
       appRequest.applicationType!!,
       prisoner.username,
+      SubmittedByType.PRISONER,
     )
     if (applicationTypeCount.isPresent) {
       throw ApiException(
@@ -131,6 +135,7 @@ class AppPrisonerFacingService(
       AppStatus.PENDING,
       appType,
       prisoner.username,
+      SubmittedByType.PRISONER,
     )
     var count = 0
     if (applicationTypeCounts.isPresent) {

@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedG
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByFirstNightCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import java.util.*
 
 @Repository
@@ -85,7 +86,6 @@ interface AppRepository : JpaRepository<App, UUID> {
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
       " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)", // +
-    // " ORDER BY a.requestedDate DESC",
     nativeQuery = false,
   )
   fun appsBySearchFilter(
@@ -117,8 +117,15 @@ interface AppRepository : JpaRepository<App, UUID> {
       " AND (a.status = :status)" +
       " AND (a.applicationType = :applicationType)" +
       " AND (a.createdBy = :createdBy)" +
+      " AND (a.submittedByType = :submittedByType)" +
       " GROUP BY a.applicationType ORDER BY a.applicationType ASC",
     nativeQuery = false,
   )
-  fun countAppsByStatusAndApplicationTypeAndCreatedBy(establishmentId: String, status: AppStatus, applicationType: Long, createdBy: String): Optional<AppByAppTypeCounts>
+  fun countAppsByStatusAndApplicationTypeAndCreatedBy(
+    establishmentId: String,
+    status: AppStatus,
+    applicationType: Long,
+    createdBy: String,
+    submittedByType: SubmittedByType,
+  ): Optional<AppByAppTypeCounts>
 }
