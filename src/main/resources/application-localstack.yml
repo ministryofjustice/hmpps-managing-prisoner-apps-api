@@ -3,6 +3,7 @@
 
 hmpps:
   sqs:
+    enabled: true
     provider: localstack
     localstackUrl: http://localhost:4566
     region: eu-west-2
@@ -14,4 +15,22 @@ hmpps:
     topics:
       domainevents:
         arn: arn:aws:sns:eu-west-2:000000000000:domainevents-topic
+
+  auth:
+    base-url: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
+    timeout: 10s
+  manage-users:
+    api:
+      url: https://manage-users-api-dev.hmpps.service.justice.gov.uk
+      timeout: 10s
+  prisoner-search:
+    api:
+      url: https://prisoner-search-dev.prison.service.justice.gov.uk
+      timeout: 10s
+
+example-api:
+  url: "http://localhost:8080"
+  client:
+    id: "example-api-client"
+    secret: "example-api-client-secret"
 

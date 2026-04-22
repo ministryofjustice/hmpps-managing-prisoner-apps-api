@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
@@ -10,15 +11,15 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.jdbc.Sql
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.AdditionalInformationMerge
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.HMPPSMergeDomainEvent
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.PrisonerEventSubscriberService.Companion.PRISONER_MERGE_EVENT_TYPE
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.Duration
 import java.time.Instant
+import java.util.*
 
 private const val OLD_NOMS_NUMBER = "A1234AA"
 private const val NEW_NOMS_NUMBER = "B1234BB"
@@ -29,19 +30,27 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
   lateinit var appRepository: AppRepository
 
   @Autowired
-  lateinit var commentRepository: CommentRepository
-
-  @Autowired
   lateinit var historyRepository: HistoryRepository
 
   private val awaitAtMost30Secs
     get() = await.atMost(Duration.ofSeconds(30))
 
+  @BeforeEach
+  fun setUp() {
+    // Clean up existing data
+    historyRepository.deleteAll()
+    appRepository.deleteAll()
+
+    // Create 3 apps for old NOMS number
+    appRepository.save(DataGenerator.generateOldNomsMergeApp1())
+    appRepository.save(DataGenerator.generateOldNomsMergeApp2())
+    appRepository.save(DataGenerator.generateOldNomsMergeApp3())
+
+    // Create 1 app for new NOMS number (already exists)
+    appRepository.save(DataGenerator.generateNewNomsMergeApp())
+  }
+
   @Test
-  @Sql(
-    "classpath:test_data/reset.sql",
-    "classpath:test_data/prisoner-merge.sql",
-  )
   fun `should merge prisoner app records when merge event received`() {
     // ARRANGE - Verify initial state
     assertThat(appRepository.findAppsByRequestedBy(OLD_NOMS_NUMBER)).hasSize(3)
@@ -77,9 +86,8 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     verify(telemetryClient).trackEvent(
       eq("PRISONER_ID_UPDATE"),
       argThat { map ->
-        map["requestedBy"] == NEW_NOMS_NUMBER &&
-          map["appType"] == "0" &&
-          map["appGroup"] == "1" &&
+        map["newPrisoneId"] == NEW_NOMS_NUMBER &&
+          map["removedPrisoneId"] == OLD_NOMS_NUMBER &&
           map["createdBy"] == "MANAGE_APPS_ADMIN" &&
           map.containsKey("dateTime") // dateTime is added by TelemetryService
       },
@@ -91,10 +99,6 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
   }
 
   @Test
-  @Sql(
-    "classpath:test_data/reset.sql",
-    "classpath:test_data/prisoner-merge.sql",
-  )
   fun `should not track telemetry event when no apps to merge`() {
     val nonExistentNomsNumber = "ZZ9999ZZ"
 
