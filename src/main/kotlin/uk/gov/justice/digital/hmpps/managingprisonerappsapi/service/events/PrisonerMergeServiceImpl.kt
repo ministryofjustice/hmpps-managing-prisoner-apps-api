@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.analytics.TelemetryService
@@ -23,11 +24,12 @@ class PrisonerMergeServiceImpl(
   private val historyRepository: HistoryRepository,
   private val telemetryService: TelemetryService,
   private val entityManager: EntityManager,
+  @Value("\${hmpps.merge.page-size:50}")
+  private val pageSize: Int,
 ) : PrisonerMergeService {
 
   companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
-    const val PAGE_SIZE = 50
   }
 
   @Transactional
@@ -39,7 +41,7 @@ class PrisonerMergeServiceImpl(
 
     // Process apps in pages.
     while (hasMoreApps) {
-      val pageable = PageRequest.of(0, PAGE_SIZE)
+      val pageable = PageRequest.of(0, pageSize)
       val appsPage = appRepository.findAppsByRequestedBy(removedNomsNumber, pageable)
 
       if (appsPage.isEmpty) {
@@ -75,7 +77,7 @@ class PrisonerMergeServiceImpl(
       entityManager.clear()
 
       // Continue if there might be more apps
-      hasMoreApps = appsPage.content.size == PAGE_SIZE
+      hasMoreApps = appsPage.content.size == pageSize
     }
 
     if (totalMergedApps > 0) {

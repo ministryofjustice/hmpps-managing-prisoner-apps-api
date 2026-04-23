@@ -11,14 +11,19 @@ import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.springframework.beans.factory.annotation.Autowired
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.AdditionalInformationMerge
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.HMPPSMergeDomainEvent
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.PrisonerEventSubscriberService.Companion.PRISONER_MERGE_EVENT_TYPE
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.assignedGroup
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.generateAppForMerge
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
 import java.util.*
 
 private const val OLD_NOMS_NUMBER = "A1234AA"
@@ -42,12 +47,12 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     appRepository.deleteAll()
 
     // Create 3 apps for old NOMS number
-    appRepository.save(DataGenerator.generateOldNomsMergeApp1())
-    appRepository.save(DataGenerator.generateOldNomsMergeApp2())
-    appRepository.save(DataGenerator.generateOldNomsMergeApp3())
+    appRepository.save(generateOldNomsMergeApp1())
+    appRepository.save(generateOldNomsMergeApp2())
+    appRepository.save(generateOldNomsMergeApp3())
 
     // Create 1 app for new NOMS number (already exists)
-    appRepository.save(DataGenerator.generateNewNomsMergeApp())
+    appRepository.save(generateNewNomsMergeApp())
   }
 
   @Test
@@ -156,4 +161,68 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
         )
     }
   }
+
+  fun generateNewNomsMergeApp(): App = generateAppForMerge(
+    id = UUID.fromString("11111111-1111-1111-1111-111111111114"),
+    reference = "REF-004",
+    assignedGroup = assignedGroup,
+    appType = AppType.PIN_PHONE_REMOVE_CONTACT,
+    applicationGroup = 1,
+    applicationType = 1,
+    requestedDate = LocalDateTime.of(2026, 1, 4, 10, 0, 0),
+    requestedBy = NEW_NOMS_NUMBER,
+    requestedByFirstName = "Jane",
+    requestedByLastName = "Smith",
+    status = AppStatus.PENDING,
+    establishmentId = "MDI",
+    firstNightCenter = false,
+  )
+
+  fun generateOldNomsMergeApp1(): App = generateAppForMerge(
+    id = UUID.fromString("11111111-1111-1111-1111-111111111111"),
+    reference = "REF-001",
+    assignedGroup = assignedGroup,
+    appType = AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
+    applicationGroup = 1,
+    applicationType = 1,
+    requestedDate = LocalDateTime.of(2026, 1, 1, 10, 0, 0),
+    requestedBy = OLD_NOMS_NUMBER,
+    requestedByFirstName = "John",
+    requestedByLastName = "Doe",
+    status = AppStatus.PENDING,
+    establishmentId = "MDI",
+    firstNightCenter = false,
+  )
+
+  fun generateOldNomsMergeApp2(): App = generateAppForMerge(
+    id = UUID.fromString("11111111-1111-1111-1111-111111111112"),
+    reference = "REF-002",
+    assignedGroup = assignedGroup,
+    appType = AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP,
+    applicationGroup = 1,
+    applicationType = 2,
+    requestedDate = LocalDateTime.of(2026, 1, 2, 10, 0, 0),
+    requestedBy = OLD_NOMS_NUMBER,
+    requestedByFirstName = "John",
+    requestedByLastName = "Doe",
+    status = AppStatus.DECLINED,
+    establishmentId = "MDI",
+    firstNightCenter = false,
+  )
+
+  fun generateOldNomsMergeApp3(): App = generateAppForMerge(
+    id = UUID.fromString("11111111-1111-1111-1111-111111111113"),
+    reference = "REF-003",
+    assignedGroup = assignedGroup,
+    appType = AppType.PIN_PHONE_ADD_NEW_OFFICIAL_CONTACT,
+    applicationGroup = 1,
+    applicationType = 1,
+    requestedDate = LocalDateTime.of(2026, 1, 3, 10, 0, 0),
+    requestedBy = OLD_NOMS_NUMBER,
+    requestedByFirstName = "John",
+    requestedByLastName = "Doe",
+    status = AppStatus.APPROVED,
+    establishmentId = "MDI",
+    firstNightCenter = true,
+  )
 }

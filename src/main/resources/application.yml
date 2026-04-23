@@ -2,6 +2,10 @@ info.app:
   name: HMPPS Managing Prisoner Apps Api
   version: 1.0
 
+hmpps:
+  merge:
+    page-size: 50
+
 spring:
   application:
     name: hmpps-managing-prisoner-apps-api

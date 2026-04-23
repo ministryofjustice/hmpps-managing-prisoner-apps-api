@@ -20,9 +20,6 @@ import java.util.*
 class DataGenerator {
   companion object {
 
-    private const val OLD_NOMS_NUMBER = "A1234AA"
-    private const val NEW_NOMS_NUMBER = "B1234BB"
-
     val MESSAGE = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit." +
       " Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes," +
       " nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis," +
@@ -207,70 +204,6 @@ class DataGenerator {
       establishmentId = establishmentId,
       responses = mutableListOf(),
       firstNightCenter = firstNightCenter,
-    )
-
-    fun generateNewNomsMergeApp(): App = generateAppForMerge(
-      id = UUID.fromString("11111111-1111-1111-1111-111111111114"),
-      reference = "REF-004",
-      assignedGroup = assignedGroup,
-      appType = AppType.PIN_PHONE_REMOVE_CONTACT,
-      applicationGroup = 1,
-      applicationType = 1,
-      requestedDate = LocalDateTime.of(2026, 1, 4, 10, 0, 0),
-      requestedBy = NEW_NOMS_NUMBER,
-      requestedByFirstName = "Jane",
-      requestedByLastName = "Smith",
-      status = AppStatus.PENDING,
-      establishmentId = "MDI",
-      firstNightCenter = false,
-    )
-
-    fun generateOldNomsMergeApp1(): App = generateAppForMerge(
-      id = UUID.fromString("11111111-1111-1111-1111-111111111111"),
-      reference = "REF-001",
-      assignedGroup = assignedGroup,
-      appType = AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
-      applicationGroup = 1,
-      applicationType = 1,
-      requestedDate = LocalDateTime.of(2026, 1, 1, 10, 0, 0),
-      requestedBy = OLD_NOMS_NUMBER,
-      requestedByFirstName = "John",
-      requestedByLastName = "Doe",
-      status = AppStatus.PENDING,
-      establishmentId = "MDI",
-      firstNightCenter = false,
-    )
-
-    fun generateOldNomsMergeApp2(): App = generateAppForMerge(
-      id = UUID.fromString("11111111-1111-1111-1111-111111111112"),
-      reference = "REF-002",
-      assignedGroup = assignedGroup,
-      appType = AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP,
-      applicationGroup = 1,
-      applicationType = 2,
-      requestedDate = LocalDateTime.of(2026, 1, 2, 10, 0, 0),
-      requestedBy = OLD_NOMS_NUMBER,
-      requestedByFirstName = "John",
-      requestedByLastName = "Doe",
-      status = AppStatus.DECLINED,
-      establishmentId = "MDI",
-      firstNightCenter = false,
-    )
-
-    fun generateOldNomsMergeApp3(): App = generateAppForMerge(
-      id = UUID.fromString("11111111-1111-1111-1111-111111111113"),
-      reference = "REF-003",
-      assignedGroup = assignedGroup,
-      appType = AppType.PIN_PHONE_ADD_NEW_OFFICIAL_CONTACT,
-      applicationGroup = 1,
-      applicationType = 1,
-      requestedDate = LocalDateTime.of(2026, 1, 3, 10, 0, 0),
-      requestedBy = OLD_NOMS_NUMBER,
-      requestedByFirstName = "John",
-      requestedByLastName = "Doe",
-      status = AppStatus.APPROVED,
-      establishmentId = "MDI",
-      firstNightCenter = true,
     )
   }
 
