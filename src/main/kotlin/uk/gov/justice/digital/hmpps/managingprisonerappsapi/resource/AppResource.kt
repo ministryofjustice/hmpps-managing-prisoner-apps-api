@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
-import io.swagger.v3.oas.annotations.Operation
+/*import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -33,13 +33,15 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNam
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
-import java.util.*
+import java.util.**/
 
-@RestController
-@RequestMapping("v2")
-class AppResource(@Qualifier("appServiceV2") var appService: AppService) {
+/*@RestController
+@RequestMapping("v2")*/
+class AppResource(
+  // @Qualifier("appServiceV2") var appService: AppService
+) {
 
-  companion object {
+  /*companion object {
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
@@ -305,5 +307,5 @@ class AppResource(@Qualifier("appServiceV2") var appService: AppService) {
     authentication as AuthAwareAuthenticationToken
     val searchResult = appService.searchRequestedByTextSearch(authentication.principal, name)
     return ResponseEntity.status(HttpStatus.OK).body(searchResult)
-  }
+  }*/
 }
