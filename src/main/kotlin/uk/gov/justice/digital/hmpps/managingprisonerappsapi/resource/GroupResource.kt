@@ -126,10 +126,10 @@ class GroupResource(private val groupService: GroupService) {
     return ResponseEntity.status(HttpStatus.OK).build()
   }*/
 
-  @Tag(name = "Groups")
+  @Tag(name = "Departments")
   @Operation(
-    summary = "Get list of groups by logged user active caseload id.",
-    description = "This api endpoint is for getting list of all groups for an establishment where establishment is logged user active case load id. Requires role ROLE_MANAGING_PRISONER_APPS",
+    summary = "Get list of departments of establishment by logged user active caseload id.",
+    description = "This api endpoint is for getting list of all departments for an establishment where establishment is logged user active case load id. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "Establishment add successfully"),
@@ -156,6 +156,25 @@ class GroupResource(private val groupService: GroupService) {
     return ResponseEntity.status(HttpStatus.OK).body(groups)
   }
 
+  @Tag(name = "Departments")
+  @Operation(
+    summary = "Get list of departments enable for a given application type.",
+    description = "This api endpoint is for getting list of all department enabled to handle request for a given application type. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   @GetMapping("/groups/app/types/{type}", produces = [MediaType.APPLICATION_JSON_VALUE])
   fun getGroupsByAppType(
