@@ -2,12 +2,12 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events
 
 import com.fasterxml.uuid.Generators
 import jakarta.persistence.EntityManager
-import jakarta.transaction.Transactional
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.analytics.TelemetryService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
