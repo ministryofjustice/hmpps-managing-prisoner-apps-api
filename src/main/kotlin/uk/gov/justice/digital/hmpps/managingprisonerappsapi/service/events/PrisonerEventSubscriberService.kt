@@ -45,7 +45,7 @@ class PrisonerEventSubscriberService(
       eventProcessingComplete.complete()
     } catch (e: Exception) {
       log.error("Error processing prisoner domain event", e)
-      throw e
+      throw RuntimeException("Error processing prisoner domain event", e)
     }
   }
 }

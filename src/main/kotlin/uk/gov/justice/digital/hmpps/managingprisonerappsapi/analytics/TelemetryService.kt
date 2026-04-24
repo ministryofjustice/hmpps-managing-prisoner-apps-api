@@ -51,6 +51,7 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
     createdDate: LocalDateTime,
     newPrisonerId: String,
     removedPrisonerId: String,
+    status: String,
   ) {
     try {
       val map = LinkedHashMap<String, String>()
@@ -59,6 +60,7 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
       map["createdBy"] = createdBy
       map["newPrisoneId"] = newPrisonerId
       map["removedPrisoneId"] = removedPrisonerId
+      map["status"] = status
 
       telemetryClient.trackEvent(activity.toString(), map, null)
     } catch (e: Exception) {
