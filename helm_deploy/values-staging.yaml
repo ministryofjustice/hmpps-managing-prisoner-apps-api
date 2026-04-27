@@ -20,5 +20,5 @@ generic-prometheus-alerts:
   alertSeverity: hmpps-managing-prisoner-apps-nonprod
   businessHoursOnly: true
   sqsAlertsQueueNames:
-    - "Digital-Prison-Services-staging-managing_prisoner_apps_domain_events_queue"
-    - "Digital-Prison-Services-staging-managing_prisoner_apps_domain_events_dl"
+    - "hmpps-launchpad-staging-managing_prisoner_apps_domain_events_queue"
+    - "hmpps-launchpad-staging-managing_prisoner_apps_domain_events_dl"

@@ -5,6 +5,13 @@ info.app:
 hmpps:
   merge:
     page-size: 50
+  sqs:
+    enabled: false  # Disabled - cloud dev(values.yml) overrides with HMPPS_SQS_ENABLED=true
+    region: eu-west-2
+    queues:
+      domaineventsqueue:
+        queueName: ${HMPPS_SQS_QUEUES_DOMAINEVENTSQUEUE_QUEUE_NAME}
+        dlqName: ${HMPPS_SQS_QUEUES_DOMAINEVENTSQUEUE_DLQ_NAME}
 
 spring:
   application:

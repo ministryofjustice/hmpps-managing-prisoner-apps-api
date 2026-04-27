@@ -22,5 +22,5 @@ generic-prometheus-alerts:
   rdsAlertsDatabases:
     cloud-platform-xxxxxx: "managing-prisoner-apps"
   sqsAlertsQueueNames:
-    - "Digital-Prison-Services-dev-managing_prisoner_apps_domain_events_queue"
-    - "Digital-Prison-Services-dev-managing_prisoner_apps_domain_events_dl"
+    - "hmpps-launchpad-dev-managing_prisoner_apps_domain_events_queue"
+    - "hmpps-launchpad-dev-managing_prisoner_apps_domain_events_dl"
