@@ -10,6 +10,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExcept
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.StaffType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import java.time.LocalDateTime
@@ -84,8 +87,21 @@ class HistoryServiceImpl(
   private fun convertHistoryEntityToHistory(history: List<History>): List<HistoryResponse> {
     val map = mutableMapOf<String, HistoryResponse>()
     history.forEach { h ->
-      val createdBy = staffService.getStaffById(h.createdBy).orElseThrow {
-        ApiException("Staff with id ${h.createdBy} does not exist", HttpStatus.NOT_FOUND)
+      var createdBy: Staff
+      if (h.createdBy == StaffType.MANAGE_APPS_ADMIN.name) {
+        createdBy = Staff(
+          StaffType.MANAGE_APPS_ADMIN.name,
+          StaffType.MANAGE_APPS_ADMIN.name,
+          StaffType.MANAGE_APPS_ADMIN.name,
+          UserCategory.STAFF,
+          "MERGE_EVENT",
+          "Admin",
+          Generators.timeBasedEpochGenerator().generate(),
+        )
+      } else {
+        createdBy = staffService.getStaffById(h.createdBy).orElseThrow {
+          ApiException("Staff with id ${h.createdBy} does not exist", HttpStatus.NOT_FOUND)
+        }
       }
       var groupName: String = ""
       if (h.activity != Activity.FORWARDING_COMMENT_ADDED && h.activity != Activity.APP_FORWARDED_TO_A_GROUP && h.activity != Activity.APP_SUBMITTED && h.activity != Activity.FILE_ADDED) {
@@ -166,6 +182,7 @@ class HistoryServiceImpl(
       Activity.FORWARDING_COMMENT_ADDED, Activity.APP_FORWARDED_TO_A_GROUP -> x = "Forwarding comment added by $staffName"
       Activity.APP_APPROVED -> x = "Marked as approved by $staffName"
       Activity.APP_DECLINED -> x = "Marked as declined by $staffName"
+      Activity.PRISONER_ID_UPDATE -> x = "Prisoner merged by $staffName"
       else -> throw ApiException("Unknown activity type: $activity", HttpStatus.INTERNAL_SERVER_ERROR)
     }
     return x

@@ -22,3 +22,5 @@ hmpps:
     api:
       url: https://prisoner-search-dev.prison.service.justice.gov.uk
       timeout: 10s
+  sqs:
+    enabled: false  # Disabled for local dev - cloud dev overrides with HMPPS_SQS_ENABLED=true
