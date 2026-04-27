@@ -16,5 +16,5 @@ generic-service:
 generic-prometheus-alerts:
   alertSeverity: hmpps-managing-prisoner-apps-prod
   sqsAlertsQueueNames:
-    - "Digital-Prison-Services-prod-managing_prisoner_apps_domain_events_queue"
-    - "Digital-Prison-Services-prod-managing_prisoner_apps_domain_events_dl"
+    - "hmpps-launchpad-prod-managing_prisoner_apps_domain_events_queue"
+    - "hmpps-launchpad-prod-managing_prisoner_apps_domain_events_dl"
