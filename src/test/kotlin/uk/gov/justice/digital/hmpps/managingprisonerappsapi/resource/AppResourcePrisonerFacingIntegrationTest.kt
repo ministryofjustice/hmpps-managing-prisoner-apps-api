@@ -12,6 +12,7 @@ import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
@@ -193,6 +194,71 @@ class AppResourcePrisonerFacingIntegrationTest(
       .returnResult()
       .responseBody as List<ApplicationGroupResponse>
     Assertions.assertNotNull(appsResponse.get(0))
+  }
+
+  @Test
+  fun `get logged prisoner apps count by application type`() {
+    appRepository.deleteAll()
+    var response = webTestClient.get()
+      .uri("/v1/prisoners/apps/$applicationTypeOne/pending")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<ApplicationTypeResponse>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as ApplicationTypeResponse
+    Assertions.assertEquals(0, response.count)
+
+    // add app request
+    val app = webTestClient.post()
+      .uri("/v1/prisoners/apps")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(
+        AppRequestPrisoner(
+          null,
+          1L,
+          true,
+          listOf(
+            HashMap<String, Any>()
+              .apply {
+                // put("amount", 10)
+                put("contact-number", CONTACT_NUMBER)
+                // put("firstName", "John")
+                // put("lastName", "Smith")
+              },
+          ),
+        ),
+      )
+      .exchange()
+      .expectStatus().isCreated
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponsePrisoner<Any, Prisoner>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponsePrisoner<Any, Prisoner>
+
+    Assertions.assertNotNull(app)
+
+    // verify count is 1 in getting app count by application type
+    response = webTestClient.get()
+      .uri("/v1/prisoners/apps/$applicationTypeOne/pending")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<ApplicationTypeResponse>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as ApplicationTypeResponse
+    Assertions.assertEquals(1, response.count)
   }
 
   protected fun populateEstablishments() {
