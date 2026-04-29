@@ -40,7 +40,8 @@ class AppPrisonerFacingService(
   fun getAppsByPrisonerId(prisonerId: String, pageNumber: Long, pageSize: Long): PrisonerAppsPage {
     val prisoner = validatePrisoner(prisonerId)
     validateEstablishment(prisoner.establishmentId!!)
-    val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(Sort.Direction.ASC, "createdDate")
+    val pageRequest =
+      PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(Sort.Direction.ASC, "createdDate")
     val pageResult = appRepository.findAppsByRequestedBy(prisonerId, pageRequest)
     return PrisonerAppsPage(
       pageResult.pageable.pageNumber + 1,
@@ -63,15 +64,38 @@ class AppPrisonerFacingService(
   }
 
   fun submitApp(appRequest: AppRequestPrisoner, prisonerId: String): AppResponsePrisoner<Any, Any> {
+    // validate prisoner exist
     val prisoner = validatePrisoner(prisonerId)
+    // validate establishment onboarded
     validateEstablishment(prisoner.establishmentId!!)
+    // validate no app request for give aplication type is in pending status.
+    val applicationTypeCount = appRepository.countAppsByStatusAndApplicationTypeAndCreatedBy(
+      prisoner.establishmentId!!,
+      AppStatus.PENDING,
+      appRequest.applicationType!!,
+      prisoner.username,
+      SubmittedByType.PRISONER,
+    )
+    if (applicationTypeCount.isPresent) {
+      throw ApiException(
+        "There is already a pending app request for  application type ${appRequest.applicationType}",
+        HttpStatus.BAD_REQUEST,
+      )
+    }
     val groups = groupService.getGroupByInitialAppType(prisoner.establishmentId!!, appRequest.applicationType!!)
     if (groups.isEmpty()) {
       throw ApiException("No department found to assigned app request", HttpStatus.BAD_REQUEST)
     }
     val applicationType = applicationTypeRepository.findById(appRequest.applicationType!!)
       .orElseThrow { ApiException("No application type found for $appRequest", HttpStatus.BAD_REQUEST) }
-    val app = convertAppRequestToAppRequestEntity(appRequest, prisonerId, prisoner, groups[0].id, applicationType.applicationGroup!!.id, applicationType.id)
+    val app = convertAppRequestToAppRequestEntity(
+      appRequest,
+      prisonerId,
+      prisoner,
+      groups[0].id,
+      applicationType.applicationGroup!!.id,
+      applicationType.id,
+    )
     val appEntity = appRepository.save(app)
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
     activityService.addActivity(
@@ -86,7 +110,13 @@ class AppPrisonerFacingService(
       app.applicationType!!,
       app.applicationGroup!!,
     )
-    return convertAppEntityToAppResponse(appEntity, prisoner, groups[0].id, applicationType.applicationGroup!!, applicationType)
+    return convertAppEntityToAppResponse(
+      appEntity,
+      prisoner,
+      groups[0].id,
+      applicationType.applicationGroup!!,
+      applicationType,
+    )
   }
 
   fun getAppGroupsAndTypesByLoggedUserEstablishment(prisonerId: String): List<ApplicationGroupResponse> {
@@ -95,7 +125,40 @@ class AppPrisonerFacingService(
     return establishmentService.getAppGroupsAndTypesForPrisonerEstablishment(prisoner.establishmentId)
   }
 
-  private fun convertAppRequestToAppRequestEntity(appRequest: AppRequestPrisoner, prisonerId: String, prisoner: Prisoner, groupId: UUID, applicationType: Long, applicationGroup: Long): App {
+  fun getPrisonerAppsCountInPending(prisonerId: String, appType: Long): ApplicationTypeResponse {
+    val prisoner = validatePrisoner(prisonerId)
+    val applicationType = applicationTypeRepository.findById(appType).orElseThrow {
+      ApiException("No application type found for id: $appType", HttpStatus.BAD_REQUEST)
+    }
+    val applicationTypeCounts = appRepository.countAppsByStatusAndApplicationTypeAndCreatedBy(
+      prisoner.establishmentId!!,
+      AppStatus.PENDING,
+      appType,
+      prisoner.username,
+      SubmittedByType.PRISONER,
+    )
+    var count = 0
+    if (applicationTypeCounts.isPresent) {
+      count = applicationTypeCounts.get().getCount()
+    }
+    return ApplicationTypeResponse(
+      applicationType.id,
+      applicationType.name,
+      applicationType.genericType,
+      applicationType.genericForm,
+      applicationType.logDetailRequired,
+      count.toLong(),
+    )
+  }
+
+  private fun convertAppRequestToAppRequestEntity(
+    appRequest: AppRequestPrisoner,
+    prisonerId: String,
+    prisoner: Prisoner,
+    groupId: UUID,
+    applicationType: Long,
+    applicationGroup: Long,
+  ): App {
     val localDateTime = LocalDateTime.now(ZoneOffset.UTC)
     var firstNightCenter = false
     return App(
