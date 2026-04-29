@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.argThat
@@ -46,6 +47,9 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     historyRepository.deleteAll()
     appRepository.deleteAll()
 
+    // Purge SQS queue
+    purgeQueueSafely()
+
     // Create 3 apps for old NOMS number
     appRepository.save(generateOldNomsMergeApp1())
     appRepository.save(generateOldNomsMergeApp2())
@@ -53,6 +57,12 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
 
     // Create 1 app for new NOMS number (already exists)
     appRepository.save(generateNewNomsMergeApp())
+  }
+
+  @AfterEach
+  fun tearDown() {
+    // Clean up after test
+    purgeQueueSafely()
   }
 
   @Test
@@ -225,4 +235,17 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     establishmentId = "MDI",
     firstNightCenter = true,
   )
+
+  private fun purgeQueueSafely() {
+    try {
+      domainEventsQueue.sqsClient.purgeQueue {
+        it.queueUrl(domainEventsQueue.queueUrl)
+      }
+      // AWS requires 60 seconds between purge calls, but 1 second is enough for tests
+      Thread.sleep(1000)
+    } catch (e: Exception) {
+      // Ignore errors - queue might not exist or already empty
+      println("Queue purge skipped: ${e.message}")
+    }
+  }
 }

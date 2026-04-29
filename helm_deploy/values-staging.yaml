@@ -10,9 +10,18 @@ generic-service:
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: "applicationinsights.dev.json"
     SPRING_PROFILES_ACTIVE: "staging"
+    HMPPS_SQS_ENABLED: "true"  # Enable SQS in cloud environments
+    HMPPS_SQS_USE_WEB_TOKEN: "true"
+
     # Template kotlin calls out to itself to provide an example of a service call
     # TODO: This should be replaced by a call to a different service, or removed
     EXAMPLE_API_URL: "https://managing-prisoner-apps-api-staging.hmpps.service.justice.gov.uk"
+
+  namespace_secrets:
+    managing-prisoner-apps-domain-events-sqs-instance-output:
+      HMPPS_SQS_QUEUES_DOMAINEVENTSQUEUE_QUEUE_NAME: "sqs_queue_name"
+    managing-prisoner-apps-domain-events-sqs-dl-instance-output:
+      HMPPS_SQS_QUEUES_DOMAINEVENTSQUEUE_DLQ_NAME: "sqs_queue_name"
 
 # CloudPlatform AlertManager receiver to route prometheus alerts to slack
 # See https://user-guide.cloud-platform.service.justice.gov.uk/documentation/monitoring-an-app/how-to-create-alarms.html#creating-your-own-custom-alerts
