@@ -10,6 +10,8 @@ generic-service:
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: "applicationinsights.dev.json"
     SPRING_PROFILES_ACTIVE: "preprod"
+    HMPPS_SQS_ENABLED: "false"  # Disabled SQS in preprod cloud environments
+
     # Template kotlin calls out to itself to provide an example of a service call
     # TODO: This should be replaced by a call to a different service, or removed
     EXAMPLE_API_URL: "https://managing-prisoner-apps-api-preprod.hmpps.service.justice.gov.uk"
@@ -19,6 +21,3 @@ generic-service:
 generic-prometheus-alerts:
   alertSeverity: hmpps-managing-prisoner-apps-nonprod
   businessHoursOnly: true
-  sqsAlertsQueueNames:
-    - "hmpps-launchpad-preprod-managing_prisoner_apps_domain_events_queue"
-    - "hmpps-launchpad-preprod-managing_prisoner_apps_domain_events_dl"

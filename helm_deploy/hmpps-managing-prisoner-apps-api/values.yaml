@@ -22,8 +22,6 @@ generic-service:
     JAVA_OPTS: "-Xmx512m"
     SERVER_PORT: "8080"
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: applicationinsights.json
-    HMPPS_SQS_USE_WEB_TOKEN: "true"
-    HMPPS_SQS_ENABLED: "true"  # Enable SQS in cloud environments
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -44,10 +42,6 @@ generic-service:
       DB_USERNAME: "database_username"
       DB_PASSWORD: "database_password"
       DB_ENDPOINT: "rds_instance_endpoint"
-    managing-prisoner-apps-domain-events-sqs-instance-output:
-      HMPPS_SQS_QUEUES_DOMAINEVENTSQUEUE_QUEUE_NAME: "sqs_queue_name"
-    managing-prisoner-apps-domain-events-sqs-dl-instance-output:
-      HMPPS_SQS_QUEUES_DOMAINEVENTSQUEUE_DLQ_NAME: "sqs_queue_name"
 
   allowlist:
     groups:
