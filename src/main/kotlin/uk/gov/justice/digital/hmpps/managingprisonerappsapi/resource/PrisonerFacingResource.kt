@@ -40,8 +40,8 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
   @Tag(name = "Prisoner Apps")
   @Operation(
     summary = "Get apps for  a prisoner",
-    description = "This api endpoint to get prisoner apps. Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    description = "This api endpoint to get prisoner apps. Requires role ROLE_PRISONER_FACING_APPS",
+    security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "Successfully got prisoner apps."),
       ApiResponse(
@@ -56,7 +56,7 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   @GetMapping("/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
   fun getPrisonerApps(
     @RequestParam(value = "pageNum", required = true) pageNum: Long,
@@ -72,8 +72,8 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
   @Tag(name = "Prisoner Apps")
   @Operation(
     summary = "Get app by app id for a logged prisoner",
-    description = "This api endpoint to get prisoner app by app id . Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    description = "This api endpoint to get prisoner app by app id . Requires role ROLE_PRISONER_FACING_APPS",
+    security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "Successfully got app by app id."),
       ApiResponse(
@@ -88,7 +88,7 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   @GetMapping("/prisoners/apps/{id}")
   fun getPrisonerAppByAppId(
     @PathVariable("id") id: UUID,
@@ -103,8 +103,8 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
   @Tag(name = "Prisoner Apps")
   @Operation(
     summary = "Get app groups and app types.",
-    description = "This api endpoint to app groups and app types for a logged prisoner. Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    description = "This api endpoint to app groups and app types for a logged prisoner. Requires role ROLE_PRISONER_FACING_APPS",
+    security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "App request created."),
       ApiResponse(
@@ -119,7 +119,7 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   @GetMapping("/prisoners/apps/groups")
   fun getPrisonerAppTypes(
     authentication: Authentication,
@@ -132,8 +132,8 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
   @Tag(name = "Prisoner Apps")
   @Operation(
     summary = "Get app count in pending status by application type",
-    description = "This api endpoint to app groups and app types for a logged prisoner. Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    description = "This api endpoint to app groups and app types for a logged prisoner. Requires role ROLE_PRISONER_FACING_APPS",
+    security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "App request created."),
       ApiResponse(
@@ -148,7 +148,7 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   @GetMapping("/prisoners/apps/{applicationType}/pending")
   fun getPrisonerPendingAppCountByAppType(
     @PathVariable("applicationType") applicationType: Long,
@@ -163,8 +163,8 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
   @Tag(name = "Prisoner Apps")
   @Operation(
     summary = "Submit App request for a prisoner",
-    description = "This api endpoint is for submitting app request by  a logged prisoner.  Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    description = "This api endpoint is for submitting app request by  a logged prisoner.  Requires role ROLE_PRISONER_FACING_APPS",
+    security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
     responses = [
       ApiResponse(responseCode = "201", description = "App request submitted"),
       ApiResponse(
@@ -184,7 +184,7 @@ class PrisonerFacingResource(private val appPrisonerFacingService: AppPrisonerFa
     produces = [MediaType.APPLICATION_JSON_VALUE],
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   fun submitApp(
     @RequestBody appRequestPrisoner: AppRequestPrisoner,
     authentication: Authentication,

@@ -111,7 +111,7 @@ class AppResourcePrisonerFacingIntegrationTest(
   fun `submit an app by prisoner and get app by id`() {
     var response = webTestClient.post()
       .uri("/v1/prisoners/apps")
-      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
@@ -148,7 +148,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     // Get app by id
     response = webTestClient.get()
       .uri("/v1/prisoners/apps/${response.id}")
-      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
@@ -164,7 +164,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     // get apps
     val appsResponse = webTestClient.get()
       .uri("/v1/prisoners/apps?pageNum=1")
-      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
@@ -183,7 +183,7 @@ class AppResourcePrisonerFacingIntegrationTest(
   fun `get app groups and types for logged prisoner`() {
     val appsResponse = webTestClient.get()
       .uri("/v1/prisoners/apps/groups")
-      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
@@ -201,7 +201,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     appRepository.deleteAll()
     var response = webTestClient.get()
       .uri("/v1/prisoners/apps/$applicationTypeOne/pending")
-      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
@@ -216,7 +216,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     // add app request
     val app = webTestClient.post()
       .uri("/v1/prisoners/apps")
-      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .bodyValue(
@@ -248,7 +248,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     // verify count is 1 in getting app count by application type
     response = webTestClient.get()
       .uri("/v1/prisoners/apps/$applicationTypeOne/pending")
-      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
