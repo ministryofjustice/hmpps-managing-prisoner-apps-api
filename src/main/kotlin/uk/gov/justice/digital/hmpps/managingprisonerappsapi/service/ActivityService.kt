@@ -26,7 +26,7 @@ class ActivityService(
     applicationGroup: Long,
   ) {
     appType as Long
-    historyService.updateActivityInHistory(entityId, entityType, appId, activity, establishment, createdBy, createdDate)
+    historyService.updateActivityInHistory(entityId, entityType, appId, activity, establishment, createdBy, createdDate, null)
     telemetryService.addTelemetryData(
       entityId,
       entityType,

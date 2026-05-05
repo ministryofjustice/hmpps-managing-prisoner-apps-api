@@ -1,9 +1,18 @@
 # LocalStack-specific configuration for local development and testing
-# This profile is automatically activated when using 'dev' or 'test' profiles
+# This profile is automatically activated when using 'localstack' profile
 
+# Remove the spring.autoconfigure.exclude to enable SQS integration with LocalStack
+# Also set hmpps.sqs.enabled to true to enable the SQS configuration for LocalStack
+# SPRING_PROFILES_ACTIVE=localstack and start localstack container.
+# (docker run --rm -d -p 4566:4566 -e SERVICES=sns,sqs --name localstack localstack/localstack:community-archive)
+
+spring:
+  autoconfigure:
+    exclude:
+      - uk.gov.justice.hmpps.sqs.HmppsSqsConfiguration
 hmpps:
   sqs:
-    enabled: true
+    enabled: false
     provider: localstack
     localstackUrl: http://localhost:4566
     region: eu-west-2

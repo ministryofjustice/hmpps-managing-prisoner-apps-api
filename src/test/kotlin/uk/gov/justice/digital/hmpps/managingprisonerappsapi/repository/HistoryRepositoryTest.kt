@@ -38,6 +38,7 @@ class HistoryRepositoryTest(@Autowired private val historyRepository: HistoryRep
       "ETS",
       "A12345",
       LocalDateTime.now(ZoneOffset.UTC),
+      null,
     )
     val entity = historyRepository.save(history)
 
