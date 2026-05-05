@@ -37,7 +37,7 @@ class HistoryServiceImpl(
     return convertHistoryEntityToHistory(history)
   }
 
-  override fun updateActivityInHistory(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime) {
+  override fun updateActivityInHistory(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime, reference: String?) {
     logger.info("Updating history for entity:$entityType, activity: $activity,  entityType: $entityType, appId: $appId")
     val history = historyRepository.save(
       History(
@@ -49,6 +49,7 @@ class HistoryServiceImpl(
         establishment,
         createdBy,
         createdDate,
+        reference,
       ),
     )
   }

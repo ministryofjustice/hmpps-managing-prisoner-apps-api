@@ -28,7 +28,7 @@ class PrisonerMergeBatchProcessor(
   }
 
   @Transactional
-  fun updateBatch(appsPage: Page<App>, mergedNomsNumber: String, createdOn: LocalDateTime): Int {
+  fun updateBatch(appsPage: Page<App>, mergedNomsNumber: String, removedNomsNumber: String, createdOn: LocalDateTime): Int {
     try {
       var updatedCount = 0
 
@@ -47,6 +47,7 @@ class PrisonerMergeBatchProcessor(
           app.establishmentId,
           StaffType.MANAGE_APPS_ADMIN.toString(),
           createdOn,
+          removedNomsNumber,
         )
         historyRepository.save(history)
         updatedCount++

@@ -46,7 +46,7 @@ class PrisonerMergeServiceImpl(
         }
 
         try {
-          val batchCount = batchProcessor.updateBatch(appsPage, mergedNomsNumber, createdOn)
+          val batchCount = batchProcessor.updateBatch(appsPage, mergedNomsNumber, removedNomsNumber, createdOn)
           totalMergedApps += batchCount
         } catch (e: Exception) {
           failedBatches++

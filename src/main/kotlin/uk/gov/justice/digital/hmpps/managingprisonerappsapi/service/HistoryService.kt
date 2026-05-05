@@ -10,5 +10,5 @@ interface HistoryService {
 
   fun getHistoryByAppId(appId: UUID, establishment: String): List<HistoryResponse>
 
-  fun updateActivityInHistory(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime)
+  fun updateActivityInHistory(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime, reference: String?)
 }
