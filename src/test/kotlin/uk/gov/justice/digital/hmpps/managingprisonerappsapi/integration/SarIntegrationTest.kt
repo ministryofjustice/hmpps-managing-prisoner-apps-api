@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
@@ -212,6 +213,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       genericForm = false,
       requestedDate = LocalDateTime.of(2026, 1, 10, 10, 30),
       createdDate = LocalDateTime.of(2026, 1, 10, 10, 30),
+      submittedByType = SubmittedByType.PRISONER,
       createdBy = "staff.one",
       lastModifiedDate = LocalDateTime.of(2026, 1, 15, 0, 0),
       lastModifiedBy = "staff.two",
@@ -300,6 +302,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           establishment = ESTABLISHMENT_ID,
           createdBy = "staff.one",
           createdDate = LocalDateTime.of(2026, 1, 10, 11, 0),
+          reference = null,
         ),
         History(
           id = UUID.fromString("30000000-0000-0000-0000-000000000002"),
@@ -310,6 +313,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           establishment = ESTABLISHMENT_ID,
           createdBy = "staff.one",
           createdDate = LocalDateTime.of(2026, 1, 11, 9, 15),
+          reference = null,
         ),
         History(
           id = UUID.fromString("30000000-0000-0000-0000-000000000003"),
@@ -320,6 +324,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           establishment = ESTABLISHMENT_ID,
           createdBy = "staff.two",
           createdDate = LocalDateTime.of(2026, 1, 15, 0, 0),
+          reference = null,
         ),
       ),
     )

@@ -60,7 +60,7 @@ class SarServiceTest {
     groupRepository = Mockito.mock(GroupRepository::class.java)
     appFileRepository = Mockito.mock(AppFileRepository::class.java)
 
-    sarService = SarService(
+    sarService = SarServiceImpl(
       appRepository,
       applicationTypeRepository,
       historyRepository,
@@ -126,6 +126,7 @@ class SarServiceTest {
         establishmentId,
         "staff-1",
         LocalDateTime.of(2026, 1, 10, 11, 0),
+        reference = null,
       ),
       History(
         UUID.randomUUID(),
@@ -136,6 +137,7 @@ class SarServiceTest {
         establishmentId,
         "staff-1",
         LocalDateTime.of(2026, 1, 11, 9, 15),
+        reference = null,
       ),
       History(
         UUID.randomUUID(),
@@ -146,6 +148,7 @@ class SarServiceTest {
         establishmentId,
         "staff-2",
         LocalDateTime.of(2026, 1, 15, 0, 0),
+        reference = null,
       ),
     )
     val appFile = AppFile(fileId, "document-1", "proof-of-id.pdf", LocalDateTime.of(2026, 1, 11, 9, 0), "staff-1", "application/pdf")

@@ -16,6 +16,48 @@ hmpps:
     api:
       url: http://localhost:8093
       timeout: 10s
+  document:
+    api:
+      url: https://document-api-dev.hmpps.service.justice.gov.uk
+      timeout: 10s
+
+  sar:
+    template:
+      enabled: true
+      path: /sar/templates/sar_template.mustache
+    tests:
+      # When generate-actual is true the SAR tests write the actual output to
+      # src/test/resources/*.log scratch files AND the @AfterEach tearDown in
+      # SarIntegrationTestBase automatically promotes them into:
+      #   src/test/resources/sar/expected/jpa-entity-schema.json
+      #   src/test/resources/sar/expected/sar-api-response.json
+      #   src/test/resources/sar/expected/sar-report-output.html
+      #
+      # To regenerate expected snapshots:
+      #   1. Set generate-actual: true
+      #   2. Set generate-actual: true
+      generate-actual: false
+      expected-api-response-path: /sar/expected/sar-api-response.json
+      expected-jpa-entity-schema-path: /sar/expected/jpa-entity-schema.json
+      expected-render-result-path: /sar/expected/sar-report-output.html
+      attachments-expected: true
+
+  # SQS configuration for tests
+  # Tests that don't need SQS should use @ActiveProfiles("test") only
+  # Tests that need SQS should use @ActiveProfiles("test", "test-sqs")
+  sqs:
+    enabled: false  # Disabled by default, enable in test-sqs profile
+    provider: localstack
+    localstackUrl: http://localhost:4566
+    region: eu-west-2
+    queues:
+      domaineventsqueue:
+        queueName: domainevents-queue
+        dlqName: domainevents-queue-dlq
+        subscribeTopicId: domainevents
+    topics:
+      domainevents:
+        arn: arn:aws:sns:eu-west-2:000000000000:domainevents-topic
 
 # example client configuration for calling out to other services
 # TODO: Remove / replace this configuration
@@ -28,14 +70,22 @@ example-api:
 spring:
   application:
     name: hmpps-managing-prisoner-apps-api
+  main:
+    allow-bean-definition-overriding: true  # Required for test mocking
+  autoconfigure:
+    exclude:
+      - uk.gov.justice.hmpps.sqs.HmppsSqsConfiguration  # Exclude SQS by default for non-SQS tests
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
   datasource:
     username: sa
     password: password
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
   flyway:
     enabled: false
