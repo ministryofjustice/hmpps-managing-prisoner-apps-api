@@ -41,7 +41,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
-class AppResourceIntegrationTest(
+open class AppResourceIntegrationTest(
   @Autowired private val appRepository: AppRepository,
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
@@ -51,37 +51,37 @@ class AppResourceIntegrationTest(
   @Autowired private val appFileRepository: AppFileRepository,
 ) : IntegrationTestBase() {
 
-  private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
-  private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
-  private val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
-  private val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
-  private val assignedGroupFirstName = "Business Hub"
-  private val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
-  private val assignedGroupSecondName = "OMU"
-  private val requestedByFirst = "A12345"
-  private val requestedByFirstMainName = "John"
-  private val requestedByFirstSurname = "Smith"
-  private val requestedBySecondMainName = "John"
-  private val requestedBySecondSurname = "Butler"
-  private val requestedBySecond = "B12345"
-  private val requestedByThird = "C12345"
-  private val requestedByThirdMainName = "Test"
-  private val requestedByThirdSurname = "User"
+  protected val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
+  protected val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
+  protected val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
+  protected val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
+  protected val assignedGroupFirstName = "Business Hub"
+  protected val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
+  protected val assignedGroupSecondName = "OMU"
+  protected val requestedByFirst = "A12345"
+  protected val requestedByFirstMainName = "John"
+  protected val requestedByFirstSurname = "Smith"
+  protected val requestedBySecondMainName = "John"
+  protected val requestedBySecondSurname = "Butler"
+  protected val requestedBySecond = "B12345"
+  protected val requestedByThird = "C12345"
+  protected val requestedByThirdMainName = "Test"
+  protected val requestedByThirdSurname = "User"
 
-  private val applicationGroupOne = 1L
-  private val applicationTypeOne = 1L
-  private val applicationTypeTwo = 2L
-  private val applicationTypeThree = 3L
-  private val applicationTypeFour = 4L
+  protected val applicationGroupOne = 1L
+  protected val applicationTypeOne = 1L
+  protected val applicationTypeTwo = 2L
+  protected val applicationTypeThree = 3L
+  protected val applicationTypeFour = 4L
 
-  private val applicationGroupOneName = "Bt PIN PHONES"
-  private val applicationTypeOneName = "Add new Social Contact"
-  private val applicationTypeTwoName = "Add new Official Contact"
-  private val applicationTypeThreeName = "Remove Contact"
-  private val applicationTypeFourName = "Add Generic Pin Phone enquiry"
+  protected val applicationGroupOneName = "Bt PIN PHONES"
+  protected val applicationTypeOneName = "Add new Social Contact"
+  protected val applicationTypeTwoName = "Add new Official Contact"
+  protected val applicationTypeThreeName = "Remove Contact"
+  protected val applicationTypeFourName = "Add Generic Pin Phone enquiry"
 
-  private lateinit var appIdFirst: UUID
-  private lateinit var appIdSecond: UUID
+  protected lateinit var appIdFirst: UUID
+  protected lateinit var appIdSecond: UUID
 
   @BeforeEach
   fun setUp() {
@@ -668,7 +668,7 @@ class AppResourceIntegrationTest(
     Assertions.assertNotNull(response.assignedGroup.name)
   }
 
-  private fun populateEstablishments() {
+  protected fun populateEstablishments() {
     establishmentRepository.save(
       Establishment(
         establishmentIdFirst,
@@ -701,7 +701,7 @@ class AppResourceIntegrationTest(
     )
   }
 
-  private fun populateGroups() {
+  protected fun populateGroups() {
     groupRepository.save(
       DataGenerator.generateGroups(
         assignedGroupFirst,
@@ -731,7 +731,7 @@ class AppResourceIntegrationTest(
     )
   }
 
-  private fun populateApplicationGroupsAndTypes() {
+  protected fun populateApplicationGroupsAndTypes() {
     val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false, false)
     val removeContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false, false)
     val addOfficialContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false, false)
@@ -741,7 +741,7 @@ class AppResourceIntegrationTest(
     applicationGroupRepository.save<ApplicationGroup>(applicationGroupOne)
   }
 
-  private fun populateApps() {
+  protected fun populateApps() {
     appIdFirst = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,

@@ -20,6 +20,7 @@ data class History(
   val establishment: String,
   val createdBy: String,
   val createdDate: LocalDateTime,
+  val reference: String?,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

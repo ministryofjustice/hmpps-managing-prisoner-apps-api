@@ -172,6 +172,25 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
     return ResponseEntity.status(HttpStatus.OK).body(appTypes)
   }
 
+  @Tag(name = "Establishments")
+  @Operation(
+    summary = "Get application groups by establishment id",
+    description = "This api endpoint is for getting an application groups by establishment id. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
   @GetMapping("/v2/establishments/apps/groups", produces = [MediaType.APPLICATION_JSON_VALUE])
   @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
   fun getAppGroupsByEstablishment(authentication: Authentication): ResponseEntity<List<ApplicationGroupResponse>> {

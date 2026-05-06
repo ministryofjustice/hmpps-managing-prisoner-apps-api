@@ -29,13 +29,15 @@ data class App(
   val requestedDate: LocalDateTime,
   val createdDate: LocalDateTime,
   val createdBy: String,
+  @Enumerated(EnumType.STRING)
+  val submittedByType: SubmittedByType,
   var lastModifiedDate: LocalDateTime,
   var lastModifiedBy: String,
   @ElementCollection
   var comments: MutableList<UUID>,
   @JdbcTypeCode(SqlTypes.JSON)
   var requests: List<MutableMap<String, Any>>,
-  val requestedBy: String,
+  var requestedBy: String,
   val requestedByFirstName: String,
   val requestedByLastName: String,
   @Enumerated(EnumType.STRING)

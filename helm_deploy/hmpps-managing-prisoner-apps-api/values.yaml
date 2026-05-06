@@ -9,6 +9,9 @@ generic-service:
     tag: app_version # override at deployment time
     port: 8080
 
+  # Use IRSA service account for AWS access (SQS, SNS)
+  serviceAccountName: "hmpps-managing-prisoner-apps"
+
   ingress:
     enabled: true
     host: app-hostname.local # override per environment
@@ -46,3 +49,5 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: hmpps-managing-prisoner-apps-api
+  sqsAlertsTotalMessagesThreshold: 1
+  sqsAlertsOldestThreshold: 10
