@@ -93,8 +93,8 @@ class AppPrisonerFacingService(
       prisonerId,
       prisoner,
       groups[0].id,
-      applicationType.applicationGroup!!.id,
       applicationType.id,
+      applicationType.applicationGroup!!.id,
     )
     val appEntity = appRepository.save(app)
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
