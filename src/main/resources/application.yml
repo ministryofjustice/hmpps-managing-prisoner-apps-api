@@ -5,10 +5,10 @@ info.app:
 hmpps:
   service:
     name: hmpps-managing-prisoner-apps
-    sar:
-      template:
-        path: /sar/templates/sar_template.mustache
-        enabled: true
+  sar:
+    template:
+      path: /sar/templates/sar_template.mustache
+      enabled: true
   merge:
     page-size: 50
   sqs:

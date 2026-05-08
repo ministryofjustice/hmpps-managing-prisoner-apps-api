@@ -1,20 +1,16 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration
 
-import com.fasterxml.jackson.databind.MapperFeature
-import com.fasterxml.jackson.databind.json.JsonMapper
 import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.AfterEach
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
-import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.config.SarTestConfig
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelper
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SarIntegrationTestHelperConfig
 import uk.gov.justice.digital.hmpps.subjectaccessrequest.SubjectAccessRequestResponse
 import java.nio.file.Paths
 import java.time.LocalDate
-import java.util.Optional
 
 /**
  * Base class for SAR integration tests that extends IntegrationTestBase
@@ -38,6 +34,7 @@ abstract class SarIntegrationTestBase : IntegrationTestBase() {
       "entity-schema.json.log" to "jpa-entity-schema.json",
       "sar-api-response.json.log" to "sar-api-response.json",
       "sar-generated-report.html.log" to "sar-report-output.html",
+      "sar-generated-report.pdf.log" to "sar-report-output.pdf",
     )
   }
 
@@ -47,11 +44,6 @@ abstract class SarIntegrationTestBase : IntegrationTestBase() {
   /**
    * When generateActual is true, copies the .log scratch files written by the library
    * into src/test/resources/sar/expected/ so they become the new expected snapshots.
-   *
-   * File mappings:
-   *   entity-schema.json.log          -> sar/expected/jpa-entity-schema.json
-   *   sar-api-response.json.log       -> sar/expected/sar-api-response.json
-   *   sar-generated-report.html.log   -> sar/expected/sar-report-output.html
    */
   @AfterEach
   fun tearDown() {
@@ -97,47 +89,19 @@ abstract class SarIntegrationTestBase : IntegrationTestBase() {
   abstract fun getEntityManagerInstance(): EntityManager
 
   /**
-   * Workaround for Spring 6.2 incompatibility: StatusAssertions.isOk() now returns void
-   * instead of WebTestClient.ResponseSpec, breaking the library's chaining.
-   * Uses isEqualTo(HttpStatus.OK) which still returns ResponseSpec.
+   * Delegates to the library's requestSarData which calls GET /subject-access-request
+   * and queries the actual database with the test data inserted by setupTestData().
    */
   protected fun requestSarData(
     prn: String?,
     crn: String?,
     fromDate: LocalDate?,
     toDate: LocalDate?,
-  ): SubjectAccessRequestResponse {
-    val objectMapper = JsonMapper.builder()
-      .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
-      .build()
-
-    val response = webTestClient.get().uri {
-      it.path("/subject-access-request")
-        .queryParamIfPresent("prn", Optional.ofNullable(prn))
-        .queryParamIfPresent("crn", Optional.ofNullable(crn))
-        .queryParamIfPresent("fromDate", Optional.ofNullable(fromDate))
-        .queryParamIfPresent("toDate", Optional.ofNullable(toDate))
-        .build()
-    }
-      .headers(setAuthorisation(roles = listOf("ROLE_SAR_DATA_ACCESS")))
-      .exchange()
-      .expectStatus().isEqualTo(HttpStatus.OK)
-      .expectBody(String::class.java)
-      .returnResult().responseBody!!
-
-    return objectMapper.readValue(response, SubjectAccessRequestResponse::class.java)
-  }
+  ): SubjectAccessRequestResponse = getSarHelper().requestSarData(prn, crn, fromDate, toDate, webTestClient)
 
   /**
-   * Workaround for Spring 6.2 incompatibility for the template endpoint.
+   * Delegates to the library's requestSarTemplate which calls GET /subject-access-request/template
+   * and returns the actual sar_template.mustache from src/main/resources.
    */
-  protected fun requestSarTemplate(): String = webTestClient
-    .get().uri {
-      it.path("/subject-access-request/template").build()
-    }
-    .headers(setAuthorisation(roles = listOf("ROLE_SAR_DATA_ACCESS")))
-    .exchange()
-    .expectStatus().isEqualTo(HttpStatus.OK)
-    .expectBody(String::class.java)
-    .returnResult().responseBody!!
+  protected fun requestSarTemplate(): String = getSarHelper().requestSarTemplate(webTestClient)
 }

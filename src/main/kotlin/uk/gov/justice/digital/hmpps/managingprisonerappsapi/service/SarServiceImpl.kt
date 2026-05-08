@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AttachmentHeader
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.FormDataItem
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnApp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnAppAttachment
@@ -10,7 +11,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnAppC
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnAppHistory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnAppResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarContent
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarContentAndAttachments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRe
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
-import uk.gov.justice.hmpps.kotlin.sar.Attachment
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.LocalDate
 import java.util.UUID
@@ -53,22 +52,20 @@ class SarServiceImpl(
     if (apps.isEmpty()) {
       return null
     }
-    val sarData: SarContentAndAttachments? = convertAppsToSarContent(apps)
+    val sarData: SarContent? = convertAppsToSarContent(apps)
     return sarData?.let {
-      HmppsSubjectAccessRequestContent(content = it.content as Any, attachments = it.attachments)
+      HmppsSubjectAccessRequestContent(content = sarData)
     }
   }
 
-  override fun convertAppsToSarContent(apps: List<App>): SarContentAndAttachments? {
+  override fun convertAppsToSarContent(apps: List<App>): SarContent? {
     if (apps.isEmpty()) return null
     val list = mutableListOf<PrnApp>()
     val firstName = apps.get(0).requestedByFirstName
     val lastName = apps.get(0).requestedByLastName
     val prisonerId = apps.get(0).requestedBy
-    val allPrnAttachments = mutableListOf<Attachment>()
 
     apps.forEach { app ->
-      var fileCount = 1
       val histories = historyRepository.findByAppIdAndEstablishmentOrderByCreatedDate(app.id, app.establishmentId)
       val prnApphistory = mutableListOf<PrnAppHistory>()
       histories.forEach { history ->
@@ -76,7 +73,7 @@ class SarServiceImpl(
           PrnAppHistory(
             convertActivityToStatement(history.activity, history.entityId),
             history.createdDate,
-            // history.createdBy,
+            history.createdBy,
           ),
         )
       }
@@ -110,32 +107,19 @@ class SarServiceImpl(
       val attachments = appFileRepository.findByAppId(app.id)
       val appAttachments = mutableListOf<PrnAppAttachment>()
       if (attachments.isNotEmpty()) {
+        val attachmentHeaderList: List<AttachmentHeader> = listOf(AttachmentHeader("Service-Name", serviceName))
+
         attachments.forEach { attachment ->
           appAttachments.add(
             PrnAppAttachment(
-              app.id,
-              serviceName,
-              fileCount,
-              attachment.fileName,
-              "Scanned Sheet",
-              documentApiurl + attachment.fileName + "/" + UUID.fromString(attachment.documentId),
+              attachment.fileType,
+              // TODO
+              // documentApiurl +  "/documents/" + UUID.fromString(attachment.documentId) + "/file",
+              "https://dummyimage.com/350x200/1a1a1a/ffffff&text=New%20Pin%20Phone%20request",
               1200, // TODO -Actual size from DB
-              attachment.fileType,
+              attachmentHeaderList,
             ),
           )
-          allPrnAttachments.add(
-            Attachment(
-              // Ref No. //TODO
-              // Namespace //TODO
-              fileCount,
-              "Scanned Sheet", // TODO File Name from DB
-              attachment.fileType,
-              documentApiurl + attachment.fileName + "/" + UUID.fromString(attachment.documentId),
-              1200, // TODO - Actual size from DB
-              attachment.fileName,
-            ),
-          )
-          fileCount++
         }
       }
 
@@ -161,7 +145,6 @@ class SarServiceImpl(
         app.establishmentId,
         assignedGroup.get().name,
         prnApphistory,
-        app.requests,
         formDataItems,
         prnAppComments,
         prnAppResponses,
@@ -170,7 +153,7 @@ class SarServiceImpl(
       list.add(prnApp)
     }
     val sarContent = SarContent(firstName, lastName, prisonerId, list)
-    return SarContentAndAttachments(sarContent, allPrnAttachments)
+    return sarContent
   }
 
   override fun convertActivityToStatement(activity: Activity, entityId: UUID): String {
@@ -188,6 +171,8 @@ class SarServiceImpl(
       return "App request forwarded to a approval department."
     } else if (activity == Activity.APP_REQUEST_FORM_DATA_UPDATED) {
       return "App request form data updated"
+    } else if (activity == Activity.PRISONER_ID_UPDATE) {
+      return "Prisoner Id updated"
     } else if (activity == Activity.FILE_ADDED) {
       val file = appFileRepository.findById(entityId)
       var fileName = ""

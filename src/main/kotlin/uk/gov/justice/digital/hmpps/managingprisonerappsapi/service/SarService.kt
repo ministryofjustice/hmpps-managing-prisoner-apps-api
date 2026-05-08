@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarContentAndAttachments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarContent
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
@@ -18,7 +18,7 @@ interface SarService : HmppsPrisonSubjectAccessRequestService {
    * @param apps List of apps to convert
    * @return SarContentAndAttachments containing the SAR content and associated attachments, or null if the list is empty
    */
-  fun convertAppsToSarContent(apps: List<App>): SarContentAndAttachments?
+  fun convertAppsToSarContent(apps: List<App>): SarContent?
 
   /**
    * Converts an activity to a human-readable statement.

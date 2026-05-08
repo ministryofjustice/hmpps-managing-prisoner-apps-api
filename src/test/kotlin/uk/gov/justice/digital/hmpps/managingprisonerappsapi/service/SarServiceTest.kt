@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.FormDataItem
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarContent
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
@@ -180,7 +181,10 @@ class SarServiceTest {
     assertEquals(AppStatus.PENDING, prnApp.status)
     assertEquals("Add social contact", prnApp.type)
     assertEquals(establishmentId, prnApp.establishment)
-    assertEquals(includedApp.requests, prnApp.formData)
+    val expectedFormDataItems = includedApp.requests.flatMap { requestMap ->
+      requestMap.entries.map { (key, value) -> FormDataItem(key, value.toString()) }
+    }
+    assertEquals(expectedFormDataItems, prnApp.formDataItems)
     assertEquals(
       listOf(
         "App request submitted.",
