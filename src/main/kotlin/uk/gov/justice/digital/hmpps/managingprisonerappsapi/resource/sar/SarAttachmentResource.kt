@@ -22,7 +22,7 @@ class SarAttachmentResource(
   private val documentApiClient: DocumentApiClient,
 ) {
 
-  //TODO - Remove 'MANAGING_PRISONER_APPS'
+  // TODO - Remove 'MANAGING_PRISONER_APPS'
   @GetMapping("/{documentId}/file")
   @PreAuthorize("hasAnyRole('ROLE_DOCUMENT_READER', 'MANAGING_PRISONER_APPS')")
   @Operation(
