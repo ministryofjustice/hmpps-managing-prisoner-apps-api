@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppReposi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ESTABLISHMENT_ID_1
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -50,6 +51,7 @@ class AppPrisonerFacingServiceTest {
   private lateinit var establishmentService: EstablishmentService
   private lateinit var applicationGroupRepository: ApplicationGroupRepository
   private lateinit var applicationTypeRepository: ApplicationTypeRepository
+  private lateinit var responseRepository: ResponseRepository
 
   private lateinit var appService: AppPrisonerFacingService
   private lateinit var app: App
@@ -66,6 +68,7 @@ class AppPrisonerFacingServiceTest {
     establishmentService = Mockito.mock(EstablishmentService::class.java)
     applicationTypeRepository = Mockito.mock(ApplicationTypeRepository::class.java)
     applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
+    responseRepository = Mockito.mock(ResponseRepository::class.java)
     // app.submittedByType = SubmittedByType.PRISONER
 
     establishment =
@@ -130,6 +133,7 @@ class AppPrisonerFacingServiceTest {
     )
     appService = AppPrisonerFacingService(
       appRepository,
+      responseRepository,
       applicationTypeRepository,
       prisonerService,
       groupService,
