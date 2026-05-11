@@ -16,6 +16,11 @@ spring:
 hmpps:
   self:
     url: https://managing-prisoner-apps-api-dev.hmpps.service.justice.gov.uk
+  sqs:
+    queues:
+      domaineventsqueue:
+        queueName: ${HMPPS_SQS_QUEUES_DOMAINEVENTSQUEUE_QUEUE_NAME}
+        dlqName: ${HMPPS_SQS_QUEUES_DOMAINEVENTSQUEUE_DLQ_NAME}
   auth:
     base-url: https://sign-in-dev.hmpps.service.justice.gov.uk/auth
     timeout: 10s

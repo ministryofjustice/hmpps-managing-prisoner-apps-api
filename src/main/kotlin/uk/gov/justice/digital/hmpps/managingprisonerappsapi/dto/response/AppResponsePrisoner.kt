@@ -26,4 +26,5 @@ data class AppResponsePrisoner<X, Y>(
   val requestedByLastName: String,
   val status: AppStatus,
   val establishmentId: String,
+  val reason: String?,
 )
