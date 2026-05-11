@@ -63,7 +63,7 @@ class AppPrisonerFacingService(
       .orElseThrow { ApiException("No application type found for id: ${app.applicationType}", HttpStatus.BAD_REQUEST) }
     var reason: String? = null
     if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED) {
-      val responseId = app.requests[0].get("responseId") as UUID
+      val responseId = UUID.fromString(app.requests[0].get("responseId") as String)
       val response = responseRepository.findById(responseId)
         .orElseThrow { ApiException("Response with id $responseId not found", HttpStatus.INTERNAL_SERVER_ERROR) }
       if (response.reason.isNotEmpty()) {
