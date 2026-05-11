@@ -23,6 +23,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -30,6 +31,7 @@ import java.util.*
 @Service
 class AppPrisonerFacingService(
   private val appRepository: AppRepository,
+  private val responseRepository: ResponseRepository,
   private val applicationTypeRepository: ApplicationTypeRepository,
   private val prisonerService: PrisonerService,
   private val groupService: GroupService,
@@ -60,7 +62,15 @@ class AppPrisonerFacingService(
     val group = groupService.getGroupById(app.assignedGroup)
     val applicationType = applicationTypeRepository.findById(app.applicationType!!)
       .orElseThrow { ApiException("No application type found for id: ${app.applicationType}", HttpStatus.BAD_REQUEST) }
-    return convertAppEntityToAppResponse(app, prisoner, group, applicationType.applicationGroup!!, applicationType)
+    var reason: String? = null
+    if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED) {
+      val responseId = app.requests[0].get("responseId") as UUID
+      val response = responseRepository.findById(responseId).orElseThrow { ApiException("Response with id $responseId not found", HttpStatus.INTERNAL_SERVER_ERROR) }
+      if (response.reason.isNotEmpty()) {
+        reason = response.reason
+      }
+    }
+    return convertAppEntityToAppResponse(app, prisoner, group, applicationType.applicationGroup!!, applicationType, reason)
   }
 
   fun submitApp(appRequest: AppRequestPrisoner, prisonerId: String): AppResponsePrisoner<Any, Any> {
@@ -116,6 +126,7 @@ class AppPrisonerFacingService(
       groups[0].id,
       applicationType.applicationGroup!!,
       applicationType,
+      null
     )
   }
 
@@ -193,6 +204,7 @@ class AppPrisonerFacingService(
     assignedGroup: Any,
     applicationGroup: ApplicationGroup,
     applicationType: ApplicationType,
+    reason: String?,
   ): AppResponsePrisoner<Any, Any> = AppResponsePrisoner(
     app.id,
     app.reference,
@@ -211,6 +223,7 @@ class AppPrisonerFacingService(
     app.requestedByLastName,
     app.status,
     app.establishmentId,
+    reason,
   )
 
   private fun convertRequestsToAppRequests(requests: List<Map<String, Any>>): List<MutableMap<String, Any>> {
@@ -226,7 +239,7 @@ class AppPrisonerFacingService(
     return appRequests
   }
 
-  private fun convertAppToAppResponsePrisonerFacing(
+  /*private fun convertAppToAppResponsePrisonerFacing(
     app: App,
     prisoner: Any,
     assignedGroup: Any,
@@ -249,7 +262,7 @@ class AppPrisonerFacingService(
     app.requestedByLastName,
     app.status,
     app.establishmentId,
-  )
+  )*/
 
   private fun convertAppsToAppResponsePrisonerFacing(apps: List<App>): List<AppListPrisonerFacing> {
     val appList = ArrayList<AppListPrisonerFacing>()
