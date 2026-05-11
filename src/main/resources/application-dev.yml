@@ -38,7 +38,6 @@ hmpps:
       timeout: 10s
   sar:
     additionalAccessRole: MANAGING_PRISONER_APPS
-  sqs:
-    enabled: false  # Disabled for local dev - cloud dev overrides with HMPPS_SQS_ENABLED=true
+
 
 

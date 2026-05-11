@@ -23,13 +23,13 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRe
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar.SarService
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar.SarServiceImpl
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar.SarService
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar.SarServiceImpl
 
 class SarServiceTest {
 
@@ -43,6 +43,7 @@ class SarServiceTest {
   private val typeId = 1L
   private val documentApiUrl = "https://document-api-dev.hmpps.service.justice.gov.uk"
   private val serviceName = "hmpps-managing-prisoner-apps"
+  private val selfUrl = "http://localhost:8080"
 
   private lateinit var appRepository: AppRepository
   private lateinit var applicationTypeRepository: ApplicationTypeRepository
@@ -74,6 +75,7 @@ class SarServiceTest {
       responseRepository,
       documentApiUrl,
       serviceName,
+      selfUrl,
     )
   }
 

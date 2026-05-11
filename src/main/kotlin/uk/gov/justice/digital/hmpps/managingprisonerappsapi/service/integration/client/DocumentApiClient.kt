@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.integration.client
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -12,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import java.time.Duration
 import java.util.Base64
-import com.fasterxml.jackson.databind.ObjectMapper
 
 @Component
 class DocumentApiClient(

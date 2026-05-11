@@ -9,8 +9,8 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
-import java.util.*
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import java.util.*
 
 @Component
 class HmppsAuthClient(private var webClientBuilder: WebClient.Builder) {
@@ -49,13 +49,13 @@ class HmppsAuthClient(private var webClientBuilder: WebClient.Builder) {
       } else {
         throw ApiException(
           "Response code ${response.statusCode.value()} making request to Hmpps auth for access token",
-          HttpStatus.INTERNAL_SERVER_ERROR
+          HttpStatus.INTERNAL_SERVER_ERROR,
         )
       }
     } catch (e: WebClientResponseException) {
       throw ApiException(
         "Response code ${e.statusCode.value()} making request to Hmpps auth for access token",
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       )
     }
   }
