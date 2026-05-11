@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarContent
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
+package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
@@ -36,6 +36,7 @@ class SarServiceImpl(
   private val responseRepository: ResponseRepository,
   @Value("\${hmpps.document.api.url}") private val documentApiurl: String,
   @Value("\${hmpps.service.name}") private val serviceName: String,
+  @Value("\${hmpps.self.url}") private val selfUrl: String,
 ) : SarService {
 
   override fun getPrisonContentFor(
@@ -113,10 +114,8 @@ class SarServiceImpl(
           appAttachments.add(
             PrnAppAttachment(
               attachment.fileType,
-              // TODO
-              // documentApiurl +  "/documents/" + UUID.fromString(attachment.documentId) + "/file",
-              "https://dummyimage.com/350x200/1a1a1a/ffffff&text=New%20Pin%20Phone%20request",
-              1200, // TODO -Actual size from DB
+              "$selfUrl/sar/attachments/${attachment.documentId}/file",
+              1200, // TODO - Actual size from DB
               attachmentHeaderList,
             ),
           )

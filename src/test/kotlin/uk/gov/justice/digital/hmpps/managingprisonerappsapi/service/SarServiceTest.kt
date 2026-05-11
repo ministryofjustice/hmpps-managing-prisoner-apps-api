@@ -28,6 +28,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar.SarService
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar.SarServiceImpl
+
 class SarServiceTest {
 
   private val establishmentId = "MDI"

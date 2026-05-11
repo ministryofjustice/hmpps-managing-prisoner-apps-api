@@ -1,11 +1,16 @@
 server:
   shutdown: immediate
 
+SYSTEM_CLIENT_ID: "test-system-client-id"
+SYSTEM_CLIENT_SECRET: "test-system-client-secret"
+
 management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
 
 hmpps:
+  self:
+    url: http://localhost:8080
   auth:
     base-url: "http://localhost:8090/auth"
   manage-users:

@@ -18,11 +18,20 @@ class WebClientConfiguration(
   private val prisonSearchBaseUrl: String,
   @Value("\${hmpps.manage-users.api.url}")
   private val manageUsersApiBaseUrl: String,
+  @Value("\${hmpps.document.api.url}")
+  private val documentApiBaseUrl: String,
 ) {
   private enum class HmppsAuthClientRegistrationId(val clientRegistrationId: String) {
     PRISONER_SEARCH("other-hmpps-apis"),
     MANAGE_USERS_API_CLIENT("other-hmpps-apis"),
   }
+
+  // ...existing code...
+
+  @Bean
+  fun documentApiWebClient(builder: WebClient.Builder): WebClient = builder
+    .baseUrl(documentApiBaseUrl)
+    .build()
 
   @Bean
   fun prisonerSearchWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = HmppsAuthClientRegistrationId.PRISONER_SEARCH.clientRegistrationId, url = prisonSearchBaseUrl, apiTimeout)
