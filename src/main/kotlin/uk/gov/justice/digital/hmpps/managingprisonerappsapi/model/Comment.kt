@@ -20,6 +20,7 @@ data class Comment(
   val createdBy: String,
   @Column(name = "app")
   val appId: UUID,
+  val visibility: CommentVisibility,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

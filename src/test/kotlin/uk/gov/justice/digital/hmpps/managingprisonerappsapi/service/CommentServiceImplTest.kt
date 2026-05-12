@@ -21,6 +21,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
@@ -44,6 +45,7 @@ class CommentServiceImplTest {
   private lateinit var staff: Staff
   private lateinit var appService: AppService
   private lateinit var staffService: StaffService
+  private lateinit var prisonerService: PrisonerService
   private lateinit var commentRepository: CommentRepository
   private lateinit var establishmentService: EstablishmentService
   private lateinit var commentServiceImpl: CommentServiceImpl
@@ -77,13 +79,28 @@ class CommentServiceImplTest {
       UUID.randomUUID(),
     )
 
-    comment = Comment(Generators.timeBasedEpochGenerator().generate(), message, createdDate, createdBy, app.id)
+    comment = Comment(
+      Generators.timeBasedEpochGenerator().generate(),
+      message,
+      createdDate,
+      createdBy,
+      app.id,
+      CommentVisibility.STAFF,
+    )
     appService = Mockito.mock(AppService::class.java)
     commentRepository = Mockito.mock(CommentRepository::class.java)
     establishmentService = Mockito.mock(EstablishmentService::class.java)
     staffService = Mockito.mock(StaffService::class.java)
+    prisonerService = Mockito.mock(PrisonerService::class.java)
     activityService = Mockito.mock(ActivityService::class.java)
-    commentServiceImpl = CommentServiceImpl(staffService, appService, commentRepository, establishmentService, activityService)
+    commentServiceImpl = CommentServiceImpl(
+      staffService,
+      appService,
+      commentRepository,
+      establishmentService,
+      activityService,
+      prisonerService,
+    )
   }
 
   @AfterEach
@@ -96,7 +113,15 @@ class CommentServiceImplTest {
       .thenReturn(Optional.of(staff))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
-    val result = commentServiceImpl.addComment(requestedBy, createdBy, app.id, CommentRequestDto(message))
+    val result = commentServiceImpl.addCommentByStaff(
+      requestedBy,
+      createdBy,
+      app.id,
+      CommentRequestDto(
+        message,
+        CommentVisibility.STAFF,
+      ),
+    )
     assertComment(comment, result, false, requestedBy)
   }
 
@@ -107,7 +132,12 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
     val exception = assertThrows(ApiException::class.java) {
-      commentServiceImpl.addComment(requestedBy, createdBy, app.id, CommentRequestDto(message))
+      commentServiceImpl.addCommentByStaff(
+        requestedBy,
+        createdBy,
+        app.id,
+        CommentRequestDto(message, CommentVisibility.STAFF),
+      )
     }
     assertEquals(HttpStatus.NOT_FOUND, exception.status)
   }
@@ -131,7 +161,12 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
     val exception = assertThrows(ApiException::class.java) {
-      commentServiceImpl.addComment(requestedBy, createdBy, app.id, CommentRequestDto(message))
+      commentServiceImpl.addCommentByStaff(
+        requestedBy,
+        createdBy,
+        app.id,
+        CommentRequestDto(message, CommentVisibility.STAFF),
+      )
     }
     assertEquals(HttpStatus.FORBIDDEN, exception.status)
   }
@@ -143,7 +178,12 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.empty())
     Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
     val exception = assertThrows(ApiException::class.java) {
-      commentServiceImpl.addComment(requestedBy, createdBy, app.id, CommentRequestDto(message))
+      commentServiceImpl.addCommentByStaff(
+        requestedBy,
+        createdBy,
+        app.id,
+        CommentRequestDto(message, CommentVisibility.STAFF),
+      )
     }
     assertEquals(HttpStatus.FORBIDDEN, exception.status)
   }
@@ -155,7 +195,12 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
     val exception = assertThrows(ApiException::class.java) {
-      commentServiceImpl.addComment("X12345", createdBy, app.id, CommentRequestDto(message))
+      commentServiceImpl.addCommentByStaff(
+        "X12345",
+        createdBy,
+        app.id,
+        CommentRequestDto(message, CommentVisibility.STAFF),
+      )
     }
     assertEquals(HttpStatus.FORBIDDEN, exception.status)
   }
@@ -166,7 +211,7 @@ class CommentServiceImplTest {
       .thenReturn(Optional.of(staff))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(commentRepository.findById(comment.id)).thenReturn(Optional.of(comment))
-    val result = commentServiceImpl.getCommentById(requestedBy, createdBy, app.id, false, comment.id)
+    val result = commentServiceImpl.getCommentByIdForStaff(requestedBy, createdBy, app.id, false, comment.id)
     assertEquals(app.requestedBy, result.prisonerNumber)
     assertComment(comment, result, false, requestedBy)
   }
@@ -182,7 +227,7 @@ class CommentServiceImplTest {
         EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
       ),
     )
-    val result = commentServiceImpl.getCommentById(requestedBy, createdBy, app.id, true, comment.id)
+    val result = commentServiceImpl.getCommentByIdForStaff(requestedBy, createdBy, app.id, true, comment.id)
     assertEquals(app.requestedBy, result.prisonerNumber)
     assertComment(comment, result, true, requestedBy)
   }
@@ -195,7 +240,7 @@ class CommentServiceImplTest {
     Mockito.`when`(commentRepository.findById(comment.id)).thenReturn(Optional.of(comment))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(Optional.empty())
     val exception = assertThrows(ApiException::class.java) {
-      commentServiceImpl.getCommentById(requestedBy, createdBy, app.id, true, comment.id)
+      commentServiceImpl.getCommentByIdForStaff(requestedBy, createdBy, app.id, true, comment.id)
     }
     assertEquals(HttpStatus.NOT_FOUND, exception.status)
   }
@@ -207,7 +252,7 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5)))
       .thenReturn(PageImpl(listOf(comment), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppId(requestedBy, createdBy, app.id, false, 1, 5)
+    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, false, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
     assertComment(comment, result.contents.get(0), false, requestedBy)
@@ -225,7 +270,7 @@ class CommentServiceImplTest {
     )
     Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5)))
       .thenReturn(PageImpl(listOf(comment), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppId(requestedBy, createdBy, app.id, true, 1, 5)
+    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, true, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
     assertComment(comment, result.contents.get(0), true, requestedBy)

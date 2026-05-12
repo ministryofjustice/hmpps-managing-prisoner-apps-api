@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 
 @SpringBootTest(classes = [CommentRepository::class])
@@ -56,6 +57,7 @@ class CommentRepositoryTest(
       createdComment.createdDate,
       createdComment.createdBy,
       createdComment.appId,
+      CommentVisibility.STAFF,
     )
     comment = commentRepository.save(comment)
     Assertions.assertEquals("updating message", comment.message)
