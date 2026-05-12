@@ -28,4 +28,13 @@ class InfoTest : IntegrationTestBase() {
         assertThat(it).startsWith(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
       }
   }
+
+  fun `Info page reports activeAgencies`() {
+    webTestClient.get().uri("/info")
+      .exchange()
+      .expectStatus().isOk
+      .expectBody().jsonPath("activeAgencies").value<List<String>> {
+        assertThat(it).isEqualTo(listOf("RNI"))
+      }
+  }
 }
