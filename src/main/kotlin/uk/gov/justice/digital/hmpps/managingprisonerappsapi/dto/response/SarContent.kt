@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import java.time.LocalDateTime
@@ -56,6 +57,7 @@ data class PrnAppAttachment(
   val url: String,
   val filesize: Long,
   val headers: List<AttachmentHeader>,
+  @JsonIgnore val documentId: String,
 )
 
 data class AttachmentHeader(

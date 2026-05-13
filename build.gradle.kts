@@ -20,18 +20,16 @@ dependencies {
   implementation("org.flywaydb:flyway-core")
   implementation("org.springframework.boot:spring-boot-starter-flyway")
   implementation("org.postgresql:postgresql:42.7.9")
-
+  implementation("org.springframework.boot:spring-boot-starter-cache")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
-
   implementation("org.flywaydb:flyway-database-postgresql")
-
   // SQS/SNS dependencies
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.3.0")
 
-  // TODO- Remove
-  implementation("com.samskivert:jmustache:1.16")
+  // iText HTML → PDF (dev/local testing only)
+  implementation("com.itextpdf:html2pdf:6.1.0")
 
   testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")

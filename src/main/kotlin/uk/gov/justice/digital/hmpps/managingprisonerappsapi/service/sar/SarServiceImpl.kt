@@ -115,8 +115,9 @@ class SarServiceImpl(
             PrnAppAttachment(
               attachment.fileType,
               "$selfUrl/sar/attachments/${attachment.documentId}/file",
-              1200, // TODO - Actual size from DB
+              274072,
               attachmentHeaderList,
+              attachment.documentId,
             ),
           )
         }

@@ -18,6 +18,9 @@ hmpps:
 spring:
   application:
     name: hmpps-managing-prisoner-apps-api
+  cache:
+    type: simple
+    cache-names: hmpps-auth-token
   profiles:
     group:
       test-sqs:

@@ -2,7 +2,10 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.config
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.codec.ClientCodecConfigurer
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
+import org.springframework.util.unit.DataSize
+import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.hmpps.kotlin.auth.authorisedWebClient
 import uk.gov.justice.hmpps.kotlin.auth.healthWebClient
@@ -20,17 +23,24 @@ class WebClientConfiguration(
   private val manageUsersApiBaseUrl: String,
   @Value("\${hmpps.document.api.url}")
   private val documentApiBaseUrl: String,
+  @Value("\${spring.codec.max-in-memory-size:10MB}")
+  private val maxInMemorySize: DataSize,
 ) {
   private enum class HmppsAuthClientRegistrationId(val clientRegistrationId: String) {
     PRISONER_SEARCH("other-hmpps-apis"),
     MANAGE_USERS_API_CLIENT("other-hmpps-apis"),
   }
 
-  // ...existing code...
-
   @Bean
   fun documentApiWebClient(builder: WebClient.Builder): WebClient = builder
     .baseUrl(documentApiBaseUrl)
+    .exchangeStrategies(
+      ExchangeStrategies.builder()
+        .codecs { configurer: ClientCodecConfigurer ->
+          configurer.defaultCodecs().maxInMemorySize(maxInMemorySize.toBytes().toInt())
+        }
+        .build(),
+    )
     .build()
 
   @Bean
