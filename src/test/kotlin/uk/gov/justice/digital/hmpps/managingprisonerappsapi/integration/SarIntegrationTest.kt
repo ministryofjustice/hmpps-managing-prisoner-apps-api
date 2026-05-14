@@ -13,13 +13,14 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
@@ -272,7 +273,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       genericForm = false,
       requestedDate = LocalDateTime.of(2026, 3, 9, 12, 16, 9),
       createdDate = LocalDateTime.of(2026, 3, 9, 12, 16, 9),
-      submittedByType = SubmittedByType.PRISONER,
+      submittedByType = UserCategory.STAFF,
       createdBy = "CHIEMNDEV",
       lastModifiedDate = LocalDateTime.of(2026, 3, 9, 12, 16, 9),
       lastModifiedBy = "CHIEMNDEV",
@@ -310,7 +311,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       genericForm = false,
       requestedDate = LocalDateTime.of(2025, 11, 10, 16, 15, 30),
       createdDate = LocalDateTime.of(2025, 11, 10, 16, 15, 30),
-      submittedByType = SubmittedByType.PRISONER,
+      submittedByType = UserCategory.STAFF,
       createdBy = "SMJOHN_GEN",
       lastModifiedDate = LocalDateTime.of(2025, 12, 8, 12, 36, 34),
       lastModifiedBy = "SMJOHN_GEN",
@@ -342,6 +343,8 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           createdDate = LocalDateTime.of(2026, 2, 27, 11, 52, 15),
           createdBy = "SMJOHN_GEN",
           appId = APP_ID_1,
+          visibility = CommentVisibility.STAFF_AND_PRISONER,
+          createdByUserType = UserCategory.STAFF,
         ),
         Comment(
           id = COMMENT_ID_2,
@@ -349,6 +352,8 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           createdDate = LocalDateTime.of(2025, 12, 8, 12, 36, 34),
           createdBy = "SMJOHN_GEN",
           appId = APP_ID_2,
+          visibility = CommentVisibility.STAFF_AND_PRISONER,
+          createdByUserType = UserCategory.STAFF,
         ),
       ),
     )
