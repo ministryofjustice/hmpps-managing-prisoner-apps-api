@@ -11,7 +11,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedG
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByFirstNightCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import java.util.*
 
 @Repository
@@ -126,6 +126,6 @@ interface AppRepository : JpaRepository<App, UUID> {
     status: AppStatus,
     applicationType: Long,
     createdBy: String,
-    submittedByType: SubmittedByType,
+    submittedByType: UserCategory,
   ): Optional<AppByAppTypeCounts>
 }

@@ -26,7 +26,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
@@ -104,7 +103,7 @@ class AppServiceImplTest {
       app.createdBy,
       app.id,
       CommentVisibility.STAFF_ONLY,
-      SubmittedByType.STAFF,
+      UserCategory.STAFF,
     )
 
     staff = Staff(

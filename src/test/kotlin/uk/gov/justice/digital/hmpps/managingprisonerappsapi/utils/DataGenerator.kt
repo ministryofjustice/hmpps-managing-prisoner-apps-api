@@ -14,7 +14,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import java.time.LocalDateTime
 import java.util.*
 
@@ -44,7 +44,7 @@ class DataGenerator {
       createdBy,
       UUID.randomUUID(),
       CommentVisibility.STAFF_ONLY,
-      SubmittedByType.STAFF,
+      UserCategory.STAFF,
     )
 
     fun generateResponse(staffId: String): Response = Response(
@@ -65,7 +65,7 @@ class DataGenerator {
       requestedDate = LocalDateTime.now(),
       createdDate = LocalDateTime.now(),
       createdBy = "testStaaf@moj",
-      submittedByType = SubmittedByType.STAFF,
+      submittedByType = UserCategory.STAFF,
       lastModifiedDate = LocalDateTime.now(),
       lastModifiedBy = "testStaaf@moj",
       comments = arrayListOf(Generators.timeBasedEpochGenerator().generate()),
@@ -101,7 +101,7 @@ class DataGenerator {
       requestedDate = requestedDate,
       createdDate = requestedDate,
       createdBy = "testStaaf@moj",
-      submittedByType = SubmittedByType.STAFF,
+      submittedByType = UserCategory.STAFF,
       lastModifiedDate = requestedDate,
       lastModifiedBy = "testStaaf@moj",
       comments = arrayListOf(),
@@ -195,7 +195,7 @@ class DataGenerator {
       requestedDate = requestedDate,
       createdDate = requestedDate,
       createdBy = "TEST_USER",
-      submittedByType = SubmittedByType.STAFF,
+      submittedByType = UserCategory.STAFF,
       lastModifiedDate = requestedDate,
       lastModifiedBy = "TEST_USER",
       comments = mutableListOf(),
