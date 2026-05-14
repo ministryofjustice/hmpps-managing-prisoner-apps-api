@@ -137,12 +137,14 @@ class SarServiceImpl(
 
       // Convert formData maps to FormDataItem list
       val formDataItems = app.requests.flatMap { requestMap ->
-        requestMap.entries.map { entry ->
-          FormDataItem(
-            key = entry.key,
-            value = entry.value.toString(),
-          )
-        }
+        requestMap.entries
+          .filter { entry -> entry.key != "id" }
+          .map { entry ->
+            FormDataItem(
+              key = entry.key,
+              value = entry.value.toString(),
+            )
+          }
       }
 
       val prnApp = PrnApp(
