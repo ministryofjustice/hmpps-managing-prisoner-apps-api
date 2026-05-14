@@ -6,8 +6,6 @@ example-api:
 hmpps:
   self:
     url: https://managing-prisoner-apps-api-preprod.hmpps.service.justice.gov.uk
-  sqs:
-    enabled: false  # SQS not configured in preprod namespace
   auth:
     base-url: https://sign-in-preprod.hmpps.service.justice.gov.uk/auth
     timeout: 10s

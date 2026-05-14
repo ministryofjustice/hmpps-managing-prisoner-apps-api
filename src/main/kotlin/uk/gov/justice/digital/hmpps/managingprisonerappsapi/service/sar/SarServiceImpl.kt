@@ -1,5 +1,7 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -39,11 +41,16 @@ class SarServiceImpl(
   @Value("\${hmpps.self.url}") private val selfUrl: String,
 ) : SarService {
 
+  companion object {
+    val log: Logger = LoggerFactory.getLogger(this::class.java)
+  }
+
   override fun getPrisonContentFor(
     prn: String,
     fromDate: LocalDate?,
     toDate: LocalDate?,
   ): HmppsSubjectAccessRequestContent? {
+    log.info("SAR Requesting prison content for $prn")
     var apps = appRepository.findAppsByRequestedBy(prn)
     apps = apps.stream().filter { app ->
       (fromDate == null || fromDate.atStartOfDay() <= app.requestedDate) &&
@@ -51,9 +58,11 @@ class SarServiceImpl(
     }.toList()
 
     if (apps.isEmpty()) {
+      log.info("SAR No data for prison $prn")
       return null
     }
     val sarData: SarContent? = convertAppsToSarContent(apps)
+    log.info("SAR Returned prison content for $prn")
     return sarData?.let {
       HmppsSubjectAccessRequestContent(content = sarData)
     }

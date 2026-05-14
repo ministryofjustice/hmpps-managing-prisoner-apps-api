@@ -1,15 +1,16 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.config
+
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.codec.ClientCodecConfigurer
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
-import org.springframework.util.unit.DataSize
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 import uk.gov.justice.hmpps.kotlin.auth.authorisedWebClient
 import uk.gov.justice.hmpps.kotlin.auth.healthWebClient
 import java.time.Duration
+
+private const val MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024
 
 @Configuration
 class WebClientConfiguration(
@@ -23,25 +24,22 @@ class WebClientConfiguration(
   private val manageUsersApiBaseUrl: String,
   @Value("\${hmpps.document.api.url}")
   private val documentApiBaseUrl: String,
-  @Value("\${spring.codec.max-in-memory-size:10MB}")
-  private val maxInMemorySize: DataSize,
 ) {
   private enum class HmppsAuthClientRegistrationId(val clientRegistrationId: String) {
     PRISONER_SEARCH("other-hmpps-apis"),
     MANAGE_USERS_API_CLIENT("other-hmpps-apis"),
+    DOCUMENT_API("other-hmpps-apis"),
   }
 
   @Bean
-  fun documentApiWebClient(builder: WebClient.Builder): WebClient = builder
-    .baseUrl(documentApiBaseUrl)
-    .exchangeStrategies(
+  fun documentApiWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient {
+    val largeBufferBuilder = builder.clone().exchangeStrategies(
       ExchangeStrategies.builder()
-        .codecs { configurer: ClientCodecConfigurer ->
-          configurer.defaultCodecs().maxInMemorySize(maxInMemorySize.toBytes().toInt())
-        }
+        .codecs { it.defaultCodecs().maxInMemorySize(MAX_ATTACHMENT_SIZE) }
         .build(),
     )
-    .build()
+    return largeBufferBuilder.authorisedWebClient(authorizedClientManager, registrationId = HmppsAuthClientRegistrationId.DOCUMENT_API.clientRegistrationId, url = documentApiBaseUrl, apiTimeout)
+  }
 
   @Bean
   fun prisonerSearchWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = HmppsAuthClientRegistrationId.PRISONER_SEARCH.clientRegistrationId, url = prisonSearchBaseUrl, apiTimeout)

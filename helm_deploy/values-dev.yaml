@@ -12,7 +12,6 @@ generic-service:
     SPRING_PROFILES_ACTIVE: "dev"
     HMPPS_SQS_ENABLED: "true"  # Enable SQS in cloud environments
     HMPPS_SQS_USE_WEB_TOKEN: "true"
-    SPRING_AUTOCONFIGURE_EXCLUDE: ""  # Override local dev exclusion - enable SQS auto-config in cloud
 
     # Template kotlin calls out to itself to provide an example of a service call
     # TODO: This should be replaced by a call to a different service, or removed

@@ -7,9 +7,6 @@ example-api:
     secret: "example-api-client-secret"
 
 spring:
-  autoconfigure:
-    exclude:
-      - uk.gov.justice.hmpps.sqs.HmppsSqsConfiguration  # Exclude SQS for local dev
   flyway:
      locations: classpath:db/migration/dev
 
