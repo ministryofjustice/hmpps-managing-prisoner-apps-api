@@ -10,16 +10,22 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
@@ -27,6 +33,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRe
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
@@ -34,11 +41,11 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
 
 class AppResourcePrisonerFacingIntegrationTest(
   @Autowired private val appRepository: AppRepository,
   @Autowired private val groupRepository: GroupRepository,
+  @Autowired private val commentRepository: CommentRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val applicationGroupRepository: ApplicationGroupRepository,
   @Autowired private val applicationTypeRepository: ApplicationTypeRepository,
@@ -55,12 +62,6 @@ class AppResourcePrisonerFacingIntegrationTest(
   val requestedByFirst = "A12345"
   val requestedByFirstMainName = "John"
   val requestedByFirstSurname = "Smith"
-  val requestedBySecondMainName = "John"
-  val requestedBySecondSurname = "Butler"
-  val requestedBySecond = "B12345"
-  val requestedByThird = "C12345"
-  val requestedByThirdMainName = "Test"
-  val requestedByThirdSurname = "User"
 
   val applicationGroupOne = 1L
   val applicationTypeOne = 1L
@@ -74,17 +75,18 @@ class AppResourcePrisonerFacingIntegrationTest(
   val applicationTypeThreeName = "Remove Contact"
   val applicationTypeFourName = "Add Generic Pin Phone enquiry"
 
-  lateinit var appIdFirst: UUID
-  lateinit var appIdSecond: UUID
+  private lateinit var app: App
 
   @BeforeEach
   fun setUp() {
+    loggedUserId = requestedByFirst
     appRepository.deleteAll()
     groupRepository.deleteAll()
     establishmentRepository.deleteAll()
     applicationGroupRepository.deleteAll()
     applicationTypeRepository.deleteAll()
     appFileRepository.deleteAll()
+    commentRepository.deleteAll()
 
     populateEstablishments()
     populateGroups()
@@ -105,10 +107,12 @@ class AppResourcePrisonerFacingIntegrationTest(
     appRepository.deleteAll()
     groupRepository.deleteAll()
     establishmentRepository.deleteAll()
+    commentRepository.deleteAll()
   }
 
   @Test
-  fun `submit an app by prisoner and get app by id`() {
+  fun `submit an app by prisoner, get app by id, get list of apps`() {
+    appRepository.deleteAll()
     var response = webTestClient.post()
       .uri("/v1/prisoners/apps")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
@@ -261,6 +265,116 @@ class AppResourcePrisonerFacingIntegrationTest(
     Assertions.assertEquals(1, response.count)
   }
 
+  @Test
+  fun `add a comment for the app`() {
+    val message = "Do you need more information"
+    val body = CommentRequestDto(message, CommentVisibility.STAFF_AND_PRISONER)
+    val response = webTestClient.post()
+      .uri("/v1/prisoners/apps/${app.id}/comments")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(body)
+      .exchange()
+      .expectStatus().isCreated
+      .expectBody(object : ParameterizedTypeReference<CommentResponseDto<String>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as CommentResponseDto<String>
+
+    Assertions.assertNotNull(message, response.message)
+    Assertions.assertEquals(app.id, response.appId)
+    Assertions.assertEquals(app.requestedBy, response.prisonerNumber)
+  }
+
+  @Test
+  fun `get comment by id`() {
+    val message = "This needs to be checked again"
+    val body = CommentRequestDto(message, CommentVisibility.STAFF_AND_PRISONER)
+    val response = webTestClient.post()
+      .uri("/v1/prisoners/apps/${app.id}/comments")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(body)
+      .exchange()
+      .expectStatus().isCreated
+      .expectBody(object : ParameterizedTypeReference<CommentResponseDto<String>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as CommentResponseDto<String>
+    Assertions.assertNotNull(message, response.message)
+    Assertions.assertEquals(app.id, response.appId)
+    Assertions.assertEquals(app.requestedBy, response.prisonerNumber)
+
+    var res = webTestClient.get()
+      .uri("/v1/prisoners/apps/${app.id}/comments/${response.id}")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(object : ParameterizedTypeReference<CommentResponseDto<String>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as CommentResponseDto<String>
+
+    Assertions.assertNotNull(message, res.message)
+    Assertions.assertEquals(app.id, res.appId)
+    Assertions.assertEquals(app.requestedBy, res.prisonerNumber)
+
+    val resp = webTestClient.get()
+      .uri("/v1/prisoners/apps/${app.id}/comments/${response.id}?createdBy=true")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      // .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(object : ParameterizedTypeReference<CommentResponseDto<PrisonerDto>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as CommentResponseDto<PrisonerDto>
+
+    Assertions.assertNotNull(message, resp.message)
+    Assertions.assertEquals(app.id, resp.appId)
+    Assertions.assertEquals(app.requestedBy, resp.prisonerNumber)
+  }
+
+  @Test
+  fun `get comments by app id`() {
+    val message = "Do you need more information?"
+    val body = CommentRequestDto(
+      message,
+      CommentVisibility.STAFF_AND_PRISONER,
+    )
+    webTestClient.post()
+      .uri("/v1/prisoners/apps/${app.id}/comments")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(body)
+      .exchange()
+      .expectStatus().isCreated
+      .expectBody(object : ParameterizedTypeReference<CommentResponseDto<String>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as CommentResponseDto<String>
+
+    var res = webTestClient.get()
+      .uri("/v1/prisoners/apps/${app.id}/comments?page=1&size=10")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectBody(object : ParameterizedTypeReference<PageResultComments>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as PageResultComments
+
+    Assertions.assertEquals(1, res.page)
+    Assertions.assertEquals(1, res.totalElements)
+  }
+
   protected fun populateEstablishments() {
     establishmentRepository.save(
       Establishment(
@@ -344,17 +458,17 @@ class AppResourcePrisonerFacingIntegrationTest(
         addGenericPinPhoneEnquiry,
       ),
     )
-    // val applicationGroupOne = ApplicationGroup(applicationGroupOne, applicationGroupOneName, listOf(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
+    /*// val applicationGroupOne = ApplicationGroup(applicationGroupOne, applicationGroupOneName, listOf(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
 
     // applicationGroupRepository.save<ApplicationGroup>(applicationGroupOne)
     // addOfficialContact.applicationGroup = applicationGroupOne
     // applicationTypeRepository.save(addOfficialContact)
     val appgrp = applicationTypeRepository.findById(applicationTypeOne)
-    // println(appgrp)
+    // println(appgrp)*/
   }
 
   protected fun populateApps() {
-    appIdFirst = appRepository.save(
+    app = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
         null,
@@ -366,112 +480,6 @@ class AppResourcePrisonerFacingIntegrationTest(
         requestedByFirstSurname,
         AppStatus.PENDING,
         assignedGroupFirst,
-        false,
-      ),
-    ).id
-    appIdSecond = appRepository.save(
-      DataGenerator.generateApp(
-        establishmentIdFirst,
-        null,
-        applicationTypeTwo,
-        applicationGroupOne,
-        requestedByFirst,
-        LocalDateTime.now(ZoneOffset.UTC).minusDays(2),
-        requestedByFirstMainName,
-        requestedByFirstSurname,
-        AppStatus.PENDING,
-        assignedGroupFirst,
-        false,
-      ),
-    ).id
-
-    appRepository.save(
-      DataGenerator.generateApp(
-        establishmentIdFirst,
-        null,
-        applicationTypeThree,
-        applicationGroupOne,
-        requestedByFirst,
-        LocalDateTime.now(ZoneOffset.UTC).minusDays(1),
-        requestedByFirstMainName,
-        requestedByFirstSurname,
-        AppStatus.PENDING,
-        assignedGroupFirst,
-        false,
-      ),
-    )
-    appRepository.save(
-      DataGenerator.generateApp(
-        establishmentIdFirst,
-        null,
-        applicationTypeFour,
-        applicationGroupOne,
-        requestedBySecond,
-        LocalDateTime.now(ZoneOffset.UTC).minusDays(2).minusHours(1),
-        requestedBySecondMainName,
-        requestedBySecondSurname,
-        AppStatus.PENDING,
-        assignedGroupFirst,
-        false,
-      ),
-    )
-    appRepository.save(
-      DataGenerator.generateApp(
-        establishmentIdSecond,
-        null,
-        applicationTypeOne,
-        applicationGroupOne,
-        requestedByThird,
-        LocalDateTime.now(ZoneOffset.UTC),
-        requestedByFirstMainName,
-        requestedByFirstSurname,
-        AppStatus.PENDING,
-        assignedGroupFirst,
-        false,
-      ),
-    )
-    appRepository.save(
-      DataGenerator.generateApp(
-        establishmentIdFirst,
-        null,
-        applicationTypeOne,
-        applicationGroupOne,
-        requestedByThird,
-        LocalDateTime.now(ZoneOffset.UTC),
-        requestedByThirdMainName,
-        requestedByThirdSurname,
-        AppStatus.PENDING,
-        assignedGroupSecond,
-        false,
-      ),
-    )
-    appRepository.save(
-      DataGenerator.generateApp(
-        establishmentIdFirst,
-        null,
-        applicationTypeOne,
-        applicationGroupOne,
-        requestedByThird,
-        LocalDateTime.now(ZoneOffset.UTC),
-        requestedByThirdMainName,
-        requestedByThirdSurname,
-        AppStatus.PENDING,
-        assignedGroupSecond,
-        false,
-      ),
-    )
-    appRepository.save(
-      DataGenerator.generateApp(
-        establishmentIdThird,
-        null,
-        applicationTypeOne,
-        applicationGroupOne,
-        requestedByThird,
-        LocalDateTime.now(ZoneOffset.UTC),
-        requestedByThirdMainName,
-        requestedByThirdSurname,
-        AppStatus.PENDING,
-        assignedGroupSecond,
         false,
       ),
     )

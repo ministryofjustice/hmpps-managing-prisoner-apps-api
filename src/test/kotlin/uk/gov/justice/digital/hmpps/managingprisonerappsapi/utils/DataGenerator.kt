@@ -8,6 +8,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
@@ -42,6 +43,8 @@ class DataGenerator {
       LocalDateTime.now(),
       createdBy,
       UUID.randomUUID(),
+      CommentVisibility.STAFF_ONLY,
+      SubmittedByType.STAFF,
     )
 
     fun generateResponse(staffId: String): Response = Response(

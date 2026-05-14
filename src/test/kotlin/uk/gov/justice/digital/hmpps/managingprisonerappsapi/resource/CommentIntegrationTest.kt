@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
@@ -103,7 +104,7 @@ class CommentIntegrationTest(
   @Test
   fun `add a comment for the app`() {
     val message = "This needs to be checked again"
-    val body = CommentRequestDto(message)
+    val body = CommentRequestDto(message, CommentVisibility.STAFF_ONLY)
     val response = webTestClient.post()
       .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
@@ -138,7 +139,7 @@ class CommentIntegrationTest(
   @Test
   fun `get comment by id`() {
     val message = "This needs to be checked again"
-    val body = CommentRequestDto(message)
+    val body = CommentRequestDto(message, CommentVisibility.STAFF_ONLY)
     val response = webTestClient.post()
       .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
@@ -192,6 +193,7 @@ class CommentIntegrationTest(
     val message = "This needs to be checked again"
     val body = CommentRequestDto(
       message,
+      CommentVisibility.STAFF_ONLY,
     )
     webTestClient.post()
       .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments")
