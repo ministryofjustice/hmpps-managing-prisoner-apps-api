@@ -2,7 +2,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import java.time.LocalDateTime
 import java.util.*
 
@@ -15,5 +15,5 @@ data class CommentResponseDto<T>(
   val createdDate: LocalDateTime,
   val createdBy: T,
   val visibility: CommentVisibility,
-  val createdByType: SubmittedByType,
+  val createdByType: UserCategory,
 )

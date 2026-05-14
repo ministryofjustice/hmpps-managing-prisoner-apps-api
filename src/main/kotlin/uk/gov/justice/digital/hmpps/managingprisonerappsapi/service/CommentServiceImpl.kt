@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibil
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import java.time.LocalDateTime
@@ -59,7 +58,7 @@ class CommentServiceImpl(
         staffId,
         appId,
         CommentVisibility.STAFF_ONLY,
-        SubmittedByType.STAFF,
+        UserCategory.STAFF,
       ),
     )
     app.comments.add(comment.id)
@@ -95,7 +94,7 @@ class CommentServiceImpl(
         prisonerId,
         appId,
         CommentVisibility.STAFF_AND_PRISONER,
-        SubmittedByType.PRISONER,
+        UserCategory.PRISONER,
       ),
     )
     app.comments.add(comment.id)
@@ -244,7 +243,7 @@ class CommentServiceImpl(
     comments.forEach { comment ->
       var createdByPerson: Any = comment.createdBy
       if (createdBy) {
-        if (comment.createdByUserType == SubmittedByType.STAFF) {
+        if (comment.createdByUserType == UserCategory.STAFF) {
           staffService.getStaffById(comment.createdBy).ifPresent { staff ->
             val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
               ApiException("Establishment not added for  id ${staff.establishmentId}", HttpStatus.BAD_REQUEST)
@@ -257,7 +256,7 @@ class CommentServiceImpl(
               establishment,
             )
           }
-        } else if (comment.createdByUserType == SubmittedByType.PRISONER) {
+        } else if (comment.createdByUserType == UserCategory.PRISONER) {
           prisonerService.getPrisonerById(comment.createdBy).ifPresent { prisoner ->
             val establishment = establishmentService.getEstablishmentById(prisoner.establishmentId!!).orElseThrow {
               ApiException("Establishment not added for  id ${prisoner.establishmentId}", HttpStatus.BAD_REQUEST)

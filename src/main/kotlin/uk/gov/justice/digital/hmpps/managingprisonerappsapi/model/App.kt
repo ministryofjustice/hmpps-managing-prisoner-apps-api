@@ -30,7 +30,7 @@ data class App(
   val createdDate: LocalDateTime,
   val createdBy: String,
   @Enumerated(EnumType.STRING)
-  val submittedByType: SubmittedByType,
+  val submittedByType: UserCategory,
   var lastModifiedDate: LocalDateTime,
   var lastModifiedBy: String,
   @ElementCollection

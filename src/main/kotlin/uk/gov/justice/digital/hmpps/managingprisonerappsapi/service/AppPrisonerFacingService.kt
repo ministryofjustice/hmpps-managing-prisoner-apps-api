@@ -19,7 +19,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGro
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
@@ -91,7 +91,7 @@ class AppPrisonerFacingService(
       AppStatus.PENDING,
       appRequest.applicationType!!,
       prisoner.username,
-      SubmittedByType.PRISONER,
+      UserCategory.PRISONER,
     )
     if (applicationTypeCount.isPresent) {
       throw ApiException(
@@ -153,7 +153,7 @@ class AppPrisonerFacingService(
       AppStatus.PENDING,
       appType,
       prisoner.username,
-      SubmittedByType.PRISONER,
+      UserCategory.PRISONER,
     )
     var count = 0
     if (applicationTypeCounts.isPresent) {
@@ -190,7 +190,7 @@ class AppPrisonerFacingService(
       localDateTime, // last modified date
       localDateTime, // created by
       prisonerId,
-      SubmittedByType.PRISONER,
+      UserCategory.PRISONER,
       localDateTime,
       prisonerId,
       mutableListOf(),

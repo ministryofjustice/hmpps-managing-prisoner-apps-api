@@ -37,7 +37,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
@@ -295,7 +295,7 @@ class AppServiceImplV2(
           staffId,
           appId,
           CommentVisibility.STAFF_ONLY,
-          SubmittedByType.STAFF,
+          UserCategory.STAFF,
         ),
       )
     }
@@ -474,7 +474,7 @@ class AppServiceImplV2(
       appRequest.requestedDate ?: localDateTime, // last modified date
       localDateTime, // created by
       staff.username,
-      SubmittedByType.STAFF,
+      UserCategory.STAFF,
       localDateTime,
       staff.username,
       mutableListOf(),

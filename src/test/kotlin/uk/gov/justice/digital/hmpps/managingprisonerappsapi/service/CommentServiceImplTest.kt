@@ -25,7 +25,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
@@ -104,7 +103,7 @@ class CommentServiceImplTest {
       createdBy,
       app.id,
       CommentVisibility.STAFF_ONLY,
-      SubmittedByType.STAFF,
+      UserCategory.STAFF,
     )
     commentByPrisoner = Comment(
       Generators.timeBasedEpochGenerator().generate(),
@@ -113,7 +112,7 @@ class CommentServiceImplTest {
       requestedBy,
       app.id,
       CommentVisibility.STAFF_AND_PRISONER,
-      SubmittedByType.PRISONER,
+      UserCategory.PRISONER,
     )
     appService = Mockito.mock(AppService::class.java)
     commentRepository = Mockito.mock(CommentRepository::class.java)
@@ -387,10 +386,10 @@ class CommentServiceImplTest {
   ) {
     assertEquals(expected.id, result.id)
     assertEquals(expected.message, result.message)
-    if (createdBy && expected.createdByUserType == SubmittedByType.STAFF) {
+    if (createdBy && expected.createdByUserType == UserCategory.STAFF) {
       assertInstanceOf(StaffDto::class.java, result.createdBy)
       assertEquals(expected.createdBy, (result.createdBy as StaffDto).username)
-    } else if (createdBy && expected.createdByUserType == SubmittedByType.PRISONER) {
+    } else if (createdBy && expected.createdByUserType == UserCategory.PRISONER) {
       assertInstanceOf(PrisonerDto::class.java, result.createdBy)
       assertEquals(expected.createdBy, (result.createdBy as PrisonerDto).username)
     } else {
