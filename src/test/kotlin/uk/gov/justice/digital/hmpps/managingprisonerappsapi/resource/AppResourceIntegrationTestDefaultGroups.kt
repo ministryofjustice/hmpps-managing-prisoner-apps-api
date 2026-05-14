@@ -444,7 +444,7 @@ class AppResourceIntegrationTestDefaultGroups(
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-      .bodyValue(CommentRequestDto(forwardingMessage, CommentVisibility.STAFF))
+      .bodyValue(CommentRequestDto(forwardingMessage, CommentVisibility.STAFF_ONLY))
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)

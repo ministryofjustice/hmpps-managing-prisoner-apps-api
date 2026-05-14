@@ -1,6 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 enum class CommentVisibility {
-  STAFF_PRISONER,
-  STAFF,
+  STAFF_AND_PRISONER,
+  STAFF_ONLY,
 }

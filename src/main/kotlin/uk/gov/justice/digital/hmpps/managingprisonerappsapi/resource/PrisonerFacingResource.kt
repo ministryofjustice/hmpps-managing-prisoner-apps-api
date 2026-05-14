@@ -240,7 +240,7 @@ class PrisonerFacingResource(
     return ResponseEntity.status(HttpStatus.CREATED).body(comment)
   }
 
-  @Tag(name = "Comments")
+  @Tag(name = "Prisoner Apps")
   @Operation(
     summary = "Get a comment by comment id",
     description = "This api endpoint is for getting comment details. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_PRISONER_FACING_APPS",
@@ -263,7 +263,7 @@ class PrisonerFacingResource(
     "/prisoners/apps/{appId}/comments/{commentId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   fun getCommentById(
     @PathVariable appId: UUID,
     @PathVariable commentId: UUID,
@@ -276,10 +276,10 @@ class PrisonerFacingResource(
     return ResponseEntity.status(HttpStatus.OK).body(comment)
   }
 
-  @Tag(name = "Comments")
+  @Tag(name = "Prisoner Apps")
   @Operation(
     summary = "Get all comments for a give app by app id",
-    description = "This api endpoint is for getting list of comments by app Id. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_PRISONER_FACING_APPS",
+    description = "This api endpoint is for getting list of comments by app Id. Requires role ROLE_PRISONER_FACING_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "List fo comments returned successfully."),
@@ -298,7 +298,7 @@ class PrisonerFacingResource(
   @GetMapping(
     "/prisoners/apps/{appId}/comments",
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   fun getCommentsByAppId(
     @PathVariable appId: UUID,
     @RequestParam(required = true) page: Long,

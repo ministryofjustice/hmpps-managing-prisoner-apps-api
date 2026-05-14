@@ -294,7 +294,8 @@ class AppServiceImplV2(
           LocalDateTime.now(ZoneOffset.UTC),
           staffId,
           appId,
-          CommentVisibility.STAFF,
+          CommentVisibility.STAFF_ONLY,
+          SubmittedByType.STAFF,
         ),
       )
     }

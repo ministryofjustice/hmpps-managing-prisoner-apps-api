@@ -43,7 +43,8 @@ class DataGenerator {
       LocalDateTime.now(),
       createdBy,
       UUID.randomUUID(),
-      CommentVisibility.STAFF,
+      CommentVisibility.STAFF_ONLY,
+      SubmittedByType.STAFF,
     )
 
     fun generateResponse(staffId: String): Response = Response(

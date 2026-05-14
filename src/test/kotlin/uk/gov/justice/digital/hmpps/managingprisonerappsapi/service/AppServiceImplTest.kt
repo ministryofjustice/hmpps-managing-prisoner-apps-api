@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
@@ -102,7 +103,8 @@ class AppServiceImplTest {
       LocalDateTime.now(ZoneOffset.UTC),
       app.createdBy,
       app.id,
-      CommentVisibility.STAFF,
+      CommentVisibility.STAFF_ONLY,
+      SubmittedByType.STAFF,
     )
 
     staff = Staff(
@@ -472,7 +474,7 @@ class AppServiceImplTest {
         UUID.randomUUID(),
         CommentRequestDto(
           forwardingComment,
-          CommentVisibility.STAFF,
+          CommentVisibility.STAFF_ONLY,
         ),
       )
     }
@@ -506,10 +508,12 @@ class AppServiceImplTest {
     Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
     Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     val appResponse = appService.forwardAppToGroup(
-      createdBy, forwardGroupId, app.id,
+      createdBy,
+      forwardGroupId,
+      app.id,
       CommentRequestDto(
         forwardingComment,
-        CommentVisibility.STAFF,
+        CommentVisibility.STAFF_ONLY,
       ),
     )
     assertEquals(forwardGroupId, app.assignedGroup)
