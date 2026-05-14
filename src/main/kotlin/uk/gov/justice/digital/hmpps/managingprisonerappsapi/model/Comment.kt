@@ -2,6 +2,8 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.time.LocalDateTime
@@ -20,6 +22,10 @@ data class Comment(
   val createdBy: String,
   @Column(name = "app")
   val appId: UUID,
+  @Enumerated(EnumType.STRING)
+  val visibility: CommentVisibility,
+  @Enumerated(EnumType.STRING)
+  val createdByUserType: UserCategory,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

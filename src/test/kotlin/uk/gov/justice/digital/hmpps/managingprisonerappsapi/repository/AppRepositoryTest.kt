@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.SubmittedByType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -91,7 +91,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
       requestedDate = createdApp.requestedDate,
       createdDate = createdApp.createdDate,
       createdBy = createdApp.createdBy,
-      submittedByType = SubmittedByType.STAFF,
+      submittedByType = UserCategory.STAFF,
       lastModifiedDate = createdApp.lastModifiedDate,
       lastModifiedBy = createdApp.lastModifiedBy,
       comments = createdApp.comments,

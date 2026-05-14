@@ -8,12 +8,16 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.StaffDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
@@ -28,11 +32,12 @@ class CommentServiceImpl(
   private val commentRepository: CommentRepository,
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
+  private val prisonerService: PrisonerService,
 ) : CommentService {
 
   override fun saveComment(comment: Comment): Comment = commentRepository.save(comment)
 
-  override fun addComment(
+  override fun addCommentByStaff(
     prisonerId: String,
     staffId: String,
     appId: UUID,
@@ -40,6 +45,9 @@ class CommentServiceImpl(
   ): CommentResponseDto<Any> {
     val staff = getStaff(staffId)
     val app = getAppById(appId)
+    if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED) {
+      throw ApiException("Comment cannot be added as app is already closed", HttpStatus.FORBIDDEN)
+    }
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
     val comment = commentRepository.save(
@@ -49,6 +57,8 @@ class CommentServiceImpl(
         LocalDateTime.now(ZoneOffset.UTC),
         staffId,
         appId,
+        CommentVisibility.STAFF_ONLY,
+        UserCategory.STAFF,
       ),
     )
     app.comments.add(comment.id)
@@ -68,7 +78,43 @@ class CommentServiceImpl(
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }
 
-  override fun getCommentById(
+  override fun addCommentByPrisoner(
+    prisonerId: String,
+    appId: UUID,
+    commentRequestDto: CommentRequestDto,
+  ): CommentResponseDto<Any> {
+    val prisoner = validatePrisoner(prisonerId)
+    val app = getAppById(appId)
+    validatePrisonerByRequestedBy(prisonerId, app)
+    val comment = commentRepository.save(
+      Comment(
+        Generators.timeBasedEpochGenerator().generate(),
+        commentRequestDto.message,
+        LocalDateTime.now(ZoneOffset.UTC),
+        prisonerId,
+        appId,
+        CommentVisibility.STAFF_AND_PRISONER,
+        UserCategory.PRISONER,
+      ),
+    )
+    app.comments.add(comment.id)
+    appService.saveApp(app)
+    activityService.addActivity(
+      comment.id,
+      EntityType.COMMENT,
+      app.id,
+      Activity.COMMENT_ADDED,
+      app.establishmentId,
+      prisonerId,
+      LocalDateTime.now(ZoneOffset.UTC),
+      prisonerId,
+      app.applicationType!!,
+      app.applicationGroup!!,
+    )
+    return convertCommentToCommentResponseDto(prisonerId, prisoner.username, comment)
+  }
+
+  override fun getCommentByIdForStaff(
     prisonerId: String,
     staffId: String,
     appId: UUID,
@@ -83,15 +129,12 @@ class CommentServiceImpl(
       throw ApiException("Comment with id $commentId does not exist", HttpStatus.NOT_FOUND)
     }
     if (createdBy) {
-      val staffWhoCreated = staffService.getStaffById(comment.createdBy).orElseThrow {
-        ApiException("Staff who created with id ${comment.createdBy} does not exist", HttpStatus.NOT_FOUND)
-      }
-      val establishment = establishmentService.getEstablishmentById(staffWhoCreated.establishmentId).orElseThrow {
-        ApiException("Establishment of Staff who created comment do not exist ${staffWhoCreated.establishmentId}", HttpStatus.NOT_FOUND)
+      val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+        ApiException("Establishment of Staff who created comment do not exist ${staff.establishmentId}", HttpStatus.NOT_FOUND)
       }
       val staffDto = StaffDto(
-        staffWhoCreated.username,
-        staffWhoCreated.userId,
+        staff.username,
+        staff.userId,
         "${staff.fullName}",
         UserCategory.STAFF,
         establishment,
@@ -102,7 +145,40 @@ class CommentServiceImpl(
     }
   }
 
-  override fun getCommentsByAppId(
+  override fun getCommentByIdForPrisoner(
+    prisonerId: String,
+    appId: UUID,
+    createdBy: Boolean,
+    commentId: UUID,
+  ): CommentResponseDto<Any> {
+    val app = getAppById(appId)
+    val prisoner = validatePrisoner(prisonerId)
+    validatePrisonerByRequestedBy(prisonerId, app)
+    val comment = commentRepository.findById(commentId).orElseThrow {
+      throw ApiException("Comment with id $commentId does not exist", HttpStatus.NOT_FOUND)
+    }
+    if (comment.visibility == CommentVisibility.STAFF_ONLY) {
+      throw ApiException("Comment with id $commentId cannot be viewed by prisoner", HttpStatus.FORBIDDEN)
+    }
+    if (createdBy) {
+      val establishment = establishmentService.getEstablishmentById(prisoner.establishmentId!!).orElseThrow {
+        ApiException("Establishment of Staff who created comment do not exist ${prisoner.establishmentId}", HttpStatus.NOT_FOUND)
+      }
+      val prisonerDto = PrisonerDto(
+        prisoner.username,
+        prisoner.userId,
+        "${prisoner.firstName} ${prisoner.lastName}",
+        UserCategory.PRISONER,
+        establishment,
+      )
+
+      return convertCommentToCommentResponseDto(prisonerId, prisonerDto, comment)
+    } else {
+      return convertCommentToCommentResponseDto(prisonerId, comment.createdBy, comment)
+    }
+  }
+
+  override fun getCommentsByAppIdForStaff(
     prisonerId: String,
     staffId: String,
     appId: UUID,
@@ -124,9 +200,28 @@ class CommentServiceImpl(
     )
   }
 
+  override fun getCommentsByAppIdForPrisoner(
+    prisonerId: String,
+    appId: UUID,
+    createdBy: Boolean,
+    pageNumber: Long,
+    pageSize: Long,
+  ): PageResultComments {
+    val app = getAppById(appId)
+    validatePrisonerByRequestedBy(prisonerId, app)
+    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt())
+    val pageResult = commentRepository.getCommentsByAppIdAndVisibility(appId, CommentVisibility.STAFF_AND_PRISONER, pageRequest)
+    return PageResultComments(
+      (pageResult.pageable.pageNumber + 1),
+      pageResult.totalElements.toLong(),
+      pageResult.isLast,
+      convertCommentsToCommentResponseDtoList(prisonerId, createdBy, pageResult.content),
+    )
+  }
+
   private fun convertCommentToCommentResponseDto(
     prisonerId: String,
-    staff: Any,
+    staffOrPrisoner: Any,
     comment: Comment,
   ): CommentResponseDto<Any> = CommentResponseDto(
     comment.id,
@@ -134,7 +229,9 @@ class CommentServiceImpl(
     comment.message,
     prisonerId,
     comment.createdDate,
-    staff,
+    staffOrPrisoner,
+    comment.visibility,
+    comment.createdByUserType,
   )
 
   private fun convertCommentsToCommentResponseDtoList(
@@ -146,17 +243,32 @@ class CommentServiceImpl(
     comments.forEach { comment ->
       var createdByPerson: Any = comment.createdBy
       if (createdBy) {
-        staffService.getStaffById(comment.createdBy).ifPresent { staff ->
-          val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
-            ApiException("Establishment not added for  id ${staff.establishmentId}", HttpStatus.BAD_REQUEST)
+        if (comment.createdByUserType == UserCategory.STAFF) {
+          staffService.getStaffById(comment.createdBy).ifPresent { staff ->
+            val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+              ApiException("Establishment not added for  id ${staff.establishmentId}", HttpStatus.BAD_REQUEST)
+            }
+            createdByPerson = StaffDto(
+              staff.username,
+              staff.userId,
+              "${staff.fullName}",
+              UserCategory.STAFF,
+              establishment,
+            )
           }
-          createdByPerson = StaffDto(
-            staff.username,
-            staff.userId,
-            "${staff.fullName}",
-            UserCategory.STAFF,
-            establishment,
-          )
+        } else if (comment.createdByUserType == UserCategory.PRISONER) {
+          prisonerService.getPrisonerById(comment.createdBy).ifPresent { prisoner ->
+            val establishment = establishmentService.getEstablishmentById(prisoner.establishmentId!!).orElseThrow {
+              ApiException("Establishment not added for  id ${prisoner.establishmentId}", HttpStatus.BAD_REQUEST)
+            }
+            createdByPerson = PrisonerDto(
+              prisoner.username,
+              prisoner.userId,
+              "${prisoner.firstName} ${prisoner.lastName}",
+              UserCategory.PRISONER,
+              establishment,
+            )
+          }
         }
       }
       list.add(
@@ -167,6 +279,8 @@ class CommentServiceImpl(
           prisonerId,
           comment.createdDate,
           createdByPerson,
+          comment.visibility,
+          comment.createdByUserType,
         ),
       )
     }
@@ -191,5 +305,12 @@ class CommentServiceImpl(
     if (prisonerId != app.requestedBy) {
       throw ApiException("App with id ${app.id} is not requested by $prisonerId", HttpStatus.FORBIDDEN)
     }
+  }
+
+  private fun validatePrisoner(prisonerId: String): Prisoner {
+    val prisoner = prisonerService.getPrisonerById(prisonerId).orElseThrow {
+      ApiException("Prison with id $prisonerId not found", HttpStatus.NOT_FOUND)
+    }
+    return prisoner
   }
 }

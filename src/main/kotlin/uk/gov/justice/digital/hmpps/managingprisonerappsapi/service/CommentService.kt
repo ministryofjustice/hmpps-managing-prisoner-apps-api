@@ -10,9 +10,15 @@ interface CommentService {
 
   fun saveComment(comment: Comment): Comment
 
-  fun addComment(prisonerId: String, staffId: String, appId: UUID, commentRequestDto: CommentRequestDto): CommentResponseDto<Any>
+  fun addCommentByStaff(prisonerId: String, staffId: String, appId: UUID, commentRequestDto: CommentRequestDto): CommentResponseDto<Any>
 
-  fun getCommentById(prisonerId: String, staffId: String, appId: UUID, createdBy: Boolean, commentId: UUID): CommentResponseDto<Any>
+  fun addCommentByPrisoner(prisonerId: String, appId: UUID, commentRequestDto: CommentRequestDto): CommentResponseDto<Any>
 
-  fun getCommentsByAppId(prisonerId: String, staffId: String, appId: UUID, createdBy: Boolean, pageNumber: Long, pageSize: Long): PageResultComments
+  fun getCommentByIdForStaff(prisonerId: String, staffId: String, appId: UUID, createdBy: Boolean, commentId: UUID): CommentResponseDto<Any>
+
+  fun getCommentByIdForPrisoner(prisonerId: String, appId: UUID, createdBy: Boolean, commentId: UUID): CommentResponseDto<Any>
+
+  fun getCommentsByAppIdForStaff(prisonerId: String, staffId: String, appId: UUID, createdBy: Boolean, pageNumber: Long, pageSize: Long): PageResultComments
+
+  fun getCommentsByAppIdForPrisoner(prisonerId: String, appId: UUID, createdBy: Boolean, pageNumber: Long, pageSize: Long): PageResultComments
 }
