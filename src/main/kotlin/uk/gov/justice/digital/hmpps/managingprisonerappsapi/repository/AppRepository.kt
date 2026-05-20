@@ -128,4 +128,12 @@ interface AppRepository : JpaRepository<App, UUID> {
     createdBy: String,
     submittedByType: UserCategory,
   ): Optional<AppByAppTypeCounts>
+
+  fun getAppsByEstablishmentIdAndStatusAndApplicationTypeAndCreatedByAndSubmittedByTypeOrderByCreatedDateDesc(
+    establishmentId: String,
+    status: AppStatus,
+    applicationType: Long,
+    createdBy: String,
+    submittedByType: UserCategory,
+  ): List<App>
 }

@@ -13,9 +13,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppReque
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerApplicationTypeCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
@@ -211,11 +211,11 @@ class AppResourcePrisonerFacingIntegrationTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<ApplicationTypeResponse>() {})
+      .expectBody(object : ParameterizedTypeReference<PrisonerApplicationTypeCount>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as ApplicationTypeResponse
-    Assertions.assertEquals(0, response.count)
+      .responseBody as PrisonerApplicationTypeCount
+    Assertions.assertEquals(0, response.totalAppsInPending)
 
     // add app request
     val app = webTestClient.post()
@@ -258,11 +258,11 @@ class AppResourcePrisonerFacingIntegrationTest(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<ApplicationTypeResponse>() {})
+      .expectBody(object : ParameterizedTypeReference<PrisonerApplicationTypeCount>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as ApplicationTypeResponse
-    Assertions.assertEquals(1, response.count)
+      .responseBody as PrisonerApplicationTypeCount
+    Assertions.assertEquals(1, response.totalAppsInPending)
   }
 
   @Test

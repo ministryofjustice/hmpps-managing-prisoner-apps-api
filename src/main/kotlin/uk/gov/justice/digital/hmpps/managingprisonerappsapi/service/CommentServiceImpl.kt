@@ -57,7 +57,7 @@ class CommentServiceImpl(
         LocalDateTime.now(ZoneOffset.UTC),
         staffId,
         appId,
-        CommentVisibility.STAFF_ONLY,
+        commentRequestDto.visibility,
         UserCategory.STAFF,
       ),
     )
@@ -169,7 +169,7 @@ class CommentServiceImpl(
         prisoner.userId,
         "${prisoner.firstName} ${prisoner.lastName}",
         UserCategory.PRISONER,
-        establishment,
+        establishment.id,
       )
 
       return convertCommentToCommentResponseDto(prisonerId, prisonerDto, comment)
@@ -266,7 +266,7 @@ class CommentServiceImpl(
               prisoner.userId,
               "${prisoner.firstName} ${prisoner.lastName}",
               UserCategory.PRISONER,
-              establishment,
+              establishment.id,
             )
           }
         }
