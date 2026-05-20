@@ -41,7 +41,7 @@ dependencies {
     exclude(group = "io.swagger.core.v3")
   }
   testImplementation("com.h2database:h2:2.4.240")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.4.0") {
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.4.2") {
     exclude(group = "org.springframework.boot", module = "spring-boot-webtestclient")
   }
 

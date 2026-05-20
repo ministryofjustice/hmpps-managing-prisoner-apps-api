@@ -55,7 +55,6 @@ data class PrnAppResponse(
 data class PrnAppAttachment(
   val contentType: String,
   val url: String,
-  val filesize: Long,
   val headers: List<AttachmentHeader>,
   @JsonIgnore val documentId: String,
 )
