@@ -105,14 +105,14 @@ class HistoryServiceImpl(
         createdBy = StaffType.MANAGE_APPS_ADMIN.name
       } else {
         if (h.createdBy != app.requestedBy) {
-          // app created by staff
+          // history data added due to staff action
           val staff = staffService.getStaffById(h.createdBy).orElseThrow {
             ApiException("Staff with id ${h.createdBy} does not exist", HttpStatus.NOT_FOUND)
           }
           createdBy = staff.fullName
         } else {
-          // app created by prisoner
-          createdBy = "{app.requestedByFirstName} {app.requestedByLastName} [PRISONER]"
+          // history data added due to prisoner action
+          createdBy = "${app.requestedByFirstName} ${app.requestedByLastName} [PRISONER]"
         }
       }
       var groupName: String = ""
