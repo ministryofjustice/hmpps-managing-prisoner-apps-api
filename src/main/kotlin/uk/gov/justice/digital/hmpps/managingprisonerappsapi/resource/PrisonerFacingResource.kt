@@ -23,9 +23,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppReque
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerApplicationTypeCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppPrisonerFacingService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.CommentService
@@ -161,7 +161,7 @@ class PrisonerFacingResource(
   fun getPrisonerPendingAppCountByAppType(
     @PathVariable("applicationType") applicationType: Long,
     authentication: Authentication,
-  ): ResponseEntity<ApplicationTypeResponse> {
+  ): ResponseEntity<PrisonerApplicationTypeCount> {
     logger.info("Request received for getting apps count in pending status for prisoner: ${authentication.principal} with app type: $applicationType")
     authentication as AuthAwareAuthenticationToken
     val appResponseDto =

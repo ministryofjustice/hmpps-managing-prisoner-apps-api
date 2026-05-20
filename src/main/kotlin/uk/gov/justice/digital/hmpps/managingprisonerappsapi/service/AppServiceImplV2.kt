@@ -264,7 +264,6 @@ class AppServiceImplV2(
   }
 
   override fun getHistoryAppsId(prisonerId: String, appId: UUID, staffId: String): List<HistoryResponse> {
-    // TODO("Not yet implemented")
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }

@@ -10,6 +10,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppList
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerApplicationTypeCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
@@ -143,29 +144,31 @@ class AppPrisonerFacingService(
     return establishmentService.getAppGroupsAndTypesForPrisonerEstablishment(prisoner.establishmentId)
   }
 
-  fun getPrisonerAppsCountInPending(prisonerId: String, appType: Long): ApplicationTypeResponse {
+  fun getPrisonerAppsCountInPending(prisonerId: String, appType: Long): PrisonerApplicationTypeCount {
     val prisoner = validatePrisoner(prisonerId)
     val applicationType = applicationTypeRepository.findById(appType).orElseThrow {
       ApiException("No application type found for id: $appType", HttpStatus.BAD_REQUEST)
     }
-    val applicationTypeCounts = appRepository.countAppsByStatusAndApplicationTypeAndCreatedBy(
+    val apps = appRepository.getAppsByEstablishmentIdAndStatusAndApplicationTypeAndCreatedByAndSubmittedByTypeOrderByCreatedDateDesc(
       prisoner.establishmentId!!,
       AppStatus.PENDING,
       appType,
       prisoner.username,
       UserCategory.PRISONER,
     )
-    var count = 0
-    if (applicationTypeCounts.isPresent) {
-      count = applicationTypeCounts.get().getCount()
+    var date: LocalDateTime? = null
+    if (apps.size > 0) {
+      date = apps.get(0).createdDate
     }
-    return ApplicationTypeResponse(
+    return PrisonerApplicationTypeCount(
       applicationType.id,
       applicationType.name,
       applicationType.genericType,
       applicationType.genericForm,
       applicationType.logDetailRequired,
-      count.toLong(),
+      apps.size.toLong(),
+      date,
+      UserCategory.PRISONER,
     )
   }
 
