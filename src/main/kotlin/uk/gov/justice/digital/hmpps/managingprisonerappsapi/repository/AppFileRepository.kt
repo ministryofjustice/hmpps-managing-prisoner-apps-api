@@ -6,4 +6,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import java.util.UUID
 
 @Repository
-interface AppFileRepository : JpaRepository<AppFile, UUID>
+interface AppFileRepository : JpaRepository<AppFile, UUID> {
+
+  fun findByAppId(appId: UUID): List<AppFile>
+}

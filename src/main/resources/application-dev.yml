@@ -11,6 +11,8 @@ spring:
      locations: classpath:db/migration/dev
 
 hmpps:
+  self:
+    url: https://managing-prisoner-apps-api-dev.hmpps.service.justice.gov.uk
   sqs:
     queues:
       domaineventsqueue:
@@ -27,3 +29,12 @@ hmpps:
     api:
       url: https://prisoner-search-dev.prison.service.justice.gov.uk
       timeout: 10s
+  document:
+    api:
+      url: https://document-api-dev.hmpps.service.justice.gov.uk
+      timeout: 10s
+  sar:
+    additionalAccessRole: MANAGING_PRISONER_APPS
+
+
+

@@ -1,22 +1,12 @@
-# SQS-specific test configuration
-# Only used by tests that need SQS/LocalStack (PrisonerMergeIntegrationTest)
+# SQS-specific test profile
+# This profile enables SQS for tests that need it (e.g., PrisonerMergeIntegrationTest)
+# Use with: @ActiveProfiles("test", "test-sqs")
 
 spring:
   autoconfigure:
-    exclude: []  # Override the exclusion from application-test.yml
+    exclude: []  # Override the exclusion from application-test.yml to enable SQS
 
 hmpps:
   sqs:
-    enabled: true
-    provider: localstack
-    localstackUrl: http://localhost:4566
-    region: eu-west-2
-    queues:
-      domaineventsqueue:
-        queueName: domainevents-queue
-        dlqName: domainevents-queue-dlq
-        subscribeTopicId: domainevents
-    topics:
-      domainevents:
-        arn: arn:aws:sns:eu-west-2:000000000000:domainevents-topic
+    enabled: true  # Override the disabled default from application-test.yml
 
