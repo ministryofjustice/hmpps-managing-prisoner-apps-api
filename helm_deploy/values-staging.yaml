@@ -12,12 +12,7 @@ generic-service:
     SPRING_PROFILES_ACTIVE: "staging"
     HMPPS_SQS_ENABLED: "true"  # Enable SQS in cloud environments
     HMPPS_SQS_USE_WEB_TOKEN: "true"
-
-  allowlist:
-    appsec-testers: 195.68.59.74
-    groups:
-      - internal
-
+    
     # Template kotlin calls out to itself to provide an example of a service call
     # TODO: This should be replaced by a call to a different service, or removed
     EXAMPLE_API_URL: "https://managing-prisoner-apps-api-staging.hmpps.service.justice.gov.uk"

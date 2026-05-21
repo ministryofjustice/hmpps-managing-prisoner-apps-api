@@ -7,6 +7,11 @@ generic-service:
   ingress:
     host: managing-prisoner-apps-api-dev.hmpps.service.justice.gov.uk
 
+  allowlist:
+    appsec-testers: 195.68.59.74
+    groups:
+      - internal
+
   env:
     APPLICATIONINSIGHTS_CONFIGURATION_FILE: "applicationinsights.dev.json"
     SPRING_PROFILES_ACTIVE: "dev"
