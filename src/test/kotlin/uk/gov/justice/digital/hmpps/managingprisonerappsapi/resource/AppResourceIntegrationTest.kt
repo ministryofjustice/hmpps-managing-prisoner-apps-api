@@ -194,7 +194,7 @@ open class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as List<HistoryResponse>
     Assertions.assertEquals(2, historyResponse.size)
-    Assertions.assertEquals(appResponse.id,historyResponse.get(0).appId)
+    Assertions.assertEquals(appResponse.id, historyResponse.get(0).appId)
   }
 
   @Test

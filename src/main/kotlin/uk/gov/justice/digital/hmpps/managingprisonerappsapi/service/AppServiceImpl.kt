@@ -182,8 +182,6 @@ class AppServiceImpl(
     } else {
       department = groupsService.getGroupByInitialAppType(establishmentId, appRequestDto.applicationType!!).first().id
     }
-    // val group =
-    //  groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
     var app = convertAppRequestToAppEntity(prisoner, staff, department!!, appRequestDto)
     val assignedGroup = groupsService.getGroupById(department!!, staff.establishmentId)
     logger.info("Saving app request in db")
@@ -276,10 +274,9 @@ class AppServiceImpl(
     val app = appRepository.findById(appId)
       .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.FORBIDDEN) }
     validateStaffPermission(staff, app)
-    val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+    establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
       ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
     }
-    val establishmentId = if (establishment.defaultDepartments) "DEFAULT" else staff.establishmentId
     if (groupId == app.assignedGroup) {
       throw ApiException("App already assigned to group $groupId", HttpStatus.BAD_REQUEST)
     }
@@ -367,7 +364,7 @@ class AppServiceImpl(
     runBlocking {
       launch {
         establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
-          ApiException("", HttpStatus.FORBIDDEN)
+          ApiException("Establishment with id: ${staff.establishmentId} is not enabled.", HttpStatus.FORBIDDEN)
         }
         establishmentAppTypes = establishment.blacklistedAppTypes
       }
