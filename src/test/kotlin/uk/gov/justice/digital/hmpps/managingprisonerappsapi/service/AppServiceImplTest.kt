@@ -134,7 +134,7 @@ class AppServiceImplTest {
 
     applicationGroup = ApplicationGroup(1, "Bt Pin Phones", listOf(applicationType))
 
-    appService = AppServiceImplV2(
+    appService = AppServiceImpl(
       appRepository,
       prisonerService,
       staffService,

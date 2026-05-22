@@ -41,6 +41,8 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
 
+// This integration test for App resource integration test using establishment with default departments
+
 class AppResourceIntegrationTestDefaultGroups(
   @Autowired private val appRepository: AppRepository,
   @Autowired private val groupRepository: GroupRepository,

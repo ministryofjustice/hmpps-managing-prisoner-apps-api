@@ -52,22 +52,22 @@ open class AppResourceIntegrationTest(
   @Autowired private val appFileRepository: AppFileRepository,
 ) : IntegrationTestBase() {
 
-  protected val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
-  protected val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
-  protected val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
-  protected val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
-  protected val assignedGroupFirstName = "Business Hub"
-  protected val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
-  protected val assignedGroupSecondName = "OMU"
-  protected val requestedByFirst = "A12345"
-  protected val requestedByFirstMainName = "John"
-  protected val requestedByFirstSurname = "Smith"
-  protected val requestedBySecondMainName = "John"
-  protected val requestedBySecondSurname = "Butler"
-  protected val requestedBySecond = "B12345"
-  protected val requestedByThird = "C12345"
-  protected val requestedByThirdMainName = "Test"
-  protected val requestedByThirdSurname = "User"
+  private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
+  private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
+  private val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
+  private val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
+  private val assignedGroupFirstName = "Business Hub"
+  private val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
+  private val assignedGroupSecondName = "OMU"
+  private val requestedByFirst = "A12345"
+  private val requestedByFirstMainName = "John"
+  private val requestedByFirstSurname = "Smith"
+  private val requestedBySecondMainName = "John"
+  private val requestedBySecondSurname = "Butler"
+  private val requestedBySecond = "B12345"
+  private val requestedByThird = "C12345"
+  private val requestedByThirdMainName = "Test"
+  private val requestedByThirdSurname = "User"
 
   protected val applicationGroupOne = 1L
   protected val applicationTypeOne = 1L
@@ -119,7 +119,7 @@ open class AppResourceIntegrationTest(
 
   @Test
   fun `submit an app`() {
-    var response = webTestClient.post()
+    var appResponse = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
@@ -145,19 +145,20 @@ open class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<Any, Any>
 
-    Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
-    Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
-    Assertions.assertEquals(false, response.firstNightCenter)
-    Assertions.assertEquals(1, response.requests.size)
-    Assertions.assertNotNull(response.requests.get(0)["id"])
-    Assertions.assertEquals(response.requests.get(0)["contact-number"], CONTACT_NUMBER)
+    Assertions.assertEquals(applicationTypeOne, appResponse.applicationType.id)
+    Assertions.assertEquals(requestedByFirst, appResponse.requestedBy)
+    Assertions.assertEquals(AppStatus.PENDING, appResponse.status)
+    Assertions.assertEquals(false, appResponse.firstNightCenter)
+    Assertions.assertEquals(1, appResponse.requests.size)
+    Assertions.assertNotNull(appResponse.requests.get(0)["id"])
+    Assertions.assertEquals(appResponse.requests.get(0)["contact-number"], CONTACT_NUMBER)
 
+    // update app
     val newContactNumber = "0987654321"
-    val map = response.requests.get(0).toMutableMap()
+    val map = appResponse.requests.get(0).toMutableMap()
     map["contact-number"] = newContactNumber
-    response = webTestClient.put()
-      .uri("/v1/prisoners/$requestedByFirst/apps/${response.id}")
+    appResponse = webTestClient.put()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${appResponse.id}")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -172,15 +173,16 @@ open class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<Any, Any>
 
-    Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
-    Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
-    Assertions.assertEquals(false, response.firstNightCenter)
-    Assertions.assertEquals(1, response.requests.size)
-    Assertions.assertEquals(newContactNumber, response.requests.get(0)["contact-number"])
+    Assertions.assertEquals(applicationTypeOne, appResponse.applicationType.id)
+    Assertions.assertEquals(requestedByFirst, appResponse.requestedBy)
+    Assertions.assertEquals(AppStatus.PENDING, appResponse.status)
+    Assertions.assertEquals(false, appResponse.firstNightCenter)
+    Assertions.assertEquals(1, appResponse.requests.size)
+    Assertions.assertEquals(newContactNumber, appResponse.requests.get(0)["contact-number"])
 
-    webTestClient.get()
-      .uri("/v1/prisoners/$requestedByFirst/apps/${response.id}/history")
+    // verify history
+    val historyResponse = webTestClient.get()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${appResponse.id}/history")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -191,6 +193,8 @@ open class AppResourceIntegrationTest(
       .consumeWith(System.out::println)
       .returnResult()
       .responseBody as List<HistoryResponse>
+    Assertions.assertEquals(2, historyResponse.size)
+    Assertions.assertEquals(appResponse.id,historyResponse.get(0).appId)
   }
 
   @Test
@@ -435,7 +439,6 @@ open class AppResourceIntegrationTest(
 
   @Test
   fun `forward app request to other group`() {
-    // groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentIdFirst)
     val forwardingMessage = "Forwarding  to group $assignedGroupSecondName"
 
     webTestClient.post()
@@ -506,6 +509,7 @@ open class AppResourceIntegrationTest(
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
 
+    // Get history
     webTestClient.get()
       .uri("/v1/prisoners/$requestedByFirst/apps/$appIdFirst/history")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
@@ -522,6 +526,7 @@ open class AppResourceIntegrationTest(
 
   @Test
   fun `submit an app with no roles`() {
+    // This tets for role added in access token
     webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps")
       .headers(setAuthorisation())
@@ -546,6 +551,7 @@ open class AppResourceIntegrationTest(
 
   @Test
   fun `get an app by id`() {
+    // save an app
     val app = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
@@ -564,6 +570,7 @@ open class AppResourceIntegrationTest(
         false,
       ),
     )
+    // get saved app by id
     val response = webTestClient.get()
       .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
@@ -586,6 +593,7 @@ open class AppResourceIntegrationTest(
 
   @Test
   fun `get an app by id with prisoner`() {
+    // save an app with a given prisoner
     val app = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,
@@ -605,6 +613,7 @@ open class AppResourceIntegrationTest(
       ),
     )
 
+    // get by app id saved app with a given prisoner
     val response = webTestClient.get()
       .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}?requestedBy=true")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
@@ -669,7 +678,7 @@ open class AppResourceIntegrationTest(
     Assertions.assertNotNull(response.assignedGroup.name)
   }
 
-  protected fun populateEstablishments() {
+  private fun populateEstablishments() {
     establishmentRepository.save(
       Establishment(
         establishmentIdFirst,
@@ -702,7 +711,7 @@ open class AppResourceIntegrationTest(
     )
   }
 
-  protected fun populateGroups() {
+  private fun populateGroups() {
     groupRepository.save(
       DataGenerator.generateGroups(
         assignedGroupFirst,
@@ -732,7 +741,7 @@ open class AppResourceIntegrationTest(
     )
   }
 
-  protected fun populateApplicationGroupsAndTypes() {
+  private fun populateApplicationGroupsAndTypes() {
     val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false, false)
     val removeContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false, false)
     val addOfficialContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false, false)
@@ -742,7 +751,7 @@ open class AppResourceIntegrationTest(
     applicationGroupRepository.save<ApplicationGroup>(applicationGroupOne)
   }
 
-  protected fun populateApps() {
+  private fun populateApps() {
     appIdFirst = appRepository.save(
       DataGenerator.generateApp(
         establishmentIdFirst,

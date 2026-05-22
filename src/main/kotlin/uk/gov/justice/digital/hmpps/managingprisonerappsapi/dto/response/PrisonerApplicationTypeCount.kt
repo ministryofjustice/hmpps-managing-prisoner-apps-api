@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import java.time.LocalDateTime
 
+// This is response model for giving counts of given application type which are in pending and submitted by prisoner.
 data class PrisonerApplicationTypeCount(
   val id: Long,
   val name: String,

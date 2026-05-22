@@ -53,6 +53,7 @@ class DataGenerator {
       Decision.APPROVED,
       LocalDateTime.now(),
       staffId,
+      Generators.timeBasedEpochGenerator().generate(),
     )
 
     fun generateApp(): App = App(
