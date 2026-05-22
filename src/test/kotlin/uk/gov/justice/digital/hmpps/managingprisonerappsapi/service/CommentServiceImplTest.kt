@@ -11,6 +11,7 @@ import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
@@ -321,7 +322,7 @@ class CommentServiceImplTest {
     Mockito.`when`(staffService.getStaffById(createdBy))
       .thenReturn(Optional.of(staff))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
-    Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5)))
+    Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByStaff), PageRequest.of(0, 5), 1))
     val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, false, 1, 5)
     assertEquals(1, result.totalElements)
@@ -334,7 +335,7 @@ class CommentServiceImplTest {
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy))
       .thenReturn(Optional.of(prisoner))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
-    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5)))
+    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByPrisoner), PageRequest.of(0, 5), 1))
     val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, false, 1, 5)
     assertEquals(1, result.totalElements)
@@ -352,7 +353,7 @@ class CommentServiceImplTest {
         EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
       ),
     )
-    Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5)))
+    Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByStaff), PageRequest.of(0, 5), 1))
     val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, true, 1, 5)
     assertEquals(1, result.totalElements)
@@ -370,7 +371,7 @@ class CommentServiceImplTest {
         EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
       ),
     )
-    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5)))
+    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByPrisoner), PageRequest.of(0, 5), 1))
     val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, true, 1, 5)
     assertEquals(1, result.totalElements)
