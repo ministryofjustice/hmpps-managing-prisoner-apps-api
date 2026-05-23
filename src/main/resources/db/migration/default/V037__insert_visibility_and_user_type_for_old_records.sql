@@ -1,6 +1,6 @@
-update comment
-set visibility = 'STAFF_ONLY';
+UPDATE comment
+set visibility = 'STAFF_ONLY' where visibility IS NULL;
 
-update comment
-set created_by_user_type = 'STAFF';
+UPDATE comment
+set created_by_user_type = 'STAFF' where created_by_user_type IS NULL;
 
