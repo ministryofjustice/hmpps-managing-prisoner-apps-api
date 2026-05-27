@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import com.fasterxml.uuid.Generators
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
@@ -29,7 +28,7 @@ import java.util.*
 @Service
 class CommentServiceImpl(
   private val staffService: StaffService,
-  @Qualifier("appServiceV2") private val appService: AppService,
+  private val appService: AppService,
   private val commentRepository: CommentRepository,
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
@@ -62,8 +61,8 @@ class CommentServiceImpl(
         UserCategory.STAFF,
       ),
     )
-    app.comments.add(comment.id)
-    appService.saveApp(app)
+    // app.comments.add(comment.id)
+    // appService.saveApp(app)
     activityService.addActivity(
       comment.id,
       EntityType.COMMENT,
@@ -98,8 +97,8 @@ class CommentServiceImpl(
         UserCategory.PRISONER,
       ),
     )
-    app.comments.add(comment.id)
-    appService.saveApp(app)
+    // app.comments.add(comment.id)
+    // appService.saveApp(app)
     activityService.addActivity(
       comment.id,
       EntityType.COMMENT,

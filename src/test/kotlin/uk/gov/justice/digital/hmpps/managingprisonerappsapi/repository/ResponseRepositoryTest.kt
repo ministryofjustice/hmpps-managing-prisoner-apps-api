@@ -14,7 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
-import java.util.*
 
 @SpringBootTest(classes = [ResponseRepositoryTest::class])
 @EnableAutoConfiguration
@@ -22,7 +21,7 @@ import java.util.*
 @EntityScan("uk.gov.justice.digital.hmpps.managingprisonerappsapi.model")
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("test")
-class ResponseRepositoryTest(@Autowired var responseRepository: ResponseRepository) {
+class ResponseRepositoryTest(@Autowired private val responseRepository: ResponseRepository) {
   @Test
   fun `save response`() {
     val response = responseRepository.save(DataGenerator.generateResponse(Generators.timeBasedEpochGenerator().generate().toString()))
@@ -38,6 +37,7 @@ class ResponseRepositoryTest(@Autowired var responseRepository: ResponseReposito
       createdResponse.decision,
       LocalDateTime.now(),
       createdResponse.createdBy,
+      Generators.timeBasedEpochGenerator().generate(),
     )
     response = responseRepository.save(response)
     Assertions.assertEquals("updating reason", response.reason)

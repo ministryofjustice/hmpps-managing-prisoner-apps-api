@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppListPrisonerFacing
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisonerDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerApplicationTypeCount
@@ -53,7 +53,7 @@ class AppPrisonerFacingService(
     )
   }
 
-  fun getPrisonerAppById(prisonerId: String, appId: UUID): AppResponsePrisoner<Any, Any> {
+  fun getPrisonerAppById(prisonerId: String, appId: UUID): AppResponsePrisonerDto<Any, Any> {
     val prisoner = validatePrisoner(prisonerId)
     validateEstablishment(prisoner.establishmentId!!)
     val app = appRepository.findById(appId).orElseThrow {
@@ -81,7 +81,7 @@ class AppPrisonerFacingService(
     )
   }
 
-  fun submitApp(appRequest: AppRequestPrisoner, prisonerId: String): AppResponsePrisoner<Any, Any> {
+  fun submitApp(appRequest: AppRequestPrisoner, prisonerId: String): AppResponsePrisonerDto<Any, Any> {
     // validate prisoner exist
     val prisoner = validatePrisoner(prisonerId)
     // validate establishment onboarded
@@ -215,7 +215,7 @@ class AppPrisonerFacingService(
     applicationGroup: ApplicationGroup,
     applicationType: ApplicationType,
     reason: String?,
-  ): AppResponsePrisoner<Any, Any> = AppResponsePrisoner(
+  ): AppResponsePrisonerDto<Any, Any> = AppResponsePrisonerDto(
     app.id,
     app.reference,
     assignedGroup,
