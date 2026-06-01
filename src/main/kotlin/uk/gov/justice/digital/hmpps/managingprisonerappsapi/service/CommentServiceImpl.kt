@@ -2,6 +2,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import com.fasterxml.uuid.Generators
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
@@ -189,7 +190,7 @@ class CommentServiceImpl(
     val app = getAppById(appId)
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
-    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt())
+    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt()).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))
     val pageResult = commentRepository.getCommentsByAppId(appId, pageRequest)
     return PageResultComments(
       (pageResult.pageable.pageNumber + 1),
@@ -208,7 +209,7 @@ class CommentServiceImpl(
   ): PageResultComments {
     val app = getAppById(appId)
     validatePrisonerByRequestedBy(prisonerId, app)
-    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt())
+    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt()).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))
     val pageResult = commentRepository.getCommentsByAppIdAndVisibility(appId, CommentVisibility.STAFF_AND_PRISONER, pageRequest)
     return PageResultComments(
       (pageResult.pageable.pageNumber + 1),
