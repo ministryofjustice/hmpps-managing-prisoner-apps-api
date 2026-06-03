@@ -1,13 +1,12 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.resource
 
-/*import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -33,15 +32,13 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNam
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
-import java.util.**/
+import java.util.*
 
-/*@RestController
-@RequestMapping("v2")*/
-class AppResource(
-  // @Qualifier("appServiceV2") var appService: AppService
-) {
+@RestController
+@RequestMapping("v1")
+class AppResource(var appService: AppService) {
 
-  /*companion object {
+  companion object {
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
@@ -261,6 +258,7 @@ class AppResource(
     if (appsSearchQueryDto.assignedGroups != null && appsSearchQueryDto.assignedGroups!!.isEmpty()) {
       appsSearchQueryDto.assignedGroups = null
     }
+    val oldestFirst = if (appsSearchQueryDto.oldestAppFirst != null) appsSearchQueryDto.oldestAppFirst else false
     val appResponseDto = appService.searchAppsByColumnsFilter(
       authentication.principal,
       appsSearchQueryDto.status,
@@ -270,7 +268,7 @@ class AppResource(
       appsSearchQueryDto.firstNightCenter,
       appsSearchQueryDto.page,
       appsSearchQueryDto.size,
-      appsSearchQueryDto.oldestAppFirst!!,
+      oldestFirst,
     )
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
@@ -307,5 +305,5 @@ class AppResource(
     authentication as AuthAwareAuthenticationToken
     val searchResult = appService.searchRequestedByTextSearch(authentication.principal, name)
     return ResponseEntity.status(HttpStatus.OK).body(searchResult)
-  }*/
+  }
 }

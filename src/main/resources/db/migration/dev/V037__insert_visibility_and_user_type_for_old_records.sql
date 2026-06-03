@@ -1,6 +1,4 @@
-update comment
-set visibility = 'STAFF_AND_PRISONER';
+update comment set visibility = 'STAFF_ONLY' WHERE COALESCE(visibility, '') = '';
 
-update comment
-set created_by_user_type = 'STAFF';
+update comment set created_by_user_type = 'STAFF' WHERE COALESCE(created_by_user_type, '') = '';
 

@@ -11,7 +11,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisonerDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
@@ -52,28 +52,28 @@ class AppResourcePrisonerFacingIntegrationTest(
   @Autowired private val appFileRepository: AppFileRepository,
 ) : IntegrationTestBase() {
 
-  val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
-  val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
-  val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
-  val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
-  val assignedGroupFirstName = "Business Hub"
-  val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
-  val assignedGroupSecondName = "OMU"
-  val requestedByFirst = "A12345"
-  val requestedByFirstMainName = "John"
-  val requestedByFirstSurname = "Smith"
+  private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
+  private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
+  private val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
+  private val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
+  private val assignedGroupFirstName = "Business Hub"
+  private val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
+  private val assignedGroupSecondName = "OMU"
+  private val requestedByFirst = "A12345"
+  private val requestedByFirstMainName = "John"
+  private val requestedByFirstSurname = "Smith"
 
-  val applicationGroupOne = 1L
-  val applicationTypeOne = 1L
-  val applicationTypeTwo = 2L
-  val applicationTypeThree = 3L
-  val applicationTypeFour = 4L
+  private val applicationGroupOne = 1L
+  private val applicationTypeOne = 1L
+  private val applicationTypeTwo = 2L
+  private val applicationTypeThree = 3L
+  private val applicationTypeFour = 4L
 
-  val applicationGroupOneName = "Bt PIN PHONES"
-  val applicationTypeOneName = "Add new Social Contact"
-  val applicationTypeTwoName = "Add new Official Contact"
-  val applicationTypeThreeName = "Remove Contact"
-  val applicationTypeFourName = "Add Generic Pin Phone enquiry"
+  private val applicationGroupOneName = "Bt PIN PHONES"
+  private val applicationTypeOneName = "Add new Social Contact"
+  private val applicationTypeTwoName = "Add new Official Contact"
+  private val applicationTypeThreeName = "Remove Contact"
+  private val applicationTypeFourName = "Add Generic Pin Phone enquiry"
 
   private lateinit var app: App
 
@@ -113,7 +113,8 @@ class AppResourcePrisonerFacingIntegrationTest(
   @Test
   fun `submit an app by prisoner, get app by id, get list of apps`() {
     appRepository.deleteAll()
-    var response = webTestClient.post()
+    // saved an app
+    var appResponse = webTestClient.post()
       .uri("/v1/prisoners/apps")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
@@ -137,33 +138,33 @@ class AppResourcePrisonerFacingIntegrationTest(
       .exchange()
       .expectStatus().isCreated
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<AppResponsePrisoner<Any, Prisoner>>() {})
+      .expectBody(object : ParameterizedTypeReference<AppResponsePrisonerDto<Any, Prisoner>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as AppResponsePrisoner<Any, Prisoner>
+      .responseBody as AppResponsePrisonerDto<Any, Prisoner>
 
-    Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
-    Assertions.assertEquals(loggedUserId, response.requestedBy.userId)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
-    Assertions.assertEquals(1, response.requests.size)
-    Assertions.assertNotNull(response.requests.get(0)["id"])
-    Assertions.assertEquals(response.requests.get(0)["contact-number"], CONTACT_NUMBER)
+    Assertions.assertEquals(applicationTypeOne, appResponse.applicationType.id)
+    Assertions.assertEquals(loggedUserId, appResponse.requestedBy.userId)
+    Assertions.assertEquals(AppStatus.PENDING, appResponse.status)
+    Assertions.assertEquals(1, appResponse.requests.size)
+    Assertions.assertNotNull(appResponse.requests.get(0)["id"])
+    Assertions.assertEquals(appResponse.requests.get(0)["contact-number"], CONTACT_NUMBER)
 
     // Get app by id
-    response = webTestClient.get()
-      .uri("/v1/prisoners/apps/${response.id}")
+    appResponse = webTestClient.get()
+      .uri("/v1/prisoners/apps/${appResponse.id}")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<AppResponsePrisoner<Any, Prisoner>>() {})
+      .expectBody(object : ParameterizedTypeReference<AppResponsePrisonerDto<Any, Prisoner>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as AppResponsePrisoner<Any, Prisoner>
+      .responseBody as AppResponsePrisonerDto<Any, Prisoner>
 
-    Assertions.assertNotNull(response)
+    Assertions.assertNotNull(appResponse)
 
     // get apps
     val appsResponse = webTestClient.get()
@@ -242,10 +243,10 @@ class AppResourcePrisonerFacingIntegrationTest(
       .exchange()
       .expectStatus().isCreated
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<AppResponsePrisoner<Any, Prisoner>>() {})
+      .expectBody(object : ParameterizedTypeReference<AppResponsePrisonerDto<Any, Prisoner>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as AppResponsePrisoner<Any, Prisoner>
+      .responseBody as AppResponsePrisonerDto<Any, Prisoner>
 
     Assertions.assertNotNull(app)
 

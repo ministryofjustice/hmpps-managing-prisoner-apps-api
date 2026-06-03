@@ -1,10 +1,52 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import com.fasterxml.uuid.Generators
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.FileRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppListViewDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseListDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.FileResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.GroupAppListViewDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAppTypeCounts
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedGroupCounts
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNameSearchResult
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
-// @Service("appServiceV1")
+@Service
 class AppServiceImpl(
   private val appRepository: AppRepository,
   private val prisonerService: PrisonerService,
@@ -14,13 +56,13 @@ class AppServiceImpl(
   private val activityService: ActivityService,
   private val historyService: HistoryService,
   private val establishmentService: EstablishmentService,
+  private val applicationGroupRepository: ApplicationGroupRepository,
+  private val applicationTypeRepository: ApplicationTypeRepository,
 
-)
-/*
-: AppService {
+) : AppService {
 
   companion object {
-    private val logger = LoggerFactory.getLogger(AppResource::class.java)
+    private val logger = LoggerFactory.getLogger(AppServiceImpl::class.java)
   }
 
   override fun saveApp(app: App): App = appRepository.save(app)
@@ -35,7 +77,7 @@ class AppServiceImpl(
       throw ApiException("Multiple or zero requests in app is not supported", HttpStatus.FORBIDDEN)
     }
     val staff = staffService.getStaffById(staffId).orElseThrow {
-      ApiException("Staff with id $staffId not found", HttpStatus.NOT_FOUND)
+      ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
     var app = appRepository.findAppsByIdAndRequestedBy(appId, prisonerId)
       .orElseThrow<ApiException> { throw ApiException("No app exist with id $appId", HttpStatus.NOT_FOUND) }
@@ -55,7 +97,7 @@ class AppServiceImpl(
         }
       }
     }
-    app.lastModifiedDate = LocalDateTime.now()
+    app.lastModifiedDate = LocalDateTime.now(ZoneOffset.UTC)
     app.lastModifiedBy = staffId
     app.firstNightCenter = appUpdateDto.firstNightCenter
     app = appRepository.save(app)
@@ -68,9 +110,16 @@ class AppServiceImpl(
       staffId,
       LocalDateTime.now(ZoneOffset.UTC),
       prisonerId,
-      app.appType!!,
+      app.applicationType!!,
+      app.applicationGroup!!,
     )
-    return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup)
+    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
+      throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
+    }
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
+      throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
+    }
+    return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup, applicationGroup, applicationType)
   }
 
   fun updateApp(app: App): App = appRepository.save(app)
@@ -103,20 +152,21 @@ class AppServiceImpl(
     if (prisoner.establishmentId != staff.establishmentId) {
       throw ApiException("Staff and prisoner is from two different establishment", HttpStatus.FORBIDDEN)
     }
+    validateApplicationGroupAndType(appRequestDto.applicationGroup!!, appRequestDto.applicationType!!)
     if (appRequestDto.requests.size != 1) {
       throw ApiException("Only one requests in app is supported", HttpStatus.BAD_REQUEST)
     }
     val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
       ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
     }
-    if (!establishment.appTypes.contains(AppType.getAppType(appRequestDto.type!!))) {
-      throw ApiException("The type: ${appRequestDto.type} is not enabled for ${establishment.name}", HttpStatus.FORBIDDEN)
+    if (establishment.blacklistedAppTypes.contains(appRequestDto.applicationType!!)) {
+      throw ApiException("The type: ${appRequestDto.applicationType} is not enabled for ${establishment.name}", HttpStatus.FORBIDDEN)
     }
     val establishmentId = if (establishment.defaultDepartments) "DEFAULT" else staff.establishmentId
     var department: UUID? = null
     if (appRequestDto.department != null) {
       groupsService.getGroupById(appRequestDto.department, staff.establishmentId)
-      val departments = groupsService.getGroupByInitialAppType(establishmentId, AppType.getAppType(appRequestDto.type))
+      val departments = groupsService.getGroupByInitialAppType(establishmentId, appRequestDto.applicationType)
       if (departments.size <= 1) {
         department = appRequestDto.department
       } else {
@@ -130,13 +180,12 @@ class AppServiceImpl(
         throw ApiException("Department  with id ${appRequestDto.department} is not found", HttpStatus.FORBIDDEN)
       }
     } else {
-      department = groupsService.getGroupByInitialAppType(establishmentId, AppType.getAppType(appRequestDto.type)).first().id
+      department = groupsService.getGroupByInitialAppType(establishmentId, appRequestDto.applicationType!!).first().id
     }
-    // val group =
-    //  groupsService.getGroupByInitialAppType(staff.establishmentId, AppType.getAppType(appRequestDto.type))
     var app = convertAppRequestToAppEntity(prisoner, staff, department!!, appRequestDto)
     val assignedGroup = groupsService.getGroupById(department!!, staff.establishmentId)
     logger.info("Saving app request in db")
+    app.appFiles.forEach { file -> file.app = app }
     app = appRepository.save(app)
     logger.info("App created for $prisonerId for app type ${app.appType}")
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
@@ -149,9 +198,30 @@ class AppServiceImpl(
       staffId,
       createdDate,
       prisonerId,
-      app.appType!!,
+      app.applicationType!!,
+      app.applicationGroup!!,
     )
-    return convertAppToAppResponseDto(app, prisonerId, assignedGroup)
+    app.appFiles.forEach { f ->
+      activityService.addActivity(
+        f.id,
+        EntityType.FILE,
+        app.id,
+        Activity.FILE_ADDED,
+        app.establishmentId,
+        staffId,
+        createdDate,
+        prisonerId,
+        app.applicationType!!,
+        app.applicationGroup!!,
+      )
+    }
+    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
+      throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
+    }
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
+      throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
+    }
+    return convertAppToAppResponseDto(app, prisonerId, assignedGroup, applicationGroup, applicationType)
   }
 
   override fun getAppsById(
@@ -181,11 +251,16 @@ class AppServiceImpl(
     } else {
       prisoner = prisonerId
     }
-    return convertAppToAppResponseDto(app, prisoner, groupsDto)
+    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
+      throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
+    }
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
+      throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
+    }
+    return convertAppToAppResponseDto(app, prisoner, groupsDto, applicationGroup, applicationType)
   }
 
   override fun getHistoryAppsId(prisonerId: String, appId: UUID, staffId: String): List<HistoryResponse> {
-    // TODO("Not yet implemented")
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
@@ -199,15 +274,14 @@ class AppServiceImpl(
     val app = appRepository.findById(appId)
       .orElseThrow { throw ApiException("No app found with id $appId", HttpStatus.FORBIDDEN) }
     validateStaffPermission(staff, app)
-    val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+    establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
       ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
     }
-    val establishmentId = if (establishment.defaultDepartments) "DEFAULT" else staff.establishmentId
     if (groupId == app.assignedGroup) {
       throw ApiException("App already assigned to group $groupId", HttpStatus.BAD_REQUEST)
     }
     var comment: Comment? = null
-    if (commentRequestDto != null) {
+    if (commentRequestDto != null && commentRequestDto.message.isNotEmpty()) {
       comment = commentRepository.save(
         Comment(
           Generators.timeBasedEpochGenerator().generate(),
@@ -215,6 +289,8 @@ class AppServiceImpl(
           LocalDateTime.now(ZoneOffset.UTC),
           staffId,
           appId,
+          CommentVisibility.STAFF_ONLY,
+          UserCategory.STAFF,
         ),
       )
     }
@@ -236,7 +312,8 @@ class AppServiceImpl(
       staffId,
       createdDate,
       app.requestedBy,
-      app.appType!!,
+      app.applicationType!!,
+      app.applicationGroup!!,
     )
     if (comment != null) {
       activityService.addActivity(
@@ -248,21 +325,29 @@ class AppServiceImpl(
         staffId,
         createdDate,
         app.requestedBy,
-        app.appType,
+        app.applicationType!!,
+        app.applicationGroup!!,
       )
     }
-    return convertAppToAppResponseDto(app, app.requestedBy, group)
+    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
+      throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
+    }
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
+      throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
+    }
+    return convertAppToAppResponseDto(app, app.requestedBy, group, applicationGroup, applicationType)
   }
 
   override fun searchAppsByColumnsFilter(
     staffId: String,
     status: Set<AppStatus>,
-    appTypes: Set<AppType>?,
+    appTypes: Set<Long>?,
     requestedBy: String?,
     assignedGroups: Set<UUID>?,
     firstNightCenter: Boolean?,
     pageNumber: Long,
     pageSize: Long,
+    oldestFirst: Boolean,
   ): AppResponseListDto {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       throw ApiException("No staff with id $staffId", HttpStatus.BAD_REQUEST)
@@ -275,13 +360,13 @@ class AppServiceImpl(
     var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> = listOf()
     var appByFirstNightCount: Int = 0
     var pageResult: Page<App> = Page.empty()
-    var establishmentAppTypes = emptySet<AppType>()
+    var establishmentAppTypes = emptySet<Long>()
     runBlocking {
       launch {
         establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
-          ApiException("", HttpStatus.FORBIDDEN)
+          ApiException("Establishment with id: ${staff.establishmentId} is not enabled.", HttpStatus.FORBIDDEN)
         }
-        establishmentAppTypes = establishment.appTypes
+        establishmentAppTypes = establishment.blacklistedAppTypes
       }
       launch {
         appTypeDto = appRepository.countBySearchFilterGroupByAppType(
@@ -314,7 +399,13 @@ class AppServiceImpl(
         ).getCount()
       }
       launch {
-        val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt())
+        var sortDirection: Sort.Direction? = null
+        if (oldestFirst) {
+          sortDirection = Sort.Direction.ASC
+        } else {
+          sortDirection = Sort.Direction.DESC
+        }
+        val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(sortDirection, "requestedDate")
         pageResult = appRepository.appsBySearchFilter(
           staff.establishmentId,
           status,
@@ -364,19 +455,21 @@ class AppServiceImpl(
   ): App {
     val localDateTime = LocalDateTime.now(ZoneOffset.UTC)
     var firstNightCenter = false
-    if (appRequest.type == AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString() && appRequest.firstNightCenter != null) {
+    if (appRequest.applicationType == 3L && appRequest.firstNightCenter != null) {
       firstNightCenter = appRequest.firstNightCenter
     }
     return App(
       Generators.timeBasedEpochGenerator().generate(), // id
       appRequest.reference, // reference
       groupId, // group id or department
-      AppType.getAppType(appRequest.type!!),
       null,
-      null, // created date
-      appRequest.requestedDate ?: localDateTime,
-      localDateTime, // last modified date
-      staff.username, // created by
+      appRequest.applicationGroup,
+      appRequest.applicationType, // created date
+      appRequest.genericForm,
+      appRequest.requestedDate ?: localDateTime, // last modified date
+      localDateTime, // created by
+      staff.username,
+      UserCategory.STAFF,
       localDateTime,
       staff.username,
       mutableListOf(),
@@ -388,6 +481,7 @@ class AppServiceImpl(
       prisoner.establishmentId!!,
       mutableListOf(),
       firstNightCenter,
+      convertAppFilestoAppFileEnityList(appRequest.fileRequestDtos, staff.username) as MutableList<AppFile>,
     )
   }
 
@@ -408,13 +502,16 @@ class AppServiceImpl(
     app: App,
     prisoner: Any,
     assignedGroup: Any,
+    applicationGroup: ApplicationGroup,
+    applicationType: ApplicationType,
   ): AppResponseDto<Any, Any> = AppResponseDto(
     app.id,
     app.reference,
     assignedGroup,
-    app.appType!!,
     null,
-    null,
+    ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null, null),
+    app.genericForm,
+    ApplicationGroupResponse(applicationGroup.id, applicationGroup.name, null),
     app.requestedDate,
     app.createdDate,
     app.createdBy,
@@ -429,40 +526,111 @@ class AppServiceImpl(
     app.establishmentId,
     app.responses,
     app.firstNightCenter,
+    convertEntityFilesToFiles(app.appFiles),
   )
 
   private fun convertAppToAppListDto(apps: List<App>, establishmentId: String): List<AppListViewDto> {
     val list = ArrayList<AppListViewDto>()
     apps.forEach { app ->
-      val group = groupsService.getGroupById(app.assignedGroup, establishmentId)
+      var groupAppListviewDto: GroupAppListViewDto? = null
+      var applicationType: ApplicationType? = null
+      var commentNum: Long = 0
+      runBlocking {
+        launch {
+          val group = groupsService.getGroupById(app.assignedGroup, establishmentId)
+          groupAppListviewDto = GroupAppListViewDto(group.id, group.name, null)
+        }
+        launch {
+          applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
+            ApiException("No app type found for ${app.applicationType}", HttpStatus.NOT_FOUND)
+          }
+        }
+        launch {
+          commentNum = commentRepository.countCommentsByAppId(app.id)
+        }
+      }
+      /*val group = groupsService.getGroupById(app.assignedGroup, establishmentId)
       val groupAppListviewDto = GroupAppListViewDto(group.id, group.name, null)
+      val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
+        ApiException("No app type found for ${app.applicationType}", HttpStatus.NOT_FOUND)
+      }
+      val commentNum = commentRepository.countCommentsByAppId(app.id)*/
       val appResponseDto = AppListViewDto(
         app.id,
         app.establishmentId,
         app.status.toString(),
-        app.appType.toString(),
+        ApplicationTypeResponse(applicationType!!.id, applicationType.name, null, null, null, null),
+        app.genericForm,
         app.requestedBy,
         app.requestedByFirstName,
         app.requestedByLastName,
         app.createdDate,
-        groupAppListviewDto,
+        groupAppListviewDto!!,
+        commentNum,
       )
       list.add(appResponseDto)
     }
     return list
   }
 
-  private fun convertAppTypeCountsToMap(appByAppTypeCounts: List<AppByAppTypeCounts>, types: Set<AppType>): Map<AppType, Int> {
-    val map = TreeMap<AppType, Int>()
+  private fun convertAppTypeCountsToMap(appByAppTypeCounts: List<AppByAppTypeCounts>, types: Set<Long>): Map<Long, ApplicationTypeResponse> {
+    val map = TreeMap<Long, ApplicationTypeResponse>()
     var appTypes = types
     appByAppTypeCounts.forEach { appTypeCount ->
-      map[appTypeCount.getAppType()] = appTypeCount.getCount()
-      appTypes = appTypes.minus(appTypeCount.getAppType())
+      val applicationType = applicationTypeRepository.findById(appTypeCount.getApplicationType()).orElseThrow {
+        ApiException("No app type with id $appTypeCount", HttpStatus.NOT_FOUND)
+      }
+      map[applicationType.id] = ApplicationTypeResponse(
+        applicationType.id,
+        applicationType.name,
+        null,
+        null,
+        null,
+        appTypeCount.getCount().toLong(),
+      )
+      appTypes = appTypes.minus(appTypeCount.getApplicationType())
     }
     appTypes.forEach { appType ->
-      map[appType] = 0
+      val applicationType = applicationTypeRepository.findById(appType).orElseThrow {
+        ApiException("No app type with id $appType", HttpStatus.NOT_FOUND)
+      }
+      map[appType] = ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null, null)
     }
     return map
+  }
+
+  private fun convertAppFilestoAppFileEnityList(appFileRequestDtos: List<FileRequestDto>, createdBy: String): List<AppFile> {
+    val files = ArrayList<AppFile>()
+    appFileRequestDtos.forEach { file ->
+      files.add(
+        AppFile(
+          Generators.timeBasedEpochGenerator().generate(),
+          file.documentId.toString(),
+          file.fileName,
+          LocalDateTime.now(ZoneOffset.UTC),
+          createdBy,
+          file.fileType,
+        ),
+      )
+    }
+    return files
+  }
+
+  private fun convertEntityFilesToFiles(appFiles: List<AppFile>): List<FileResponseDto> {
+    val files = ArrayList<FileResponseDto>()
+    appFiles.forEach { file ->
+      files.add(
+        FileResponseDto(
+          file.id,
+          UUID.fromString(file.documentId),
+          file.fileName,
+          LocalDateTime.now(ZoneOffset.UTC),
+          file.createdBy,
+          file.fileType,
+        ),
+      )
+    }
+    return files
   }
 
   private fun convertAssignedGroupCountsToGroupAppListViewDto(
@@ -489,4 +657,13 @@ class AppServiceImpl(
       throw ApiException("Staff with id ${staff.username} do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
     }
   }
-}*/
+
+  private fun validateApplicationGroupAndType(appGroupId: Long, appTypeId: Long) {
+    applicationGroupRepository.findById(appGroupId).orElseThrow {
+      ApiException("Application group with id $appGroupId does not exist", HttpStatus.FORBIDDEN)
+    }
+    applicationTypeRepository.findById(appTypeId).orElseThrow {
+      ApiException("Application type with id $appTypeId does not exist", HttpStatus.FORBIDDEN)
+    }
+  }
+}

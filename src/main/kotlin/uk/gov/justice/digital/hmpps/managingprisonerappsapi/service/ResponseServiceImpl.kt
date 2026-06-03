@@ -2,7 +2,6 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import com.fasterxml.uuid.Generators
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppDecisionRequestDto
@@ -24,7 +23,7 @@ import java.util.*
 
 @Service
 class ResponseServiceImpl(
-  @Qualifier("appServiceV2") private val appService: AppService,
+  private val appService: AppService,
   private val prisonerService: PrisonerService,
   private val staffService: StaffService,
   private val responseRepository: ResponseRepository,
@@ -49,7 +48,10 @@ class ResponseServiceImpl(
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
     if (response.appliesTo.size > 1) {
-      throw ApiException("Multiple responses is not supported as multiple request is not supported", HttpStatus.FORBIDDEN)
+      throw ApiException(
+        "Multiple responses is not supported as multiple request is not supported",
+        HttpStatus.FORBIDDEN,
+      )
     }
     val reqs = ArrayList<MutableMap<String, Any>>()
     var responseEntity: Response? = null
@@ -66,9 +68,11 @@ class ResponseServiceImpl(
             response.decision,
             LocalDateTime.now(ZoneOffset.UTC),
             staffId,
+            app.id,
           ),
         )
-        val activity = if (responseEntity!!.decision == Decision.APPROVED) Activity.APP_APPROVED else Activity.APP_DECLINED
+        val activity =
+          if (responseEntity!!.decision == Decision.APPROVED) Activity.APP_APPROVED else Activity.APP_DECLINED
         activityService.addActivity(
           responseEntity!!.id,
           EntityType.RESPONSE,
@@ -82,7 +86,7 @@ class ResponseServiceImpl(
           app.applicationGroup!!,
         )
         req["responseId"] = responseEntity!!.id.toString()
-        app.responses.add(responseEntity!!.id)
+        // app.responses.add(responseEntity!!.id)
       }
       reqs.add(req)
     }
@@ -97,7 +101,13 @@ class ResponseServiceImpl(
     }
     appService.saveApp(app)
 
-    return convertResponseToAppDecisionResponse(prisonerId, staff.username, response.appliesTo, app.id, responseEntity!!)
+    return convertResponseToAppDecisionResponse(
+      prisonerId,
+      staff.username,
+      response.appliesTo,
+      app.id,
+      responseEntity!!,
+    )
   }
 
   override fun getResponseById(
@@ -172,7 +182,10 @@ class ResponseServiceImpl(
 
   private fun validateStaffPermission(staff: Staff, app: App) {
     if (staff.establishmentId != app.establishmentId) {
-      throw ApiException("Staff with id ${staff.username}do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
+      throw ApiException(
+        "Staff with id ${staff.username}do not have permission to view other establishment App",
+        HttpStatus.FORBIDDEN,
+      )
     }
   }
 
