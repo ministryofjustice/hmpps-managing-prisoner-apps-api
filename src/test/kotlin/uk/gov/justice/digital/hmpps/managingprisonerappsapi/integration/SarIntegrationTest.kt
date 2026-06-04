@@ -366,6 +366,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           decision = Decision.APPROVED,
           createdDate = LocalDateTime.of(2026, 2, 27, 11, 52, 15),
           createdBy = "SMJOHN_GEN",
+          app1.id,
         ),
         Response(
           id = RESPONSE_ID_2,
@@ -373,6 +374,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           decision = Decision.DECLINED,
           createdDate = LocalDateTime.of(2025, 12, 8, 12, 36, 34),
           createdBy = "JADAMS_GEN",
+          app1.id,
         ),
       ),
     )
