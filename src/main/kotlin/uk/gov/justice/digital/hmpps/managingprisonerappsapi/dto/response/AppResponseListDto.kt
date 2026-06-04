@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.LocalDateTime
 import java.util.*
 
+// This response model is for staff facing app search page with apps list search result
 data class AppResponseListDto(
   val page: Int,
   val totalRecords: Long,
@@ -34,5 +35,5 @@ data class AppListViewDto(
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val createdDate: LocalDateTime,
   val assignedGroup: Any,
-  val comments: Int,
+  val comments: Long,
 )

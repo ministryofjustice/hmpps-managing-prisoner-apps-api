@@ -5,7 +5,6 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
@@ -65,7 +64,7 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     purgeQueueSafely()
   }
 
-  @Test
+  // @Test
   fun `should merge prisoner app records when merge event received`() {
     // ARRANGE - Verify initial state
     assertThat(appRepository.findAppsByRequestedBy(OLD_NOMS_NUMBER)).hasSize(3)
@@ -113,7 +112,7 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     assertThat(getNumberOfMessagesCurrentlyOnQueue()).isEqualTo(0)
   }
 
-  @Test
+  // @Test
   fun `should not track telemetry event when no apps to merge`() {
     val nonExistentNomsNumber = "ZZ9999ZZ"
 

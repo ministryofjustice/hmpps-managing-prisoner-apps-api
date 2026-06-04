@@ -6,6 +6,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import java.time.LocalDateTime
 import java.util.*
 
+// This app response model provides app details for staff facing
 data class AppResponseDto<X, Y>(
   val id: UUID?,
   val reference: String?,

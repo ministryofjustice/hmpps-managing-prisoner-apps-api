@@ -1,6 +1,6 @@
-update comment
-set visibility = 'STAFF_AND_PRISONER';
-
-update comment
-set created_by_user_type = 'STAFF';
+UPDATE comment
+SET
+    visibility = CASE WHEN COALESCE(visibility, '') = '' THEN 'STAFF_ONLY' ELSE visibility END,
+    created_by_user_type = CASE WHEN COALESCE(created_by_user_type, '') = '' THEN 'STAFF' ELSE created_by_user_type END
+WHERE COALESCE(visibility, '') = '' OR COALESCE(created_by_user_type, '') = '';
 

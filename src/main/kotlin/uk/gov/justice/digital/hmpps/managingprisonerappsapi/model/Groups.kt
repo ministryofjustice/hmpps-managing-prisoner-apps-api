@@ -9,13 +9,12 @@ import jakarta.persistence.Table
 import java.util.UUID
 
 @Entity
-@Table(name = "groups")
+@Table(name = "groups") // The groups table contains department records
 data class Groups(
   @Id
   val id: UUID,
   val name: String,
   val establishmentId: String,
-  // @JdbcTypeCode(SqlTypes.JSON)
   @ElementCollection
   @Enumerated(EnumType.STRING)
   val initialsApps: List<AppType>,

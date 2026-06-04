@@ -28,4 +28,6 @@ data class ApplicationGroup(
   }
 
   override fun hashCode(): Int = id.hashCode()
+
+  override fun toString(): String = "ApplicationGroup(id=$id, name='$name', applicationTypes=[${applicationTypes.joinToString { it.id.toString() }}])"
 }

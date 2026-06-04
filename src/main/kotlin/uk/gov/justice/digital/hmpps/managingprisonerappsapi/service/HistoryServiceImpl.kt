@@ -10,9 +10,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExcept
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.StaffType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import java.time.LocalDateTime
@@ -22,7 +21,9 @@ import java.util.*
 class HistoryServiceImpl(
   private val historyRepository: HistoryRepository,
   private val staffService: StaffService,
+  private val prisonerService: PrisonerService,
   private val groupService: GroupService,
+  private val appRepository: AppRepository,
   private val commentRepository: CommentRepository,
 ) : HistoryService {
   companion object {
@@ -34,10 +35,19 @@ class HistoryServiceImpl(
       ApiException("Staff with id $user does not exist", HttpStatus.FORBIDDEN)
     }*/
     val history = historyRepository.findByAppIdAndEstablishmentOrderByCreatedDate(appId, establishment)
-    return convertHistoryEntityToHistory(history)
+    return convertHistoryEntityToHistory(appId, history)
   }
 
-  override fun updateActivityInHistory(entityId: UUID, entityType: EntityType, appId: UUID, activity: Activity, establishment: String, createdBy: String, createdDate: LocalDateTime, reference: String?) {
+  override fun updateActivityInHistory(
+    entityId: UUID,
+    entityType: EntityType,
+    appId: UUID,
+    activity: Activity,
+    establishment: String,
+    createdBy: String,
+    createdDate: LocalDateTime,
+    reference: String?,
+  ) {
     logger.info("Updating history for entity:$entityType, activity: $activity,  entityType: $entityType, appId: $appId")
     val history = historyRepository.save(
       History(
@@ -85,23 +95,24 @@ class HistoryServiceImpl(
     return list
   }
 
-  private fun convertHistoryEntityToHistory(history: List<History>): List<HistoryResponse> {
+  private fun convertHistoryEntityToHistory(appId: UUID, history: List<History>): List<HistoryResponse> {
     val map = mutableMapOf<String, HistoryResponse>()
+    val app = appRepository.findById(appId)
+      .orElseThrow { ApiException("App with id $appId does not exist", HttpStatus.NOT_FOUND) }
     history.forEach { h ->
-      var createdBy: Staff
+      var createdBy: String
       if (h.createdBy == StaffType.MANAGE_APPS_ADMIN.name) {
-        createdBy = Staff(
-          StaffType.MANAGE_APPS_ADMIN.name,
-          StaffType.MANAGE_APPS_ADMIN.name,
-          StaffType.MANAGE_APPS_ADMIN.name,
-          UserCategory.STAFF,
-          "MERGE_EVENT",
-          "Admin",
-          Generators.timeBasedEpochGenerator().generate(),
-        )
+        createdBy = StaffType.MANAGE_APPS_ADMIN.name
       } else {
-        createdBy = staffService.getStaffById(h.createdBy).orElseThrow {
-          ApiException("Staff with id ${h.createdBy} does not exist", HttpStatus.NOT_FOUND)
+        if (h.createdBy != app.requestedBy) {
+          // history data added due to staff action
+          val staff = staffService.getStaffById(h.createdBy).orElseThrow {
+            ApiException("Staff with id ${h.createdBy} does not exist", HttpStatus.NOT_FOUND)
+          }
+          createdBy = staff.fullName
+        } else {
+          // history data added due to prisoner action
+          createdBy = "${app.requestedByFirstName} ${app.requestedByLastName} [PRISONER]"
         }
       }
       var groupName: String = ""
@@ -115,9 +126,9 @@ class HistoryServiceImpl(
             h.entityType,
             ActivityMessage(
               if (h.activity == Activity.APP_FORWARDED_TO_A_GROUP) {
-                convertActivityToReadableMessage(h.activity, "${createdBy.fullName} to group $groupName")
+                convertActivityToReadableMessage(h.activity, "$createdBy to group $groupName")
               } else {
-                convertActivityToReadableMessage(h.activity, createdBy.fullName)
+                convertActivityToReadableMessage(h.activity, createdBy)
               },
               null,
             ),
@@ -134,7 +145,7 @@ class HistoryServiceImpl(
             h.appId,
             h.entityId,
             h.entityType,
-            ActivityMessage("Logged by ${createdBy.fullName}", "Assigned to $groupName"),
+            ActivityMessage("Logged by $createdBy", "Assigned to $groupName"),
             h.createdDate,
           ),
         )
@@ -149,7 +160,7 @@ class HistoryServiceImpl(
             h.entityId,
             h.entityType,
             ActivityMessage(
-              "Forwarded to group $groupName by ${createdBy.fullName}",
+              "Forwarded to group $groupName by $createdBy",
               null,
             ),
             h.createdDate,
@@ -180,7 +191,8 @@ class HistoryServiceImpl(
       Activity.APP_SUBMITTED -> x = "Logged by $staffName"
       Activity.APP_REQUEST_FORM_DATA_UPDATED -> x = "Form data updated by $staffName"
       Activity.COMMENT_ADDED -> x = "Comment added by $staffName"
-      Activity.FORWARDING_COMMENT_ADDED, Activity.APP_FORWARDED_TO_A_GROUP -> x = "Forwarding comment added by $staffName"
+      Activity.FORWARDING_COMMENT_ADDED, Activity.APP_FORWARDED_TO_A_GROUP ->
+        x = "Forwarding comment added by $staffName"
       Activity.APP_APPROVED -> x = "Marked as approved by $staffName"
       Activity.APP_DECLINED -> x = "Marked as declined by $staffName"
       Activity.PRISONER_ID_UPDATE -> x = "Prisoner merged by $staffName"

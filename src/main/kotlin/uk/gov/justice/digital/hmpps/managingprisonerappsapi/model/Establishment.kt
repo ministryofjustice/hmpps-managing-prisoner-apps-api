@@ -14,6 +14,8 @@ data class Establishment(
   val name: String,
   @JdbcTypeCode(SqlTypes.JSON)
   val appTypes: Set<AppType>,
+  // Establishment with defaultDepartments = true, shares sames list of departments.
+  // Establishment with defaultDepartments = false has own list of departments not shared with other establishments.
   val defaultDepartments: Boolean,
   @JdbcTypeCode(SqlTypes.JSON)
   val blackListedAppGroups: Set<Long>,

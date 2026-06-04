@@ -35,4 +35,6 @@ data class ApplicationType(
   }
 
   override fun hashCode(): Int = id.hashCode()
+
+  override fun toString(): String = "ApplicationType(id=$id, name='$name', genericType=$genericType, genericForm=$genericForm, logDetailRequired=$logDetailRequired)"
 }

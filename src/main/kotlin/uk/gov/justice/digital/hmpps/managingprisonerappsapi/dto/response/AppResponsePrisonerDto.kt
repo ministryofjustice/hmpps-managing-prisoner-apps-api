@@ -3,9 +3,10 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 import com.fasterxml.jackson.annotation.JsonFormat
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
-data class AppResponsePrisonerFacing<X, Y>(
+// This app details view for prisoner facing so department data is hidden.
+data class AppResponsePrisonerDto<X, Y>(
   val id: UUID?,
   val reference: String?,
   val assignedGroup: X,
@@ -19,10 +20,12 @@ data class AppResponsePrisonerFacing<X, Y>(
   val createdBy: String,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val lastModifiedDate: LocalDateTime?,
+  val lastModifiedBy: String?,
   val requests: List<Map<String, Any>>,
   val requestedBy: Y,
   val requestedByFirstName: String,
   val requestedByLastName: String,
   val status: AppStatus,
   val establishmentId: String,
+  val reason: String?,
 )

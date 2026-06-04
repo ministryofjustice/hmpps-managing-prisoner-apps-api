@@ -1,8 +1,8 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import com.fasterxml.uuid.Generators
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
@@ -28,7 +28,7 @@ import java.util.*
 @Service
 class CommentServiceImpl(
   private val staffService: StaffService,
-  @Qualifier("appServiceV2") private val appService: AppService,
+  private val appService: AppService,
   private val commentRepository: CommentRepository,
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
@@ -57,12 +57,12 @@ class CommentServiceImpl(
         LocalDateTime.now(ZoneOffset.UTC),
         staffId,
         appId,
-        CommentVisibility.STAFF_ONLY,
+        commentRequestDto.visibility,
         UserCategory.STAFF,
       ),
     )
-    app.comments.add(comment.id)
-    appService.saveApp(app)
+    // app.comments.add(comment.id)
+    // appService.saveApp(app)
     activityService.addActivity(
       comment.id,
       EntityType.COMMENT,
@@ -97,8 +97,8 @@ class CommentServiceImpl(
         UserCategory.PRISONER,
       ),
     )
-    app.comments.add(comment.id)
-    appService.saveApp(app)
+    // app.comments.add(comment.id)
+    // appService.saveApp(app)
     activityService.addActivity(
       comment.id,
       EntityType.COMMENT,
@@ -169,7 +169,7 @@ class CommentServiceImpl(
         prisoner.userId,
         "${prisoner.firstName} ${prisoner.lastName}",
         UserCategory.PRISONER,
-        establishment,
+        establishment.id,
       )
 
       return convertCommentToCommentResponseDto(prisonerId, prisonerDto, comment)
@@ -190,7 +190,7 @@ class CommentServiceImpl(
     val app = getAppById(appId)
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
-    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt())
+    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt()).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))
     val pageResult = commentRepository.getCommentsByAppId(appId, pageRequest)
     return PageResultComments(
       (pageResult.pageable.pageNumber + 1),
@@ -209,7 +209,7 @@ class CommentServiceImpl(
   ): PageResultComments {
     val app = getAppById(appId)
     validatePrisonerByRequestedBy(prisonerId, app)
-    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt())
+    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt()).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))
     val pageResult = commentRepository.getCommentsByAppIdAndVisibility(appId, CommentVisibility.STAFF_AND_PRISONER, pageRequest)
     return PageResultComments(
       (pageResult.pageable.pageNumber + 1),
@@ -266,7 +266,7 @@ class CommentServiceImpl(
               prisoner.userId,
               "${prisoner.firstName} ${prisoner.lastName}",
               UserCategory.PRISONER,
-              establishment,
+              establishment.id,
             )
           }
         }

@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisonerDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerApplicationTypeCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppPrisonerFacingService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.CommentService
@@ -100,7 +100,7 @@ class PrisonerFacingResource(
   fun getPrisonerAppByAppId(
     @PathVariable("id") id: UUID,
     authentication: Authentication,
-  ): ResponseEntity<AppResponsePrisoner<Any, Any>> {
+  ): ResponseEntity<AppResponsePrisonerDto<Any, Any>> {
     logger.info("Request received for getting app by id for prisoner: ${authentication.principal}")
     authentication as AuthAwareAuthenticationToken
     val appResponseDto = appPrisonerFacingService.getPrisonerAppById(authentication.principal, id)
@@ -161,7 +161,7 @@ class PrisonerFacingResource(
   fun getPrisonerPendingAppCountByAppType(
     @PathVariable("applicationType") applicationType: Long,
     authentication: Authentication,
-  ): ResponseEntity<ApplicationTypeResponse> {
+  ): ResponseEntity<PrisonerApplicationTypeCount> {
     logger.info("Request received for getting apps count in pending status for prisoner: ${authentication.principal} with app type: $applicationType")
     authentication as AuthAwareAuthenticationToken
     val appResponseDto =
@@ -197,7 +197,7 @@ class PrisonerFacingResource(
   fun submitApp(
     @RequestBody appRequestPrisoner: AppRequestPrisoner,
     authentication: Authentication,
-  ): ResponseEntity<AppResponsePrisoner<Any, Any>> {
+  ): ResponseEntity<AppResponsePrisonerDto<Any, Any>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for submitting app request by Prisoner: ${authentication.principal}")
     val appResponseDto = appPrisonerFacingService.submitApp(appRequestPrisoner, authentication.principal)
