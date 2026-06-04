@@ -91,14 +91,14 @@ class ResponseServiceImpl(
       reqs.add(req)
     }
     app.requests = reqs
-    if (app.requests.size == app.responses.size) {
-      if (response.decision == Decision.APPROVED) {
-        app.status = AppStatus.APPROVED
-      }
-      if (response.decision == Decision.DECLINED) {
-        app.status = AppStatus.DECLINED
-      }
+    // if (app.requests.size == app.responses.size) {
+    if (response.decision == Decision.APPROVED) {
+      app.status = AppStatus.APPROVED
     }
+    if (response.decision == Decision.DECLINED) {
+      app.status = AppStatus.DECLINED
+    }
+    // }
     appService.saveApp(app)
 
     return convertResponseToAppDecisionResponse(
