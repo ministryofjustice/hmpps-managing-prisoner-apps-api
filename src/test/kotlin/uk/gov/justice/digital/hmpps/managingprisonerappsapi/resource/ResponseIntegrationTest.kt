@@ -20,10 +20,14 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
@@ -38,6 +42,8 @@ class ResponseIntegrationTest(
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val responseRepository: ResponseRepository,
+  @Autowired private val applicationTypeRepository: ApplicationTypeRepository,
+  @Autowired private val applicationGroupRepository: ApplicationGroupRepository,
 ) : IntegrationTestBase() {
 
   private lateinit var app: App
@@ -59,6 +65,18 @@ class ResponseIntegrationTest(
     val requestedByThird = "C12345"
     val requestedByThirdMainName = "Test"
     val requestedByThirdSurname = "User"
+
+    val applicationGroupOne = 1L
+    val applicationTypeOne = 1L
+    val applicationTypeTwo = 2L
+    val applicationTypeThree = 3L
+    val applicationTypeFour = 4L
+
+    val applicationGroupOneName = "Bt PIN PHONES"
+    val applicationTypeOneName = "Add new Social Contact"
+    val applicationTypeTwoName = "Add new Official Contact"
+    val applicationTypeThreeName = "Remove Contact"
+    val applicationTypeFourName = "Add Generic Pin Phone enquiry"
   }
 
   @BeforeEach
@@ -68,6 +86,7 @@ class ResponseIntegrationTest(
     populateEstablishments()
     populateGroups()
     populateApps()
+    populateApplicationGroupsAndTypes()
 
     prisonerSearchApi.start()
     prisonerSearchApi.stubPrisonerSearchFound(requestedByFirst)
@@ -249,5 +268,19 @@ class ResponseIntegrationTest(
         false,
       ),
     )
+  }
+
+  private fun populateApplicationGroupsAndTypes() {
+    val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false, false)
+    val removeContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false, false)
+    val addOfficialContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false, false)
+    val addGenericPinPhoneEnquiry = ApplicationType(applicationTypeFour, applicationTypeFourName, true, false, true)
+    applicationTypeRepository.saveAll<ApplicationType>(listOf<ApplicationType>(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
+    val applicationGroupOne = ApplicationGroup(
+      applicationGroupOne,
+      applicationGroupOneName,
+      listOf(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry),
+    )
+    applicationGroupRepository.save<ApplicationGroup>(applicationGroupOne)
   }
 }
