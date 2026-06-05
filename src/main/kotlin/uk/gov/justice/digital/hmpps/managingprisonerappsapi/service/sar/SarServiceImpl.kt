@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseR
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.LocalDate
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 
 @Service
 class SarServiceImpl(
@@ -36,7 +37,6 @@ class SarServiceImpl(
   private val groupRepository: GroupRepository,
   private val commentRepository: CommentRepository,
   private val responseRepository: ResponseRepository,
-  @Value("\${hmpps.document.api.url}") private val documentApiurl: String,
   @Value("\${hmpps.service.name}") private val serviceName: String,
   @Value("\${hmpps.self.url}") private val selfUrl: String,
 ) : SarService {
@@ -88,7 +88,7 @@ class SarServiceImpl(
         )
       }
 
-      val comments = commentRepository.getCommentsByAppIdOrderByCreatedDateDesc(app.id)
+      val comments = commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateDesc(app.id, CommentVisibility.STAFF_AND_PRISONER)
       val prnAppComments = mutableListOf<PrnAppComment>()
       comments.forEach { comment ->
         prnAppComments.add(
@@ -100,7 +100,7 @@ class SarServiceImpl(
         )
       }
 
-      val responses = responseRepository.findByAppId(app.id)
+      val responses = responseRepository.findByApp(app.id)
       val prnAppResponses = mutableListOf<PrnAppResponse>()
       if (responses.isNotEmpty()) {
         responses.forEach { response ->
