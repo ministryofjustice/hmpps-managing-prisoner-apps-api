@@ -30,6 +30,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 
 class SarServiceTest {
 
@@ -165,7 +166,7 @@ class SarServiceTest {
     Mockito.`when`(applicationTypeRepository.findById(typeId)).thenReturn(Optional.of(applicationType))
     Mockito.`when`(appFileRepository.findById(fileId)).thenReturn(Optional.of(appFile))
     Mockito.`when`(groupRepository.findById(assignedGroup)).thenReturn(Optional.of(group))
-    Mockito.`when`(commentRepository.getCommentsByAppIdOrderByCreatedDateDesc(includedApp.id)).thenReturn(emptyList())
+    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateDesc(includedApp.id, CommentVisibility.STAFF_AND_PRISONER)).thenReturn(emptyList())
     Mockito.`when`(responseRepository.findByAppId(includedApp.id)).thenReturn(emptyList())
 
     val result = sarService.getPrisonContentFor(
