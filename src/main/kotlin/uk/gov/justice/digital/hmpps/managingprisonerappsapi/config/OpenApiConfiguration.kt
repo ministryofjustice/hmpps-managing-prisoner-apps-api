@@ -37,7 +37,7 @@ class OpenApiConfiguration(buildProperties: BuildProperties) {
         )
         .addSecuritySchemes(
           "managing-prisoner-apps-api-prisoner-role",
-          SecurityScheme().addBearerJwtRequirement("PRISONER_FACING_APPS"),
+          SecurityScheme().addBearerJwtRequirement("ROLE_PRISONER_FACING_APPS"),
         ),
     )
     .addSecurityItem(SecurityRequirement().addList("managing-prisoner-apps-api-staff-role", listOf("read")))
