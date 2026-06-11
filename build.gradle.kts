@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.3.0"
-  id("org.owasp.dependencycheck") version "12.2.0"
-  kotlin("plugin.spring") version "2.3.20"
-  kotlin("plugin.jpa") version "2.3.20"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "10.3.1"
+  id("org.owasp.dependencycheck") version "12.2.2"
+  kotlin("plugin.spring") version "2.4.0"
+  kotlin("plugin.jpa") version "2.4.0"
 }
 
 configurations {
@@ -10,7 +10,7 @@ configurations {
 }
 
 dependencies {
-  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.2.0")
+  implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:2.5.0")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-webclient")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
@@ -20,19 +20,19 @@ dependencies {
   implementation("org.flywaydb:flyway-core")
   implementation("org.springframework.boot:spring-boot-starter-flyway")
   implementation("org.postgresql:postgresql:42.7.9")
+
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
+
   implementation("org.flywaydb:flyway-database-postgresql")
+
   // SQS/SNS dependencies
-  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.3.0")
-
-  // iText HTML → PDF (dev/local testing only)
-  implementation("com.itextpdf:html2pdf:6.1.0")
-
+  implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.3.2")
   testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
   testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.1.0")
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter-test:2.5.0")
+
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
   testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.3")
   testImplementation("net.javacrumbs.json-unit:json-unit-assertj:5.1.1")
@@ -41,7 +41,8 @@ dependencies {
     exclude(group = "io.swagger.core.v3")
   }
   testImplementation("com.h2database:h2:2.4.240")
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.4.2") {
+
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.5.0") {
     exclude(group = "org.springframework.boot", module = "spring-boot-webtestclient")
   }
 

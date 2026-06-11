@@ -16,6 +16,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarCont
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
@@ -26,7 +28,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseR
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
 import java.time.LocalDate
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 
 @Service
 class SarServiceImpl(
@@ -37,6 +38,7 @@ class SarServiceImpl(
   private val groupRepository: GroupRepository,
   private val commentRepository: CommentRepository,
   private val responseRepository: ResponseRepository,
+  @Value("\${hmpps.document.api.url}") private val documentApiurl: String,
   @Value("\${hmpps.service.name}") private val serviceName: String,
   @Value("\${hmpps.self.url}") private val selfUrl: String,
 ) : SarService {
@@ -96,6 +98,8 @@ class SarServiceImpl(
             comment.message,
             comment.createdBy,
             comment.createdDate,
+            comment.createdByUserType.toString(),
+            comment.createdByUserType == UserCategory.STAFF,
           ),
         )
       }
@@ -109,6 +113,7 @@ class SarServiceImpl(
               response.decision,
               response.createdBy,
               response.reason,
+              response.createdDate,
             ),
           )
         }
@@ -159,6 +164,8 @@ class SarServiceImpl(
         prnAppComments,
         prnAppResponses,
         appAttachments,
+        app.submittedByType.toString(),
+        app.submittedByType == UserCategory.STAFF,
       )
       list.add(prnApp)
     }

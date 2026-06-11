@@ -27,6 +27,8 @@ data class PrnApp(
   val comments: List<PrnAppComment>,
   val responses: List<PrnAppResponse>,
   val appAttachments: List<PrnAppAttachment>,
+  val submittedByType: String,
+  val appCreatedByStaff: Boolean,
 )
 
 data class PrnAppHistory(
@@ -44,19 +46,22 @@ data class PrnAppComment(
   val message: String,
   val createdBy: String,
   val createdDateTime: LocalDateTime,
+  val createdByUserType: String,
+  val createdByStaff: Boolean,
 )
 
 data class PrnAppResponse(
   val decision: Decision,
   val createdBy: String,
   val reason: String,
+  val createdDateTime: LocalDateTime,
 )
 
 data class PrnAppAttachment(
   val contentType: String,
   val url: String,
   val headers: List<AttachmentHeader>,
-  @JsonIgnore val documentId: String,
+  @JsonIgnore val documentId: String = "",
 )
 
 data class AttachmentHeader(

@@ -13,6 +13,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
@@ -30,7 +31,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 
 class SarServiceTest {
 
@@ -40,7 +40,7 @@ class SarServiceTest {
   private val lastName = "Doe"
   private val assignedGroup = UUID.randomUUID()
   private val requestedDate = LocalDateTime.of(2026, 1, 10, 10, 30)
-  private val lastModifiedDate = LocalDateTime.of(2026, 1, 15, 0, 0)
+  private var lastModifiedDate = LocalDateTime.of(2026, 1, 15, 0, 0)
   private val typeId = 1L
   private val documentApiUrl = "https://document-api-dev.hmpps.service.justice.gov.uk"
   private val serviceName = "hmpps-managing-prisoner-apps"
@@ -167,7 +167,7 @@ class SarServiceTest {
     Mockito.`when`(appFileRepository.findById(fileId)).thenReturn(Optional.of(appFile))
     Mockito.`when`(groupRepository.findById(assignedGroup)).thenReturn(Optional.of(group))
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateDesc(includedApp.id, CommentVisibility.STAFF_AND_PRISONER)).thenReturn(emptyList())
-    Mockito.`when`(responseRepository.findByAppId(includedApp.id)).thenReturn(emptyList())
+    Mockito.`when`(responseRepository.findByApp(includedApp.id)).thenReturn(emptyList())
 
     val result = sarService.getPrisonContentFor(
       prisonerNumber,

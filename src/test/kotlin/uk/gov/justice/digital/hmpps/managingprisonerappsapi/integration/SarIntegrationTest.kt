@@ -490,7 +490,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
    * This avoids hardcoding URLs in the test - the URLs are read directly from what
    * SarServiceImpl returns, so they always stay in sync.
    */
-  private fun extractAttachmentUrls(response: SubjectAccessRequestResponse): List<String> {
+  private fun extractAttachmentUrls(response: SubjectAccessRequestResponse<Any>): List<String> {
     val json = getSarHelper().toJson(response)
     val root = com.fasterxml.jackson.databind.ObjectMapper().readTree(json)
     return root.path("apps").flatMap { app ->

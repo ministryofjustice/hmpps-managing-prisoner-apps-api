@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.AfterEach
 import org.slf4j.LoggerFactory
@@ -41,6 +42,9 @@ abstract class SarIntegrationTestBase : IntegrationTestBase() {
   @Autowired
   protected lateinit var sarTestConfig: SarTestConfig
 
+  @Autowired
+  private lateinit var objectMapper: ObjectMapper
+
   /**
    * When generateActual is true, copies the .log scratch files written by the library
    * into src/test/resources/sar/expected/ so they become the new expected snapshots.
@@ -72,6 +76,7 @@ abstract class SarIntegrationTestBase : IntegrationTestBase() {
     attachmentsExpected = sarTestConfig.attachmentsExpected,
     expectedFlywaySchemaVersion = sarTestConfig.expectedFlywaySchemaVersion,
     expectedJpaEntitySchemaPath = sarTestConfig.expectedJpaEntitySchemaPath,
+    objectMapper = objectMapper,
   )
 
   abstract fun getSarHelper(): SarIntegrationTestHelper
@@ -97,7 +102,7 @@ abstract class SarIntegrationTestBase : IntegrationTestBase() {
     crn: String?,
     fromDate: LocalDate?,
     toDate: LocalDate?,
-  ): SubjectAccessRequestResponse = getSarHelper().requestSarData(prn, crn, fromDate, toDate, webTestClient)
+  ): SubjectAccessRequestResponse<Any> = getSarHelper().requestSarData(prn, crn, fromDate, toDate, webTestClient, Any::class.java)
 
   /**
    * Delegates to the library's requestSarTemplate which calls GET /subject-access-request/template
