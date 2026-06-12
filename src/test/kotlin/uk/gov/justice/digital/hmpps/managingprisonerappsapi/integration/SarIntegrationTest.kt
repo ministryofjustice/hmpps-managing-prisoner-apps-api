@@ -273,10 +273,10 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       genericForm = false,
       requestedDate = LocalDateTime.of(2026, 3, 9, 12, 16, 9),
       createdDate = LocalDateTime.of(2026, 3, 9, 12, 16, 9),
-      submittedByType = UserCategory.STAFF,
-      createdBy = "CHIEMNDEV",
+      submittedByType = UserCategory.PRISONER,
+      createdBy = "G2168GG",
       lastModifiedDate = LocalDateTime.of(2026, 3, 9, 12, 16, 9),
-      lastModifiedBy = "CHIEMNDEV",
+      lastModifiedBy = "G2168GG",
       comments = mutableListOf(COMMENT_ID_1),
       requests = listOf(
         linkedMapOf<String, Any>(
@@ -353,7 +353,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           createdBy = "SMJOHN_GEN",
           appId = APP_ID_2,
           visibility = CommentVisibility.STAFF_AND_PRISONER,
-          createdByUserType = UserCategory.STAFF,
+          createdByUserType = UserCategory.PRISONER,
         ),
       ),
     )

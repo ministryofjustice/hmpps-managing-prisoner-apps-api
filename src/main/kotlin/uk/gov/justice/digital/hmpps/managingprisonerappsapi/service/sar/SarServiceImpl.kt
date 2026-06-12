@@ -166,6 +166,7 @@ class SarServiceImpl(
         appAttachments,
         app.submittedByType.toString(),
         app.submittedByType == UserCategory.STAFF,
+        app.createdBy,
       )
       list.add(prnApp)
     }

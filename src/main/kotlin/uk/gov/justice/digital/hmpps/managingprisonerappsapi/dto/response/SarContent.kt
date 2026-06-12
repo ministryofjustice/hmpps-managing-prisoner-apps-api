@@ -29,6 +29,7 @@ data class PrnApp(
   val appAttachments: List<PrnAppAttachment>,
   val submittedByType: String,
   val appCreatedByStaff: Boolean,
+  val createdBy: String,
 )
 
 data class PrnAppHistory(

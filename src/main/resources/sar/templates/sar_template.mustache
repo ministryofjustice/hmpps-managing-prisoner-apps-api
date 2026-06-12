@@ -24,7 +24,13 @@
             <td>{{ optionalValue (formatDate requestedDate) }}</td>
             <td>{{ getPrisonName establishment }}</td>
             <td>{{ optionalValue assignedTo }}</td>
-            <td>{{ optionalValue submittedByType }}</td>
+            {{#appCreatedByStaff}}
+                <td>{{ optionalValue ( getUserLastName createdBy) }}</td>
+            {{/appCreatedByStaff}}
+            {{^appCreatedByStaff}}
+                <td>SUBJECT</td>
+            {{/appCreatedByStaff}}
+
         </tr>
     </table>
 
@@ -59,7 +65,12 @@
             </tr>
             <tr>
                 <td>{{ optionalValue message }}</td>
-                <td>{{ optionalValue ( getUserLastName createdBy) }}</td>
+                {{#createdByStaff}}
+                    <td>{{ optionalValue ( getUserLastName createdBy) }}</td>
+                {{/createdByStaff}}
+                {{^createdByStaff}}
+                    <td>SUBJECT</td>
+                {{/createdByStaff}}
                 <td>{{ optionalValue ( formatDate createdDateTime )}}</td>
             </tr>
         </table>
