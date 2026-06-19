@@ -37,7 +37,7 @@ dependencies {
   testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.3")
   testImplementation("net.javacrumbs.json-unit:json-unit-assertj:5.1.1")
 
-  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37") {
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.43") {
     exclude(group = "io.swagger.core.v3")
   }
   testImplementation("com.h2database:h2:2.4.240")

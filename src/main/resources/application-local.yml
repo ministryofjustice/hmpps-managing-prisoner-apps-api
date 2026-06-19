@@ -1,0 +1,17 @@
+# Local development profile - used ONLY when running on a developer machine.
+# Activate alongside 'dev': SPRING_PROFILES_ACTIVE=dev,local
+# This profile is NOT used by deployed pods (dev/staging/prod use only 'dev').
+#
+# To use real SQS locally via LocalStack instead, run:
+#   docker run --rm -d -p 4566:4566 -e SERVICES=sns,sqs --name localstack localstack/localstack
+#   SPRING_PROFILES_ACTIVE=dev,localstack
+
+spring:
+  autoconfigure:
+    exclude:
+      - uk.gov.justice.hmpps.sqs.HmppsSqsConfiguration  # Prevents SQS from calling real AWS without valid credentials
+
+hmpps:
+  sqs:
+    enabled: false
+
