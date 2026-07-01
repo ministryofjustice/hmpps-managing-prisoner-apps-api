@@ -270,7 +270,7 @@ class PrisonerFacingResource(
     @RequestParam(required = false) createdBy: Boolean,
     authentication: Authentication,
   ): ResponseEntity<CommentResponseDto<Any>> {
-    logger.info("Request received to  get comment for app: $appId and comment: $commentId")
+    logger.info("Request received to get comment for app: $appId and comment: $commentId")
     authentication as AuthAwareAuthenticationToken
     val comment = commentService.getCommentByIdForPrisoner(authentication.principal, appId, createdBy, commentId)
     return ResponseEntity.status(HttpStatus.OK).body(comment)
