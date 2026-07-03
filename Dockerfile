@@ -1,4 +1,4 @@
-# TODO: migrate to ghcr.io/ministryofjustice/hmpps-distroless-java:25-jre
+# TODO: migrate to ghcr.io/ministryofjustice/hmpps-eclipse-temurin:25-jre-jammy
 FROM --platform=$BUILDPLATFORM eclipse-temurin:25-jre-jammy AS builder
 
 ARG BUILD_NUMBER
