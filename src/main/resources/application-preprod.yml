@@ -17,3 +17,8 @@ hmpps:
     api:
       url: https://prisoner-search-preprod.prison.service.justice.gov.uk
       timeout: 10s
+  document:
+    api:
+      url: https://document-api-preprod.hmpps.service.justice.gov.uk
+      timeout: 10s
+
