@@ -32,16 +32,16 @@ class OpenApiConfiguration(buildProperties: BuildProperties) {
     .components(
       Components()
         .addSecuritySchemes(
-          "managing-prisoner-apps-api-staff-role",
+          "MANAGING_PRISONER_APPS",
           SecurityScheme().addBearerJwtRequirement("ROLE_MANAGING_PRISONER_APPS"),
         )
         .addSecuritySchemes(
-          "managing-prisoner-apps-api-prisoner-role",
+          "PRISONER_FACING_APPS",
           SecurityScheme().addBearerJwtRequirement("ROLE_PRISONER_FACING_APPS"),
         ),
     )
-    .addSecurityItem(SecurityRequirement().addList("managing-prisoner-apps-api-staff-role", listOf("read")))
-    .addSecurityItem(SecurityRequirement().addList("managing-prisoner-apps-api-prisoner-role", listOf("read")))
+    .addSecurityItem(SecurityRequirement().addList("MANAGING_PRISONER_APPS", listOf("read")))
+    .addSecurityItem(SecurityRequirement().addList("PRISONER_FACING_APPS", listOf("read")))
 }
 
 private fun SecurityScheme.addBearerJwtRequirement(role: String): SecurityScheme = type(SecurityScheme.Type.HTTP)

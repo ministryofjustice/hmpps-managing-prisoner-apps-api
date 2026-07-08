@@ -7,6 +7,8 @@ example-api:
     secret: "example-api-client-secret"
 
 hmpps:
+  self:
+    url: https://managing-prisoner-apps-api-staging.hmpps.service.justice.gov.uk
   sqs:
     queues:
       domaineventsqueue:

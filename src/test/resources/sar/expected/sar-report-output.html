@@ -1,0 +1,504 @@
+<style>
+    * {
+        font-family: "HelveticaNeue", "Helvetica Neue", "Arial", "Helvetica", sans-serif;
+        font-size: 12pt;
+        color: #0b0c0c;
+    }
+    /* --- HEADINGS --- */
+
+    .title {
+        font-size: 20pt;
+        text-align: center;
+    }
+
+    h1, h2, h3 {
+        color: #0b0c0c;
+        font-weight: 700;
+        display: block;
+        margin-top: 0;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
+    }
+
+    h1 {
+        font-size: 18pt;
+        line-height: 1.09375;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        margin-block-start: 0.67em;
+        margin-block-end: 0.67em;
+    }
+
+    h2 {
+        font-size: 17pt;
+        line-height: 1.0416666667;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+    }
+
+    h3 {
+        font-size: 16pt;
+        line-height: 1.0416666667;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+    }
+
+    h4 {
+        font-size: 15pt;
+        line-height: 1.0416666667;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+    }
+
+    h5 {
+        font-size: 14pt;
+        line-height: 1.0416666667;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+    }
+
+    /* --- SUMMARY LIST --- */
+
+    table.summary-list {
+        display: table;
+        width: 700px;
+        table-layout: fixed;
+        border-collapse: collapse;
+        margin: 0 0 5px;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
+    }
+
+    table.summary-list tr {
+        display: table-row;
+        margin: 0 0 20px;
+    }
+
+    table.summary-list tr td {
+        border-bottom: 1px solid #b1b4b6;
+        /*margin-bottom: 5px;*/
+        overflow-wrap: break-word;
+        display: table-cell;
+        /*padding-top: 2px;*/
+        /*padding-bottom: 2px;*/
+        /*padding-right: 0;*/
+        margin-inline-start: 40px;
+        width: 70%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        line-height: 1.25;
+        font-weight: 400;
+        white-space: normal;
+        vertical-align: top;
+    }
+
+    table.summary-list tr td:first-child {
+        font-size: 12pt;
+        width: 30%;
+        font-weight: 700;
+        padding-right: 20px;
+        vertical-align: top;
+    }
+
+    /* --- DATA TABLE --- */
+
+    table.data-table {
+        display: table;
+        width: 700px;
+        table-layout: fixed;
+        border-collapse: collapse;
+        margin: 0 0 5px;
+        margin-block-start: 1em;
+        margin-block-end: 1em;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
+    }
+
+    table.data-table tr {
+        display: table-row;
+        margin: 0 0 20px;
+    }
+
+    table.data-table tr td {
+        border-bottom: 1px solid #b1b4b6;
+        margin-bottom: 5px;
+        overflow-wrap: break-word;
+        display: table-cell;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        padding-right: 0;
+        margin-inline-start: 40px;
+        table-layout: fixed;
+        border-collapse: collapse;
+        line-height: 1.25;
+        font-weight: 400;
+        white-space: pre-wrap;
+        vertical-align: top;
+    }
+
+    table.data-table tr:first-child td {
+        font-size: 12pt;
+        width: 30%;
+        font-weight: 700;
+        padding-right: 20px;
+        border-bottom: none;
+        vertical-align: top;
+    }
+
+    table.data-table tr td.data-column-5 { width: 5% }
+    table.data-table tr td.data-column-10 { width: 10% }
+    table.data-table tr td.data-column-15 { width: 15% }
+    table.data-table tr td.data-column-20 { width: 20% }
+    table.data-table tr td.data-column-25 { width: 25% }
+    table.data-table tr td.data-column-30 { width: 30% }
+    table.data-table tr td.data-column-35 { width: 35% }
+    table.data-table tr td.data-column-40 { width: 40% }
+    table.data-table tr td.data-column-45 { width: 45% }
+    table.data-table tr td.data-column-50 { width: 50% }
+    table.data-table tr td.data-column-55 { width: 55% }
+    table.data-table tr td.data-column-60 { width: 60% }
+    table.data-table tr td.data-column-65 { width: 65% }
+    table.data-table tr td.data-column-70 { width: 70% }
+    table.data-table tr td.data-column-75 { width: 75% }
+    table.data-table tr td.data-column-80 { width: 80% }
+    table.data-table tr td.data-column-85 { width: 85% }
+    table.data-table tr td.data-column-90 { width: 90% }
+    table.data-table tr td.data-column-95 { width: 95% }
+
+    table tr td.data-column-5 { width: 5% }
+    table tr td.data-column-10 { width: 10% }
+    table tr td.data-column-15 { width: 15% }
+    table tr td.data-column-20 { width: 20% }
+    table tr td.data-column-25 { width: 25% }
+    table tr td.data-column-30 { width: 30% }
+    table tr td.data-column-35 { width: 35% }
+    table tr td.data-column-40 { width: 40% }
+    table tr td.data-column-45 { width: 45% }
+    table tr td.data-column-50 { width: 50% }
+    table tr td.data-column-55 { width: 55% }
+    table tr td.data-column-60 { width: 60% }
+    table tr td.data-column-65 { width: 65% }
+    table tr td.data-column-70 { width: 70% }
+    table tr td.data-column-75 { width: 75% }
+    table tr td.data-column-80 { width: 80% }
+    table tr td.data-column-85 { width: 85% }
+    table tr td.data-column-90 { width: 90% }
+    table tr td.data-column-95 { width: 95% }
+
+    table.summary-list tr td.data-column-5 { width: 5% }
+    table.summary-list tr td.data-column-10 { width: 10% }
+    table.summary-list tr td.data-column-15 { width: 15% }
+    table.summary-list tr td.data-column-20 { width: 20% }
+    table.summary-list tr td.data-column-25 { width: 25% }
+    table.summary-list tr td.data-column-30 { width: 30% }
+    table.summary-list tr td.data-column-35 { width: 35% }
+    table.summary-list tr td.data-column-40 { width: 40% }
+    table.summary-list tr td.data-column-45 { width: 45% }
+    table.summary-list tr td.data-column-50 { width: 50% }
+    table.summary-list tr td.data-column-55 { width: 55% }
+    table.summary-list tr td.data-column-60 { width: 60% }
+    table.summary-list tr td.data-column-65 { width: 65% }
+    table.summary-list tr td.data-column-70 { width: 70% }
+    table.summary-list tr td.data-column-75 { width: 75% }
+    table.summary-list tr td.data-column-80 { width: 80% }
+    table.summary-list tr td.data-column-85 { width: 85% }
+    table.summary-list tr td.data-column-90 { width: 90% }
+    table.summary-list tr td.data-column-95 { width: 95% }
+
+    ul {
+        padding: 0 0 0 10px;
+    }
+
+</style>
+
+<h1 class="title">Managing Prisoner Applications</h1>
+<h2>Apps</h2>
+
+    <br/>
+    <h3>App</h3>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Status</td>
+            <td class="data-column-60">Type</td>
+        </tr>
+        <tr>
+            <td>PENDING</td>
+            <td>Make a general PIN phone enquiry</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-20">Requested date</td>
+            <td class="data-column-20">Establishment</td>
+            <td class="data-column-30">Assigned To</td>
+            <td class="data-column-20">Submitted By</td>
+        </tr>
+        <tr>
+            <td>09 March 2026, 12:16:09 pm</td>
+            <td>Moorland (HMP &amp; YOI)</td>
+            <td>Business Hub</td>
+            
+            
+                <td>SUBJECT</td>
+            
+
+        </tr>
+    </table>
+
+    <h4>Responses</h4>
+    
+        <table class="data-table">
+            <tr>
+                <td class="data-column-20">Decision</td>
+                <td class="data-column-20">Created By</td>
+                <td class="data-column-20">Created Date</td>
+                <td class="data-column-40">Reason</td>
+            </tr>
+            <tr>
+                <td>APPROVED</td>
+                <td>SMJOHN_GEN</td>
+                <td>27 February 2026, 11:52:15 am</td>
+                <td>No Data Held</td>
+            </tr>
+        </table>
+    
+        <table class="data-table">
+            <tr>
+                <td class="data-column-20">Decision</td>
+                <td class="data-column-20">Created By</td>
+                <td class="data-column-20">Created Date</td>
+                <td class="data-column-40">Reason</td>
+            </tr>
+            <tr>
+                <td>DECLINED</td>
+                <td>JADAMS_GEN</td>
+                <td>08 December 2025, 12:36:34 pm</td>
+                <td>test reason</td>
+            </tr>
+        </table>
+    
+    
+
+    <h4>Comments</h4>
+    
+        <table class="data-table">
+            <tr>
+                <td class="data-column-50">Comment</td>
+                <td class="data-column-20">Created By</td>
+                <td class="data-column-20">Created Date</td>
+            </tr>
+            <tr>
+                <td>Need some more info</td>
+                
+                    <td>Johnson</td>
+                
+                
+                <td>27 February 2026, 11:52:15 am</td>
+            </tr>
+        </table>
+    
+    
+
+    <h4>History</h4>
+    
+        <table class="data-table">
+            <tr>
+                <td class="data-column-50">Activity</td>
+                <td class="data-column-20">Date</td>
+            </tr>
+            <tr>
+                <td>App request submitted.</td>
+                <td>09 March 2026, 12:16:09 pm</td>
+            </tr>
+        </table>
+    
+    
+
+    <h4>Form Data</h4>
+    
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">last name</td>
+                <td class="data-column-70">Patts</td>
+            </tr>
+        </table>
+    
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">first name</td>
+                <td class="data-column-70">John</td>
+            </tr>
+        </table>
+    
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">telephone 1</td>
+                <td class="data-column-70">441234567899</td>
+            </tr>
+        </table>
+    
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">telephone 2</td>
+                <td class="data-column-70">No Data Held</td>
+            </tr>
+        </table>
+    
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">relationship</td>
+                <td class="data-column-70">Brother</td>
+            </tr>
+        </table>
+    
+    
+
+    <h4>Attachments</h4>
+    
+        <table class="data-table">
+            <tr><td>Attachment</td></tr>
+            <tr>
+                <td><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAV4AAAEsBAMAAAB578bjAAAAG1BMVEUaGhr///82NjZvb29TU1PFxcWpqani4uKMjIwJpXl6AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFV0lEQVR4nO2ZzVPbRhiH17IsfGQBSz5aFEKOOGTSHFHTTnpEnWlytWjxcES0mVxRyDD+s7vfK1sLloQ1OJ3fMxNsS6t3H6323Q+FEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgf4p1xfukq/IezEm83ENCngtHfG4jlIKMlRhsI6NPo61ceLJxsIFqFJd9wjcqvNQL69I79PXqXdyQsSPbrlBpENQpJX9aPC/rvM4yepgNf4mX0tL3R03ThS/y8VtQ2dOJLTuikpc86uvH16U1boTV040uKrjpER747dS5oQ0e+Q3rOxomJ/nko/rKf/Yd7cfD3+b0847F/76/fiOsfrk9LpeXpCVmm7Osvrr+r+Cs1Nfb16IyQeKx+9bk9GYzYbcjZ7yP7lCfTC1KwH5d8UGGfd6K0HQ3pxeO+v9m5tNA1DURNzX1JeuPw9dLRPKW3TJt/XkjfY/rpikYTps0+xbogN8kqL3T7BjSaP6R0v6RJyJRVGZtZ+448xZJvsefwHUTnbDIJScFaxUtD6ZuyyfAVnQ15Gx/zx0KKAx2l2k7G18tHPOjP4mF4ajzyeCO08p0eOHwz3qQBPRIFd8QYnX4STZrtJaJwzm6TxGY1YyJUfU9kr/HEFaJdeRU8pnd4eBwdcib1feP9qi8VreXRq1Ae5MVT2TJxmM5MvQMz22R7j/pm6kss7jeQHUIPo837L3et+MraM/XwRAdOpVsg74X0RkuB8tV0M76ezkQZ2xN9XmR5O99e6PCV0aYqOdJd/idUJWSfHVCheVO+zukbmFOy1iQUmpON+spoiQomHna6p669URq8jE44R7Xa105ImbhSDPgmUTfjq4LodCqEr07sGZHVct9YbXeq6WZ87anprvjIb213aOPr6L/aVx3mQ4j1vSuVDNSTKCrpZnynZhxOZKOyVrBtvpl8W2k16Xvh8NWRqulmfO2txPvqylN7rLlv4hjPavuqVver6WZ8s119pKfCpf/Y+pv7OueL2r7yaQeOWo1vOFdkKtxJaZPf3LfYfY7vzqhc0Olr9/ZjXYnt7Rta79T2lcOEI92s73ihUWvKgNql26bWk3V95U9Hujn6r2Y6spvGduv19r5iEnClm2N8UHj00t5fu/1Qr70v13Klmx1/D1ZOMMVkXPrRzFck+DN8ecL1HOlmfCv7ODYX2zVFU1+5fu7pdWzQ2LfP+uLUkW7Gs7fyxk9UbjYmTX3l/mRHD4i9xr6E5WvqSDfjKxdyFtEBE30TTX3T8dJVWXPfbNdzpZvx7a+8ost4sKG+ZPVu1vh+lAuloRpgfNrcN94fOtvI9Nt8qbeoutkiTRDYoa2G7ys15fhqfZeMm/sORjuudLO+ydIr9pNo6eDQ+Wwe8X1HI1U6P5AO35v79qlrdiv5BvQP+YW/cdEbvaHqJb5ZCT/p+9fZ2dlDTuk3HZx/89PQb+5L8sqrkmVflhSX/OP1Z6L3rsRsV0g+nhBytM5X/V/IG32kT+mXq5yetvEt3O+8rW8/p1/m81RsVPWGxHxJ6Gj+ec0gIXyjP+ULMgl/ZRR9I218Y3dtpXlimIvW4Q9TNyvrEDKOn/Kan/Z18dPi/nxtISeuxeQK3ofF4s1j594vyg3XPe50217y2UsbNGJYZ8TfIuI1/4O5bVTf9G01fbt2+iFYXh1sPUN6+9IKTXid6xejPwJ8np29tEQDAhpdvrRDE/y3k5dWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsH/8Bscn8SatPv1EAAAAASUVORK5CYII=" alt="Inline attachment" style="max-width:100%;"/></td>
+            </tr>
+        </table>
+    
+        <table class="data-table">
+            <tr><td>Attachment</td></tr>
+            <tr>
+                <td><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAV4AAAEsBAMAAAB578bjAAAAG1BMVEUaGhr///82NjZvb29TU1PFxcWpqani4uKMjIwJpXl6AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFV0lEQVR4nO2ZzVPbRhiH17IsfGQBSz5aFEKOOGTSHFHTTnpEnWlytWjxcES0mVxRyDD+s7vfK1sLloQ1OJ3fMxNsS6t3H6323Q+FEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgf4p1xfukq/IezEm83ENCngtHfG4jlIKMlRhsI6NPo61ceLJxsIFqFJd9wjcqvNQL69I79PXqXdyQsSPbrlBpENQpJX9aPC/rvM4yepgNf4mX0tL3R03ThS/y8VtQ2dOJLTuikpc86uvH16U1boTV040uKrjpER747dS5oQ0e+Q3rOxomJ/nko/rKf/Yd7cfD3+b0847F/76/fiOsfrk9LpeXpCVmm7Osvrr+r+Cs1Nfb16IyQeKx+9bk9GYzYbcjZ7yP7lCfTC1KwH5d8UGGfd6K0HQ3pxeO+v9m5tNA1DURNzX1JeuPw9dLRPKW3TJt/XkjfY/rpikYTps0+xbogN8kqL3T7BjSaP6R0v6RJyJRVGZtZ+448xZJvsefwHUTnbDIJScFaxUtD6ZuyyfAVnQ15Gx/zx0KKAx2l2k7G18tHPOjP4mF4ajzyeCO08p0eOHwz3qQBPRIFd8QYnX4STZrtJaJwzm6TxGY1YyJUfU9kr/HEFaJdeRU8pnd4eBwdcib1feP9qi8VreXRq1Ae5MVT2TJxmM5MvQMz22R7j/pm6kss7jeQHUIPo837L3et+MraM/XwRAdOpVsg74X0RkuB8tV0M76ezkQZ2xN9XmR5O99e6PCV0aYqOdJd/idUJWSfHVCheVO+zukbmFOy1iQUmpON+spoiQomHna6p669URq8jE44R7Xa105ImbhSDPgmUTfjq4LodCqEr07sGZHVct9YbXeq6WZ87anprvjIb213aOPr6L/aVx3mQ4j1vSuVDNSTKCrpZnynZhxOZKOyVrBtvpl8W2k16Xvh8NWRqulmfO2txPvqylN7rLlv4hjPavuqVver6WZ8s119pKfCpf/Y+pv7OueL2r7yaQeOWo1vOFdkKtxJaZPf3LfYfY7vzqhc0Olr9/ZjXYnt7Rta79T2lcOEI92s73ihUWvKgNql26bWk3V95U9Hujn6r2Y6spvGduv19r5iEnClm2N8UHj00t5fu/1Qr70v13Klmx1/D1ZOMMVkXPrRzFck+DN8ecL1HOlmfCv7ODYX2zVFU1+5fu7pdWzQ2LfP+uLUkW7Gs7fyxk9UbjYmTX3l/mRHD4i9xr6E5WvqSDfjKxdyFtEBE30TTX3T8dJVWXPfbNdzpZvx7a+8ost4sKG+ZPVu1vh+lAuloRpgfNrcN94fOtvI9Nt8qbeoutkiTRDYoa2G7ys15fhqfZeMm/sORjuudLO+ydIr9pNo6eDQ+Wwe8X1HI1U6P5AO35v79qlrdiv5BvQP+YW/cdEbvaHqJb5ZCT/p+9fZ2dlDTuk3HZx/89PQb+5L8sqrkmVflhSX/OP1Z6L3rsRsV0g+nhBytM5X/V/IG32kT+mXq5yetvEt3O+8rW8/p1/m81RsVPWGxHxJ6Gj+ec0gIXyjP+ULMgl/ZRR9I218Y3dtpXlimIvW4Q9TNyvrEDKOn/Kan/Z18dPi/nxtISeuxeQK3ofF4s1j594vyg3XPe50217y2UsbNGJYZ8TfIuI1/4O5bVTf9G01fbt2+iFYXh1sPUN6+9IKTXid6xejPwJ8np29tEQDAhpdvrRDE/y3k5dWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABsH/8Bscn8SatPv1EAAAAASUVORK5CYII=" alt="Inline attachment" style="max-width:100%;"/></td>
+            </tr>
+        </table>
+    
+    
+
+
+    <br/>
+    <h3>App</h3>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Status</td>
+            <td class="data-column-60">Type</td>
+        </tr>
+        <tr>
+            <td>PENDING</td>
+            <td>Add emergency phone credit</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-20">Requested date</td>
+            <td class="data-column-20">Establishment</td>
+            <td class="data-column-30">Assigned To</td>
+            <td class="data-column-20">Submitted By</td>
+        </tr>
+        <tr>
+            <td>10 November 2025, 4:15:30 pm</td>
+            <td>Moorland (HMP &amp; YOI)</td>
+            <td>OMU</td>
+            
+                <td>Johnson</td>
+            
+            
+
+        </tr>
+    </table>
+
+    <h4>Responses</h4>
+    
+    
+        <p>No data held</p>
+    
+
+    <h4>Comments</h4>
+    
+        <table class="data-table">
+            <tr>
+                <td class="data-column-50">Comment</td>
+                <td class="data-column-20">Created By</td>
+                <td class="data-column-20">Created Date</td>
+            </tr>
+            <tr>
+                <td>No Data Held</td>
+                
+                
+                    <td>SUBJECT</td>
+                
+                <td>08 December 2025, 12:36:34 pm</td>
+            </tr>
+        </table>
+    
+    
+
+    <h4>History</h4>
+    
+        <table class="data-table">
+            <tr>
+                <td class="data-column-50">Activity</td>
+                <td class="data-column-20">Date</td>
+            </tr>
+            <tr>
+                <td>App request submitted.</td>
+                <td>10 November 2025, 4:15:30 pm</td>
+            </tr>
+        </table>
+    
+        <table class="data-table">
+            <tr>
+                <td class="data-column-50">Activity</td>
+                <td class="data-column-20">Date</td>
+            </tr>
+            <tr>
+                <td>App request forwarded to a approval department.</td>
+                <td>08 December 2025, 12:36:34 pm</td>
+            </tr>
+        </table>
+    
+        <table class="data-table">
+            <tr>
+                <td class="data-column-50">Activity</td>
+                <td class="data-column-20">Date</td>
+            </tr>
+            <tr>
+                <td>Forwarding comment added to app request</td>
+                <td>08 December 2025, 12:36:34 pm</td>
+            </tr>
+        </table>
+    
+    
+
+    <h4>Form Data</h4>
+    
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">amount</td>
+                <td class="data-column-70">1</td>
+            </tr>
+        </table>
+    
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">reason</td>
+                <td class="data-column-70">testing</td>
+            </tr>
+        </table>
+    
+    
+
+    <h4>Attachments</h4>
+    
+    
+        <p>No Data Held</p>
+    
+
+
+

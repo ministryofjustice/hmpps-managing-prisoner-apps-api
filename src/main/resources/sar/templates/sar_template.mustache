@@ -1,0 +1,128 @@
+<h1 class="title">Managing Prisoner Applications</h1>
+<h2>Apps</h2>
+{{#content.apps}}
+    <br/>
+    <h3>App</h3>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-30">Status</td>
+            <td class="data-column-60">Type</td>
+        </tr>
+        <tr>
+            <td>{{ optionalValue status }}</td>
+            <td>{{ optionalValue type }}</td>
+        </tr>
+    </table>
+    <table class="data-table">
+        <tr>
+            <td class="data-column-20">Requested date</td>
+            <td class="data-column-20">Establishment</td>
+            <td class="data-column-30">Assigned To</td>
+            <td class="data-column-20">Submitted By</td>
+        </tr>
+        <tr>
+            <td>{{ optionalValue (formatDate requestedDate) }}</td>
+            <td>{{ getPrisonName establishment }}</td>
+            <td>{{ optionalValue assignedTo }}</td>
+            {{#appCreatedByStaff}}
+                <td>{{ optionalValue ( getUserLastName createdBy) }}</td>
+            {{/appCreatedByStaff}}
+            {{^appCreatedByStaff}}
+                <td>SUBJECT</td>
+            {{/appCreatedByStaff}}
+
+        </tr>
+    </table>
+
+    <h4>Responses</h4>
+    {{#responses}}
+        <table class="data-table">
+            <tr>
+                <td class="data-column-20">Decision</td>
+                <td class="data-column-20">Created By</td>
+                <td class="data-column-20">Created Date</td>
+                <td class="data-column-40">Reason</td>
+            </tr>
+            <tr>
+                <td>{{ optionalValue decision }}</td>
+                <td>{{ optionalValue createdBy }}</td>
+                <td>{{ optionalValue (formatDate createdDateTime) }}</td>
+                <td>{{ optionalValue reason }}</td>
+            </tr>
+        </table>
+    {{/responses}}
+    {{^responses}}
+        <p>No data held</p>
+    {{/responses}}
+
+    <h4>Comments</h4>
+    {{#comments}}
+        <table class="data-table">
+            <tr>
+                <td class="data-column-50">Comment</td>
+                <td class="data-column-20">Created By</td>
+                <td class="data-column-20">Created Date</td>
+            </tr>
+            <tr>
+                <td>{{ optionalValue message }}</td>
+                {{#createdByStaff}}
+                    <td>{{ optionalValue ( getUserLastName createdBy) }}</td>
+                {{/createdByStaff}}
+                {{^createdByStaff}}
+                    <td>SUBJECT</td>
+                {{/createdByStaff}}
+                <td>{{ optionalValue ( formatDate createdDateTime )}}</td>
+            </tr>
+        </table>
+    {{/comments}}
+    {{^comments}}
+        <p>No data held</p>
+    {{/comments}}
+
+    <h4>History</h4>
+    {{#history}}
+        <table class="data-table">
+            <tr>
+                <td class="data-column-50">Activity</td>
+                <td class="data-column-20">Date</td>
+            </tr>
+            <tr>
+                <td>{{ optionalValue activity }}</td>
+                <td>{{ optionalValue (formatDate date) }}</td>
+            </tr>
+        </table>
+    {{/history}}
+    {{^history}}
+        <p>No data held</p>
+    {{/history}}
+
+    <h4>Form Data</h4>
+    {{#formDataItems}}
+        <table class="summary-list">
+            <tr>
+                <td class="data-column-30">{{ optionalValue (convertCamelCase key) }}</td>
+                <td class="data-column-70">{{ optionalValue value }}</td>
+            </tr>
+        </table>
+    {{/formDataItems}}
+    {{^formDataItems}}
+        <p>No data held</p>
+    {{/formDataItems}}
+
+    <h4>Attachments</h4>
+    {{#appAttachments}}
+        <table class="data-table">
+            <tr><td>Attachment</td></tr>
+            <tr>
+                <td><img src="{{{ inlineAttachmentContent this }}}" alt="Inline attachment" style="max-width:100%;"/></td>
+            </tr>
+        </table>
+    {{/appAttachments}}
+    {{^appAttachments}}
+        <p>No Data Held</p>
+    {{/appAttachments}}
+
+{{/content.apps}}
+{{^content.apps}}
+    <p>No Data Held</p>
+{{/content.apps}}

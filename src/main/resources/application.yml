@@ -3,6 +3,12 @@ info.app:
   version: 1.0
 
 hmpps:
+  service:
+    name: hmpps-managing-prisoner-apps
+  sar:
+    template:
+      path: /sar/templates/sar_template.mustache
+      enabled: true
   merge:
     page-size: 50
   sqs:
@@ -42,8 +48,8 @@ spring:
 
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss"
-    #serialization:
-      #WRITE_DATES_AS_TIMESTAMPS: false
+      #serialization:
+    #WRITE_DATES_AS_TIMESTAMPS: false
 
   security:
     oauth2:

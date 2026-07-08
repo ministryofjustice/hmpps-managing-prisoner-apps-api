@@ -1,11 +1,16 @@
 server:
   shutdown: immediate
 
+SYSTEM_CLIENT_ID: "test-system-client-id"
+SYSTEM_CLIENT_SECRET: "test-system-client-secret"
+
 management.endpoint:
   health.cache.time-to-live: 0
   info.cache.time-to-live: 0
 
 hmpps:
+  self:
+    url: http://localhost:8080
   auth:
     base-url: "http://localhost:8090/auth"
   manage-users:
@@ -16,8 +21,47 @@ hmpps:
     api:
       url: http://localhost:8093
       timeout: 10s
+  document:
+    api:
+      url: https://document-api-dev.hmpps.service.justice.gov.uk
+      timeout: 10s
+
+  sar:
+    template:
+      enabled: true
+      path: /sar/templates/sar_template.mustache
+    tests:
+      # When generate-actual is true the SAR tests write the actual output to
+      # src/test/resources/*.log scratch files AND the @AfterEach tearDown in
+      # SarIntegrationTestBase automatically promotes them into:
+      #   src/test/resources/sar/expected/jpa-entity-schema.json
+      #   src/test/resources/sar/expected/sar-api-response.json
+      #   src/test/resources/sar/expected/sar-report-output.html
+      #
+      # To regenerate expected snapshots:
+      #   1. Set generate-actual: true
+      generate-actual: false
+      expected-api-response-path: /sar/expected/sar-api-response.json
+      expected-jpa-entity-schema-path: /sar/expected/jpa-entity-schema.json
+      expected-render-result-path: /sar/expected/sar-report-output.html
+      attachments-expected: false
+
+  # SQS configuration for tests
+  # Tests that don't need SQS should use @ActiveProfiles("test") only
+  # Tests that need SQS should use @ActiveProfiles("test", "test-sqs")
   sqs:
-    enabled: false  # Disabled by default - enable in test-sqs profile for SQS tests
+    enabled: false  # Disabled by default, enable in test-sqs profile
+    provider: localstack
+    localstackUrl: http://localhost:4566
+    region: eu-west-2
+    queues:
+      domaineventsqueue:
+        queueName: domainevents-queue
+        dlqName: domainevents-queue-dlq
+        subscribeTopicId: domainevents
+    topics:
+      domainevents:
+        arn: arn:aws:sns:eu-west-2:000000000000:domainevents-topic
 
 # example client configuration for calling out to other services
 # TODO: Remove / replace this configuration
@@ -31,10 +75,10 @@ spring:
   application:
     name: hmpps-managing-prisoner-apps-api
   main:
-    allow-bean-definition-overriding: true
+    allow-bean-definition-overriding: true  # Required for test mocking
   autoconfigure:
     exclude:
-      - uk.gov.justice.hmpps.sqs.HmppsSqsConfiguration  # Exclude SQS for regular tests
+      - uk.gov.justice.hmpps.sqs.HmppsSqsConfiguration  # Exclude SQS by default for non-SQS tests
   jpa:
     hibernate:
       ddl-auto: update
@@ -42,7 +86,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
-    #defer-datasource-initialization: true
   datasource:
     username: sa
     password: password
