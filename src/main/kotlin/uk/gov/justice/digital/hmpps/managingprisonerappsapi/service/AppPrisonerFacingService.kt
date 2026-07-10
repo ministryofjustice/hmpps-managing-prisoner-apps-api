@@ -59,6 +59,8 @@ class AppPrisonerFacingService(
     val app = appRepository.findById(appId).orElseThrow {
       ApiException("Prisoner with id $appId not found", HttpStatus.NOT_FOUND)
     }
+    validatePrisonerByRequestedBy(prisonerId, app)
+
     val group = groupService.getGroupById(app.assignedGroup)
     val applicationType = applicationTypeRepository.findById(app.applicationType!!)
       .orElseThrow { ApiException("No application type found for id: ${app.applicationType}", HttpStatus.BAD_REQUEST) }
@@ -79,6 +81,12 @@ class AppPrisonerFacingService(
       applicationType,
       reason,
     )
+  }
+
+  private fun validatePrisonerByRequestedBy(prisonerId: String, app: App) {
+    if (prisonerId != app.requestedBy) {
+      throw ApiException("App with id ${app.id} is not requested by $prisonerId", HttpStatus.FORBIDDEN)
+    }
   }
 
   fun submitApp(appRequest: AppRequestPrisoner, prisonerId: String): AppResponsePrisonerDto<Any, Any> {
