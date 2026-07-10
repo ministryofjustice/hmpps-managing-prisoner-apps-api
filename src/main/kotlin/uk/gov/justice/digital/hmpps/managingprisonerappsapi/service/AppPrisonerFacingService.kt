@@ -59,7 +59,7 @@ class AppPrisonerFacingService(
     val app = appRepository.findById(appId).orElseThrow {
       ApiException("Prisoner with id $appId not found", HttpStatus.NOT_FOUND)
     }
-    validatePrisonerByRequestedBy(prisonerId,app)
+    validatePrisonerByRequestedBy(prisonerId, app)
 
     val group = groupService.getGroupById(app.assignedGroup)
     val applicationType = applicationTypeRepository.findById(app.applicationType!!)
