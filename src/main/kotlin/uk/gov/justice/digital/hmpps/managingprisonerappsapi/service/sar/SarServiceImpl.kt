@@ -184,7 +184,7 @@ class SarServiceImpl(
     } else if (activity == Activity.FORWARDING_COMMENT_ADDED) {
       return "Forwarding comment added to app request"
     } else if (activity == Activity.COMMENT_ADDED) {
-      return "Comment added to app request ."
+      return "Message added to app request ."
     } else if (activity == Activity.APP_FORWARDED_TO_A_GROUP) {
       return "App request forwarded to a approval department."
     } else if (activity == Activity.APP_REQUEST_FORM_DATA_UPDATED) {

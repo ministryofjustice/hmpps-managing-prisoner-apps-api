@@ -190,9 +190,9 @@ class HistoryServiceImpl(
     when (activity) {
       Activity.APP_SUBMITTED -> x = "Logged by $staffName"
       Activity.APP_REQUEST_FORM_DATA_UPDATED -> x = "Form data updated by $staffName"
-      Activity.COMMENT_ADDED -> x = "Comment added by $staffName"
+      Activity.COMMENT_ADDED -> x = "Message added by $staffName"
       Activity.FORWARDING_COMMENT_ADDED, Activity.APP_FORWARDED_TO_A_GROUP ->
-        x = "Forwarding comment added by $staffName"
+        x = "Forwarding message added by $staffName"
       Activity.APP_APPROVED -> x = "Marked as approved by $staffName"
       Activity.APP_DECLINED -> x = "Marked as declined by $staffName"
       Activity.PRISONER_ID_UPDATE -> x = "Prisoner merged by $staffName"
