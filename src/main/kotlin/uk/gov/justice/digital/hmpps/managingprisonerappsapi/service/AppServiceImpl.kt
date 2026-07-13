@@ -299,9 +299,7 @@ class AppServiceImpl(
     app.lastModifiedDate = LocalDateTime.now(ZoneOffset.UTC)
     app.lastModifiedBy = staffId
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
-    if (comment != null) {
-      app.comments.add(comment.id)
-    }
+
     appRepository.save(app)
     activityService.addActivity(
       groupId,
@@ -472,14 +470,12 @@ class AppServiceImpl(
       UserCategory.STAFF,
       localDateTime,
       staff.username,
-      mutableListOf(),
       convertRequestsToAppRequests(appRequest.requests),
       prisoner.username,
       prisoner.firstName,
       prisoner.lastName,
       AppStatus.PENDING,
       prisoner.establishmentId!!,
-      mutableListOf(),
       firstNightCenter,
       convertAppFilestoAppFileEnityList(appRequest.fileRequestDtos, staff.username) as MutableList<AppFile>,
     )
@@ -517,14 +513,12 @@ class AppServiceImpl(
     app.createdBy,
     app.lastModifiedDate,
     app.lastModifiedBy,
-    app.comments,
     app.requests,
     prisoner,
     app.requestedByFirstName,
     app.requestedByLastName,
     app.status,
     app.establishmentId,
-    app.responses,
     app.firstNightCenter,
     convertEntityFilesToFiles(app.appFiles),
   )

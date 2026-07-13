@@ -204,14 +204,12 @@ class AppPrisonerFacingService(
       UserCategory.PRISONER,
       localDateTime,
       prisonerId,
-      mutableListOf(),
       convertRequestsToAppRequests(appRequest.requests),
       prisoner.username,
       prisoner.firstName,
       prisoner.lastName,
       AppStatus.PENDING,
       prisoner.establishmentId!!,
-      mutableListOf(),
       firstNightCenter,
     )
   }

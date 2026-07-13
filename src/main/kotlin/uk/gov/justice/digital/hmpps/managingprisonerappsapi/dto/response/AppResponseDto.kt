@@ -23,14 +23,12 @@ data class AppResponseDto<X, Y>(
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
   val lastModifiedDate: LocalDateTime?,
   val lastModifiedBy: String?,
-  val comments: List<UUID>?,
   val requests: List<Map<String, Any>>,
   val requestedBy: Y,
   val requestedByFirstName: String,
   val requestedByLastName: String,
   val status: AppStatus,
   val establishmentId: String,
-  val responses: List<UUID>?,
   val firstNightCenter: Boolean,
   val files: List<FileResponseDto>,
 )
