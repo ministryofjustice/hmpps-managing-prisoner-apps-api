@@ -69,14 +69,12 @@ class DataGenerator {
       submittedByType = UserCategory.STAFF,
       lastModifiedDate = LocalDateTime.now(),
       lastModifiedBy = "testStaaf@moj",
-      comments = arrayListOf(Generators.timeBasedEpochGenerator().generate()),
       requests = listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
       requestedBy = "testprisoner@moj",
       requestedByFirstName = "Test",
       requestedByLastName = "Prisoner",
       status = AppStatus.PENDING,
       establishmentId = Generators.timeBasedEpochGenerator().generate().toString(),
-      responses = mutableListOf(),
       firstNightCenter = false,
     )
 
@@ -105,14 +103,12 @@ class DataGenerator {
       submittedByType = UserCategory.STAFF,
       lastModifiedDate = requestedDate,
       lastModifiedBy = "testStaaf@moj",
-      comments = arrayListOf(),
       requests = listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
       requestedBy = requestedBy,
       requestedByFirstName = requestedByFirstName,
       requestedByLastName = requestedByLastName,
       status = appStatus,
       establishmentId = establishmentId,
-      responses = mutableListOf(),
       firstNightCenter = firstNightCenter,
     )
 
@@ -199,14 +195,12 @@ class DataGenerator {
       submittedByType = UserCategory.STAFF,
       lastModifiedDate = requestedDate,
       lastModifiedBy = "TEST_USER",
-      comments = mutableListOf(),
       requests = listOf(HashMap<String, Any>().apply { put("contact", 123456) }),
       requestedBy = requestedBy,
       requestedByFirstName = requestedByFirstName,
       requestedByLastName = requestedByLastName,
       status = status,
       establishmentId = establishmentId,
-      responses = mutableListOf(),
       firstNightCenter = firstNightCenter,
     )
   }

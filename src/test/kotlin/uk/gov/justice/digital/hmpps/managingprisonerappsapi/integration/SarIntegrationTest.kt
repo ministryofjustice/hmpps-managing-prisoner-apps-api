@@ -277,7 +277,6 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       createdBy = "G2168GG",
       lastModifiedDate = LocalDateTime.of(2026, 3, 9, 12, 16, 9),
       lastModifiedBy = "G2168GG",
-      comments = mutableListOf(COMMENT_ID_1),
       requests = listOf(
         linkedMapOf<String, Any>(
           "id" to "5a94f455-956c-493d-8071-983c831716bf",
@@ -293,7 +292,6 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       requestedByLastName = "AALYLE",
       status = AppStatus.PENDING,
       establishmentId = ESTABLISHMENT_ID,
-      responses = mutableListOf(RESPONSE_ID_1),
       firstNightCenter = false,
       appFiles = mutableListOf(),
     )
@@ -315,7 +313,6 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       createdBy = "SMJOHN_GEN",
       lastModifiedDate = LocalDateTime.of(2025, 12, 8, 12, 36, 34),
       lastModifiedBy = "SMJOHN_GEN",
-      comments = mutableListOf(COMMENT_ID_2),
       requests = listOf(
         linkedMapOf<String, Any>(
           "id" to "998e4959-61ec-449d-908b-f219aced9e0d",
@@ -328,7 +325,6 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       requestedByLastName = "AALYLE",
       status = AppStatus.PENDING,
       establishmentId = ESTABLISHMENT_ID,
-      responses = mutableListOf(RESPONSE_ID_2),
       firstNightCenter = false,
       appFiles = mutableListOf(),
     )

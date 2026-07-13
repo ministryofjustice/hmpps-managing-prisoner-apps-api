@@ -1,7 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
 import jakarta.persistence.CascadeType
-import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -33,8 +32,6 @@ data class App(
   val submittedByType: UserCategory,
   var lastModifiedDate: LocalDateTime,
   var lastModifiedBy: String,
-  @ElementCollection
-  var comments: MutableList<UUID>,
   @JdbcTypeCode(SqlTypes.JSON)
   var requests: List<MutableMap<String, Any>>,
   var requestedBy: String,
@@ -43,8 +40,6 @@ data class App(
   @Enumerated(EnumType.STRING)
   var status: AppStatus,
   val establishmentId: String,
-  @ElementCollection
-  var responses: MutableList<UUID>,
   var firstNightCenter: Boolean,
   @OneToMany(mappedBy = "app", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
   var appFiles: MutableList<AppFile> = mutableListOf<AppFile>(),
