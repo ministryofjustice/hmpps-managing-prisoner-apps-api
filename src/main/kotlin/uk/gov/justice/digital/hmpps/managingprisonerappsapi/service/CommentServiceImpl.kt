@@ -33,6 +33,7 @@ class CommentServiceImpl(
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
   private val prisonerService: PrisonerService,
+  private val groupService: GroupService,
 ) : CommentService {
 
   override fun saveComment(comment: Comment): Comment = commentRepository.save(comment)
@@ -50,6 +51,8 @@ class CommentServiceImpl(
     }
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
+    val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
+
     val comment = commentRepository.save(
       Comment(
         Generators.timeBasedEpochGenerator().generate(),
@@ -61,8 +64,7 @@ class CommentServiceImpl(
         UserCategory.STAFF,
       ),
     )
-    // app.comments.add(comment.id)
-    // appService.saveApp(app)
+
     activityService.addActivity(
       comment.id,
       EntityType.COMMENT,
@@ -74,6 +76,7 @@ class CommentServiceImpl(
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
+      group.name,
     )
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }
@@ -86,6 +89,7 @@ class CommentServiceImpl(
     val prisoner = validatePrisoner(prisonerId)
     val app = getAppById(appId)
     validatePrisonerByRequestedBy(prisonerId, app)
+    val group = groupService.getGroupById(app.assignedGroup, prisoner.establishmentId!!)
     val comment = commentRepository.save(
       Comment(
         Generators.timeBasedEpochGenerator().generate(),
@@ -97,8 +101,6 @@ class CommentServiceImpl(
         UserCategory.PRISONER,
       ),
     )
-    // app.comments.add(comment.id)
-    // appService.saveApp(app)
     activityService.addActivity(
       comment.id,
       EntityType.COMMENT,
@@ -110,6 +112,7 @@ class CommentServiceImpl(
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
+      group.name,
     )
     return convertCommentToCommentResponseDto(prisonerId, prisoner.username, comment)
   }

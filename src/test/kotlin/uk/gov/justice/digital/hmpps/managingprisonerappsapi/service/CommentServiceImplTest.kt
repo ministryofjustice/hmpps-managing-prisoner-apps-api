@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerDto
@@ -24,6 +25,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
@@ -57,6 +59,7 @@ class CommentServiceImplTest {
   private lateinit var app: App
   private lateinit var commentByStaff: Comment
   private lateinit var commentByPrisoner: Comment
+  private lateinit var groupService: GroupService
 
   @BeforeEach
   fun beforeEach() {
@@ -121,6 +124,7 @@ class CommentServiceImplTest {
     staffService = Mockito.mock(StaffService::class.java)
     prisonerService = Mockito.mock(PrisonerService::class.java)
     activityService = Mockito.mock(ActivityService::class.java)
+    groupService = Mockito.mock(GroupService::class.java)
     commentServiceImpl = CommentServiceImpl(
       staffService,
       appService,
@@ -128,6 +132,7 @@ class CommentServiceImplTest {
       establishmentService,
       activityService,
       prisonerService,
+      groupService,
     )
   }
 
@@ -140,6 +145,15 @@ class CommentServiceImplTest {
     Mockito.`when`(staffService.getStaffById(createdBy))
       .thenReturn(Optional.of(staff))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
+    Mockito.`when`(groupService.getGroupById(app.assignedGroup, staff.establishmentId)).thenReturn(
+      AssignedGroupDto(
+        groupId,
+        "Test Group",
+        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
+        1L,
+        GroupType.WING,
+      ),
+    )
     Mockito.`when`(commentRepository.save(any())).thenReturn(commentByStaff)
     val result = commentServiceImpl.addCommentByStaff(
       requestedBy,
@@ -158,6 +172,15 @@ class CommentServiceImplTest {
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy))
       .thenReturn(Optional.of(prisoner))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
+    Mockito.`when`(groupService.getGroupById(app.assignedGroup, prisoner.establishmentId!!)).thenReturn(
+      AssignedGroupDto(
+        groupId,
+        "Test Group",
+        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
+        1L,
+        GroupType.WING,
+      ),
+    )
     Mockito.`when`(commentRepository.save(any())).thenReturn(commentByPrisoner)
     val result = commentServiceImpl.addCommentByPrisoner(
       requestedBy,

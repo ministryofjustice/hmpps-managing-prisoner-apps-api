@@ -101,6 +101,7 @@ class AppServiceImpl(
     app.lastModifiedBy = staffId
     app.firstNightCenter = appUpdateDto.firstNightCenter
     app = appRepository.save(app)
+
     activityService.addActivity(
       app.id,
       EntityType.APP,
@@ -112,6 +113,7 @@ class AppServiceImpl(
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
+      group.name,
     )
     val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
       throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
@@ -200,6 +202,7 @@ class AppServiceImpl(
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
+      assignedGroup.name,
     )
     app.appFiles.forEach { f ->
       activityService.addActivity(
@@ -213,6 +216,7 @@ class AppServiceImpl(
         prisonerId,
         app.applicationType!!,
         app.applicationGroup!!,
+        assignedGroup.name,
       )
     }
     val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
@@ -312,6 +316,7 @@ class AppServiceImpl(
       app.requestedBy,
       app.applicationType!!,
       app.applicationGroup!!,
+      group.name,
     )
     if (comment != null) {
       activityService.addActivity(
@@ -325,6 +330,7 @@ class AppServiceImpl(
         app.requestedBy,
         app.applicationType!!,
         app.applicationGroup!!,
+        group.name,
       )
     }
     val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
@@ -543,12 +549,7 @@ class AppServiceImpl(
           commentNum = commentRepository.countCommentsByAppId(app.id)
         }
       }
-      /*val group = groupsService.getGroupById(app.assignedGroup, establishmentId)
-      val groupAppListviewDto = GroupAppListViewDto(group.id, group.name, null)
-      val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
-        ApiException("No app type found for ${app.applicationType}", HttpStatus.NOT_FOUND)
-      }
-      val commentNum = commentRepository.countCommentsByAppId(app.id)*/
+
       val appResponseDto = AppListViewDto(
         app.id,
         app.establishmentId,

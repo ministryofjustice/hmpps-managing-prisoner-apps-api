@@ -24,6 +24,7 @@ class ActivityService(
     prisonerId: String,
     appType: Any,
     applicationGroup: Long,
+    department: String,
   ) {
     appType as Long
     historyService.updateActivityInHistory(entityId, entityType, appId, activity, establishment, createdBy, createdDate, null)
@@ -38,6 +39,7 @@ class ActivityService(
       prisonerId,
       appType,
       applicationGroup,
+      department,
     )
   }
 }

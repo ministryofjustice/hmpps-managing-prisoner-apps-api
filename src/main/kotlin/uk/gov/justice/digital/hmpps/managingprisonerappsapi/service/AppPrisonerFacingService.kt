@@ -135,6 +135,7 @@ class AppPrisonerFacingService(
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
+      groups[0].name,
     )
     return convertAppEntityToAppResponse(
       appEntity,
