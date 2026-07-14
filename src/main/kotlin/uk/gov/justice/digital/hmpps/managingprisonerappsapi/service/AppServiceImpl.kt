@@ -101,6 +101,7 @@ class AppServiceImpl(
     app.lastModifiedBy = staffId
     app.firstNightCenter = appUpdateDto.firstNightCenter
     app = appRepository.save(app)
+    val group = groupsService.getGroupById(app.assignedGroup, staff.establishmentId)
 
     activityService.addActivity(
       app.id,
