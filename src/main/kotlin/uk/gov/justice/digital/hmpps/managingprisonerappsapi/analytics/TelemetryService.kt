@@ -28,6 +28,7 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
     prisonerId: String,
     appType: Long,
     applicationGroup: Long,
+    department: String,
   ) {
     try {
       val map = LinkedHashMap<String, String>()
@@ -38,6 +39,7 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
       map["dateTime"] = createdDate.format(FORMATTER)
       map["createdBy"] = createdBy
       map["establishment"] = establishment
+      map["department"] = department
 
       telemetryClient.trackEvent(activity.toString(), map, null)
     } catch (e: Exception) {

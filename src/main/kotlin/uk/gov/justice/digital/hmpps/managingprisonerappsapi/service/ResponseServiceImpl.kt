@@ -29,6 +29,7 @@ class ResponseServiceImpl(
   private val responseRepository: ResponseRepository,
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
+  private val groupService: GroupService,
 ) : ResponseService {
 
   companion object {
@@ -71,6 +72,8 @@ class ResponseServiceImpl(
             app.id,
           ),
         )
+        val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
+
         val activity =
           if (responseEntity!!.decision == Decision.APPROVED) Activity.APP_APPROVED else Activity.APP_DECLINED
         activityService.addActivity(
@@ -84,21 +87,19 @@ class ResponseServiceImpl(
           prisonerId,
           app.applicationType!!,
           app.applicationGroup!!,
+          group.name,
         )
         req["responseId"] = responseEntity!!.id.toString()
-        // app.responses.add(responseEntity!!.id)
       }
       reqs.add(req)
     }
     app.requests = reqs
-    // if (app.requests.size == app.responses.size) {
     if (response.decision == Decision.APPROVED) {
       app.status = AppStatus.APPROVED
     }
     if (response.decision == Decision.DECLINED) {
       app.status = AppStatus.DECLINED
     }
-    // }
     appService.saveApp(app)
 
     return convertResponseToAppDecisionResponse(
