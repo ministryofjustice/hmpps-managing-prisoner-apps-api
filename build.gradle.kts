@@ -63,10 +63,6 @@ java {
   targetCompatibility = JavaVersion.VERSION_25
 }
 
-dependencyCheck {
-  nvd.datafeedUrl = "file:///opt/vulnz/cache"
-}
-
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25
