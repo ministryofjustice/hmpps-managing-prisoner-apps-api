@@ -22,7 +22,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.StaffDt
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
@@ -149,7 +148,7 @@ class CommentServiceImplTest {
       AssignedGroupDto(
         groupId,
         "Test Group",
-        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
         1L,
         GroupType.WING,
       ),
@@ -176,7 +175,7 @@ class CommentServiceImplTest {
       AssignedGroupDto(
         groupId,
         "Test Group",
-        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
         1L,
         GroupType.WING,
       ),
@@ -303,7 +302,7 @@ class CommentServiceImplTest {
     Mockito.`when`(commentRepository.findById(commentByStaff.id)).thenReturn(Optional.of(commentByStaff))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
       ),
     )
     val result = commentServiceImpl.getCommentByIdForStaff(requestedBy, createdBy, app.id, true, commentByStaff.id)
@@ -319,7 +318,7 @@ class CommentServiceImplTest {
     Mockito.`when`(commentRepository.findById(commentByPrisoner.id)).thenReturn(Optional.of(commentByPrisoner))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
       ),
     )
     val result = commentServiceImpl.getCommentByIdForPrisoner(requestedBy, app.id, true, commentByPrisoner.id)
@@ -373,7 +372,7 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
       ),
     )
     Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
@@ -391,7 +390,7 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
       ),
     )
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))

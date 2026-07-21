@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 
 const val ESTABLISHMENT_ID_1 = "TS1"
@@ -37,7 +36,6 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
     val establishment = Establishment(
       ESTABLISHMENT_ID_1,
       ESTABLISHMENT_NAME_1,
-      setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
       false,
       setOf(),
       setOf(),
@@ -48,16 +46,16 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
 
   @Test
   fun `update establishment`() {
-    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, AppType.entries.toSet(), false, setOf(), setOf())
+    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, false, setOf(), setOf())
     val entity = establishmentRepository.save(establishment)
-    val updatedEstablishment = Establishment(entity.id, ESTABLISHMENT_NAME_2, AppType.entries.toSet(), false, setOf(), setOf())
+    val updatedEstablishment = Establishment(entity.id, ESTABLISHMENT_NAME_2, false, setOf(), setOf())
     val updatedEntity = establishmentRepository.save(updatedEstablishment)
     assertEstablishment(updatedEstablishment, updatedEntity)
   }
 
   @Test
   fun `get establishment by id`() {
-    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, AppType.entries.toSet(), false, setOf(), setOf())
+    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, false, setOf(), setOf())
     establishmentRepository.save(establishment)
     val entity = establishmentRepository.findById(establishment.id)
     assertEstablishment(establishment, entity.get())
@@ -65,7 +63,7 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
 
   @Test
   fun `delete establishment by id`() {
-    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, AppType.entries.toSet(), false, setOf(), setOf())
+    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, false, setOf(), setOf())
     establishmentRepository.save(establishment)
     establishmentRepository.deleteById(establishment.id)
     val entity = establishmentRepository.findById(establishment.id)
@@ -75,6 +73,5 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
   private fun assertEstablishment(expected: Establishment, actual: Establishment) {
     Assertions.assertEquals(expected.id, actual.id)
     Assertions.assertEquals(expected.name, actual.name)
-    Assertions.assertEquals(expected.appTypes.size, actual.appTypes.size)
   }
 }

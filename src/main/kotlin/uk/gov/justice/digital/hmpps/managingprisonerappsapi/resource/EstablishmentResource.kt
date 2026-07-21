@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
@@ -144,7 +143,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
     return ResponseEntity.status(HttpStatus.OK).body(establishments)
   }
 
-  @Tag(name = "Establishments")
+/*  @Tag(name = "Establishments")
   @Operation(
     summary = "Get app types of establishment.",
     description = "This api endpoint is for getting app types by logged user active case load. Requires role ROLE_MANAGING_PRISONER_APPS, ROLE_PRISON",
@@ -170,7 +169,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
     logger.info("Request received for get app types by ${authentication.principal}")
     val appTypes = establishmentService.getAppTypesByLoggedUserEstablishment(authentication.principal)
     return ResponseEntity.status(HttpStatus.OK).body(appTypes)
-  }
+  }*/
 
   @Tag(name = "Establishments")
   @Operation(

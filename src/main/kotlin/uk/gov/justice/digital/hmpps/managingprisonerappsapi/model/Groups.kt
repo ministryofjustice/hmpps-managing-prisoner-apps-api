@@ -16,9 +16,6 @@ data class Groups(
   val name: String,
   val establishmentId: String,
   @ElementCollection
-  @Enumerated(EnumType.STRING)
-  val initialsApps: List<AppType>,
-  @ElementCollection
   val initialsApplicationTypes: List<Long>,
   @Enumerated(EnumType.STRING)
   val type: GroupType,

@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
@@ -68,50 +66,6 @@ class EstablishmentIntegrationTest(
   }
 
   @Test
-  fun `get app types by establishments`() {
-    var response = webTestClient.get()
-      .uri("/v1/establishments/apps/types")
-      .headers(setAuthorisation(roles = listOf("ROLE_PRISON")))
-      .header("Content-Type", "application/json")
-      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-      .exchange()
-      .expectStatus().isOk
-      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<List<AppTypeResponse>>() {})
-      .consumeWith(System.out::println)
-      .returnResult()
-      .responseBody as List<AppTypeResponse>
-    assertEquals(1, response.size)
-    assertEquals(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT.toString(), response.get(0).key)
-
-    // set all apptypes
-    establishmentRepository.save(
-      Establishment(
-        establishmentIdFirst,
-        "ESTABLISHMENT_NAME_1",
-        AppType.entries.toSet(),
-        false,
-        setOf(),
-        setOf(),
-      ),
-    )
-
-    response = webTestClient.get()
-      .uri("/v1/establishments/apps/types")
-      .headers(setAuthorisation(roles = listOf("ROLE_PRISON")))
-      .header("Content-Type", "application/json")
-      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-      .exchange()
-      .expectStatus().isOk
-      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<List<AppTypeResponse>>() {})
-      .consumeWith(System.out::println)
-      .returnResult()
-      .responseBody as List<AppTypeResponse>
-    assertEquals(AppType.entries.size, response.size)
-  }
-
-  @Test
   fun `get app groups and types by establishments`() {
     var response = webTestClient.get()
       .uri("/v2/establishments/apps/groups")
@@ -157,7 +111,6 @@ class EstablishmentIntegrationTest(
       Establishment(
         establishmentIdFirst,
         "ESTABLISHMENT_NAME_1",
-        setOf(AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT),
         false,
         setOf(),
         setOf(),
@@ -167,7 +120,6 @@ class EstablishmentIntegrationTest(
       Establishment(
         establishmentIdSecond,
         "ESTABLISHMENT_NAME_2",
-        AppType.entries.toSet(),
         false,
         setOf(),
         setOf(),
@@ -177,7 +129,6 @@ class EstablishmentIntegrationTest(
       Establishment(
         establishmentIdThird,
         "ESTABLISHMENT_NAME_3",
-        AppType.entries.toSet(),
         false,
         setOf(),
         setOf(),

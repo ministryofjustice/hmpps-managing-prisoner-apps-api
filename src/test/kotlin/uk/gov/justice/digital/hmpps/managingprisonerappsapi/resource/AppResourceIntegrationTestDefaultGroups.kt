@@ -21,7 +21,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.Integrat
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
@@ -670,7 +669,6 @@ class AppResourceIntegrationTestDefaultGroups(
       Establishment(
         establishmentIdFirst,
         "ESTABLISHMENT_NAME_1",
-        AppType.entries.toSet(),
         true,
         setOf(),
         setOf(),
@@ -680,7 +678,6 @@ class AppResourceIntegrationTestDefaultGroups(
       Establishment(
         establishmentIdSecond,
         "ESTABLISHMENT_NAME_2",
-        AppType.entries.toSet(),
         true,
         setOf(),
         setOf(),
@@ -690,7 +687,6 @@ class AppResourceIntegrationTestDefaultGroups(
       Establishment(
         establishmentIdThird,
         "ESTABLISHMENT_NAME_3",
-        AppType.entries.toSet(),
         true,
         setOf(),
         setOf(),

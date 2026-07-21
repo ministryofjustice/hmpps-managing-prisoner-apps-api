@@ -55,20 +55,6 @@ class EstablishmentService(
     return list
   }
 
-  /*fun deleteEstablishmentById(id: String) {
-    return establishmentRepository.deleteById(id)
-  }*/
-
-  fun getAppTypesByLoggedUserEstablishment(staffId: String): List<AppTypeResponse> {
-    val staff = staffService.getStaffById(staffId).orElseThrow {
-      ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
-    }
-    val establishment = establishmentRepository.findById(staff.establishmentId).orElseThrow {
-      ApiException("Establishment: ${staff.establishmentId} not enabled", HttpStatus.FORBIDDEN)
-    }
-    return convertAppTypeToAppTypeListResponse(establishment.appTypes)
-  }
-
   fun getAppGroupsAndTypesByLoggedUserEstablishment(staffId: String): List<ApplicationGroupResponse> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
@@ -89,7 +75,6 @@ class EstablishmentService(
   private fun convertEstablishmentToEstablishmentDto(establishment: Establishment): EstablishmentDto = EstablishmentDto(
     id = establishment.id,
     name = establishment.name,
-    establishment.appTypes,
     establishment.defaultDepartments,
     establishment.blackListedAppGroups,
     establishment.blackListedAppTypes,
@@ -98,7 +83,6 @@ class EstablishmentService(
   private fun convertEstablishmentDtoToEstablishment(establishmentDto: EstablishmentDto): Establishment = Establishment(
     id = establishmentDto.id,
     name = establishmentDto.name,
-    establishmentDto.appTypes,
     false,
     setOf(),
     setOf(),

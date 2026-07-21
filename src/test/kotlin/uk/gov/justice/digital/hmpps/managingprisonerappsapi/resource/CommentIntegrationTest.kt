@@ -19,7 +19,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
@@ -244,7 +243,6 @@ class CommentIntegrationTest(
       Establishment(
         establishmentIdFirst,
         "ESTABLISHMENT_NAME_1",
-        AppType.entries.toSet(),
         false,
         setOf(),
         setOf(),
