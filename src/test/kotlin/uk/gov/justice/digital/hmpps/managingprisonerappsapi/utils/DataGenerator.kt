@@ -115,7 +115,6 @@ class DataGenerator {
     fun generateEstablishment(): Establishment = Establishment(
       "HST",
       "Test Establishment",
-      AppType.entries.toSet(),
       false,
       setOf(),
       setOf(),
@@ -131,7 +130,6 @@ class DataGenerator {
       id,
       groupName,
       establishmentId,
-      listOf(),
       initialApps,
       groupType,
     )

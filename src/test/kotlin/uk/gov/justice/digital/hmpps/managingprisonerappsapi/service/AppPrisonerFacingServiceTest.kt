@@ -15,7 +15,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.Assigne
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
@@ -72,7 +71,7 @@ class AppPrisonerFacingServiceTest {
     // app.submittedByType = SubmittedByType.PRISONER
 
     establishment =
-      EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf())
+      EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", false, setOf(), setOf())
     prisoner = Prisoner(
       requestedBy,
       UUID.randomUUID().toString(),
@@ -109,7 +108,6 @@ class AppPrisonerFacingServiceTest {
           groupId,
           "Test Group",
           establishmentId,
-          listOf(),
           listOf(1L),
           GroupType.WING,
         ),
@@ -122,7 +120,6 @@ class AppPrisonerFacingServiceTest {
         EstablishmentDto(
           establishmentId,
           "Test Establishment",
-          AppType.entries.toSet(),
           false,
           setOf(),
           setOf(),

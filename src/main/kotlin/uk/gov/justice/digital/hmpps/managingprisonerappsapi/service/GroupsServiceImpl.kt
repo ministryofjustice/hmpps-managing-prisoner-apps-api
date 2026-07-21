@@ -120,7 +120,6 @@ class GroupsServiceImpl(
     Generators.timeBasedEpochGenerator().generate(),
     groupsRequestDto.name,
     groupsRequestDto.establishmentId,
-    listOf(),
     groupsRequestDto.initialsApps,
     groupsRequestDto.type,
   )

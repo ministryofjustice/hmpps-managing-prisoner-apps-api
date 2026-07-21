@@ -116,7 +116,7 @@ class AppServiceImplTest {
       UUID.randomUUID(),
     )
     establishment =
-      EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", AppType.entries.toSet(), false, setOf(), setOf())
+      EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", false, setOf(), setOf())
     prisoner = Prisoner(
       requestedBy,
       UUID.randomUUID().toString(),
@@ -261,7 +261,6 @@ class AppServiceImplTest {
           groupId,
           "Test Group",
           establishmentId,
-          listOf(),
           listOf(1L),
           GroupType.WING,
         ),
@@ -274,7 +273,6 @@ class AppServiceImplTest {
         EstablishmentDto(
           establishmentId,
           "Test Establishment",
-          AppType.entries.toSet(),
           false,
           setOf(),
           setOf(),
@@ -318,7 +316,6 @@ class AppServiceImplTest {
           groupId,
           "Test Group",
           establishmentId,
-          listOf(),
           listOf(1L),
           GroupType.WING,
         ),
@@ -331,7 +328,6 @@ class AppServiceImplTest {
         EstablishmentDto(
           establishmentId,
           "Test Establishment",
-          AppType.entries.toSet(),
           false,
           setOf(),
           setOf(),
@@ -413,7 +409,6 @@ class AppServiceImplTest {
         EstablishmentDto(
           establishmentId,
           "Test Establishment",
-          AppType.entries.toSet(),
           false,
           setOf(),
           setOf(),
@@ -494,7 +489,6 @@ class AppServiceImplTest {
         EstablishmentDto(
           establishmentId,
           "Test Establishment",
-          AppType.entries.toSet(),
           false,
           setOf(),
           setOf(),
