@@ -16,6 +16,8 @@ data class Response(
   val id: UUID,
   @Column(name = "reason", length = 1000)
   val reason: String,
+  @Column(name = "rejection_reason", length = 1000)
+  val rejectionReason: String?,
   @Enumerated(EnumType.STRING)
   val decision: Decision,
   val createdDate: LocalDateTime,

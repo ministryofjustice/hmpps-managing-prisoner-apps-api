@@ -77,6 +77,7 @@ class CommentServiceImpl(
       app.applicationType!!,
       app.applicationGroup!!,
       group.name,
+      "",
     )
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }
@@ -113,6 +114,7 @@ class CommentServiceImpl(
       app.applicationType!!,
       app.applicationGroup!!,
       group.name,
+      "",
     )
     return convertCommentToCommentResponseDto(prisonerId, prisoner.username, comment)
   }

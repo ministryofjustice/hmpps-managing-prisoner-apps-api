@@ -66,6 +66,7 @@ class ResponseServiceImpl(
           Response(
             Generators.timeBasedEpochGenerator().generate(),
             response.reason,
+            response.rejectionReason,
             response.decision,
             LocalDateTime.now(ZoneOffset.UTC),
             staffId,
@@ -75,7 +76,16 @@ class ResponseServiceImpl(
         val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
 
         val activity =
-          if (responseEntity!!.decision == Decision.APPROVED) Activity.APP_APPROVED else Activity.APP_DECLINED
+          if (responseEntity.decision == Decision.APPROVED) {
+            Activity.APP_APPROVED
+          } else if (responseEntity.decision == Decision.DECLINED) {
+            Activity.APP_DECLINED
+          } else if (responseEntity.decision == Decision.REJECTED) {
+            Activity.APP_REJECTED
+          } else {
+            Activity.APP_DECLINED
+          }
+
         activityService.addActivity(
           responseEntity!!.id,
           EntityType.RESPONSE,
@@ -88,6 +98,7 @@ class ResponseServiceImpl(
           app.applicationType!!,
           app.applicationGroup!!,
           group.name,
+          response.rejectionReason,
         )
         req["responseId"] = responseEntity!!.id.toString()
       }
@@ -99,6 +110,9 @@ class ResponseServiceImpl(
     }
     if (response.decision == Decision.DECLINED) {
       app.status = AppStatus.DECLINED
+    }
+    if (response.decision == Decision.REJECTED) {
+      app.status = AppStatus.REJECTED
     }
     appService.saveApp(app)
 
@@ -138,7 +152,7 @@ class ResponseServiceImpl(
       ApiException("No response found for id $responseId", HttpStatus.NOT_FOUND)
     }
     val recordCreatedBy = staffService.getStaffById(response.createdBy).orElseThrow {
-      ApiException("Record of by satff: ${response.createdBy} not found", HttpStatus.BAD_REQUEST)
+      ApiException("Record of staff: ${response.createdBy} not found", HttpStatus.BAD_REQUEST)
     }
     if (createdBy) {
       val establishment = establishmentService.getEstablishmentById(recordCreatedBy.establishmentId).orElseThrow {
@@ -171,6 +185,7 @@ class ResponseServiceImpl(
     prisonerId,
     appId,
     response.reason,
+    response.rejectionReason,
     response.decision,
     response.createdDate,
     staff,

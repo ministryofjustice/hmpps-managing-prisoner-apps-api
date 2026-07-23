@@ -50,7 +50,18 @@ class DataGenerator {
     fun generateResponse(staffId: String): Response = Response(
       Generators.timeBasedEpochGenerator().generate(),
       "Pass all requirement",
+      "",
       Decision.APPROVED,
+      LocalDateTime.now(),
+      staffId,
+      Generators.timeBasedEpochGenerator().generate(),
+    )
+
+    fun generateRejectedResponse(staffId: String): Response = Response(
+      Generators.timeBasedEpochGenerator().generate(),
+      "App was rejected",
+      "Prisoner used the wrong app",
+      Decision.REJECTED,
       LocalDateTime.now(),
       staffId,
       Generators.timeBasedEpochGenerator().generate(),

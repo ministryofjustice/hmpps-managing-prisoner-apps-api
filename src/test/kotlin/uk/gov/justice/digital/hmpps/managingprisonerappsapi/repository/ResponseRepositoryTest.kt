@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
@@ -34,6 +35,7 @@ class ResponseRepositoryTest(@Autowired private val responseRepository: Response
     var response = Response(
       createdResponse.id,
       "updating reason",
+      "",
       createdResponse.decision,
       LocalDateTime.now(),
       createdResponse.createdBy,
@@ -41,6 +43,23 @@ class ResponseRepositoryTest(@Autowired private val responseRepository: Response
     )
     response = responseRepository.save(response)
     Assertions.assertEquals("updating reason", response.reason)
+  }
+
+  @Test
+  fun `update rejected response`() {
+    val createdResponse = responseRepository.save(DataGenerator.generateRejectedResponse(Generators.timeBasedEpochGenerator().generate().toString()))
+    var response = Response(
+      createdResponse.id,
+      "App was rejected",
+      "Prisoner used the wrong app",
+      createdResponse.decision,
+      LocalDateTime.now(),
+      createdResponse.createdBy,
+      Generators.timeBasedEpochGenerator().generate(),
+    )
+    response = responseRepository.save(response)
+    Assertions.assertEquals("Prisoner used the wrong app", response.rejectionReason)
+    Assertions.assertEquals(Decision.REJECTED, response.decision)
   }
 
   @Test

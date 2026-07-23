@@ -25,6 +25,7 @@ class ActivityService(
     appType: Any,
     applicationGroup: Long,
     department: String,
+    rejectionReason: String?,
   ) {
     appType as Long
     historyService.updateActivityInHistory(entityId, entityType, appId, activity, establishment, createdBy, createdDate, null)
@@ -40,6 +41,7 @@ class ActivityService(
       appType,
       applicationGroup,
       department,
+      rejectionReason,
     )
   }
 }
