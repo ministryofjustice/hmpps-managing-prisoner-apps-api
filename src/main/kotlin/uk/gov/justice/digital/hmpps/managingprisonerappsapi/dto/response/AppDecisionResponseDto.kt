@@ -9,6 +9,7 @@ data class AppDecisionResponseDto<T>(
   val prisonerId: String,
   val appId: UUID,
   val reason: String,
+  val rejectionReason: String?,
   val decision: Decision,
   val createdDate: LocalDateTime,
   val createdBy: T,

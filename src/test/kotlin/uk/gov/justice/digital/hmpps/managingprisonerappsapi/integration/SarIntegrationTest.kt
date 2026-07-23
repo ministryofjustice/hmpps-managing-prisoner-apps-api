@@ -357,6 +357,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
         Response(
           id = RESPONSE_ID_1,
           reason = "",
+          rejectionReason = "",
           decision = Decision.APPROVED,
           createdDate = LocalDateTime.of(2026, 2, 27, 11, 52, 15),
           createdBy = "SMJOHN_GEN",
@@ -365,6 +366,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
         Response(
           id = RESPONSE_ID_2,
           reason = "test reason",
+          rejectionReason = "",
           decision = Decision.DECLINED,
           createdDate = LocalDateTime.of(2025, 12, 8, 12, 36, 34),
           createdBy = "JADAMS_GEN",
