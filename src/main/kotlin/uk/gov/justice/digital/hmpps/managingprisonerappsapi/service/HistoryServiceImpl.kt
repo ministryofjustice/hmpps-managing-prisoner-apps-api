@@ -195,6 +195,7 @@ class HistoryServiceImpl(
         x = "Forwarding message added by $staffName"
       Activity.APP_APPROVED -> x = "Marked as approved by $staffName"
       Activity.APP_DECLINED -> x = "Marked as declined by $staffName"
+      Activity.APP_REJECTED -> x = "Marked as rejected by $staffName"
       Activity.PRISONER_ID_UPDATE -> x = "Prisoner merged by $staffName"
       else -> throw ApiException("Unknown activity type: $activity", HttpStatus.INTERNAL_SERVER_ERROR)
     }

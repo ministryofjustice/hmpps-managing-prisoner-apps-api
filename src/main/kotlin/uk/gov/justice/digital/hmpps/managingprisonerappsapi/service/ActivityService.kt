@@ -41,7 +41,7 @@ class ActivityService(
       appType,
       applicationGroup,
       department,
-      rejectionReason,
+      rejectionReason ?: "",
     )
   }
 }
