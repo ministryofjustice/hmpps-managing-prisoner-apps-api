@@ -28,4 +28,5 @@ data class AppResponsePrisonerDto<X, Y>(
   val status: AppStatus,
   val establishmentId: String,
   val reason: String?,
+  val rejectionReason: String?,
 )
