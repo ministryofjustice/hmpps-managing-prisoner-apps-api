@@ -181,6 +181,8 @@ class SarServiceImpl(
       return "App request declined."
     } else if (activity == Activity.APP_APPROVED) {
       return "App request approved."
+    } else if (activity == Activity.APP_REJECTED) {
+      return "App request rejected."
     } else if (activity == Activity.FORWARDING_COMMENT_ADDED) {
       return "Forwarding comment added to app request"
     } else if (activity == Activity.COMMENT_ADDED) {

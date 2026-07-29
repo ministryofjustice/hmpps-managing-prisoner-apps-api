@@ -35,7 +35,6 @@ class ResponseRepositoryTest(@Autowired private val responseRepository: Response
     var response = Response(
       createdResponse.id,
       "updating reason",
-      "",
       createdResponse.decision,
       LocalDateTime.now(),
       createdResponse.createdBy,
@@ -50,7 +49,6 @@ class ResponseRepositoryTest(@Autowired private val responseRepository: Response
     val createdResponse = responseRepository.save(DataGenerator.generateRejectedResponse(Generators.timeBasedEpochGenerator().generate().toString()))
     var response = Response(
       createdResponse.id,
-      "App was rejected",
       "Prisoner used the wrong app",
       createdResponse.decision,
       LocalDateTime.now(),
@@ -58,7 +56,7 @@ class ResponseRepositoryTest(@Autowired private val responseRepository: Response
       Generators.timeBasedEpochGenerator().generate(),
     )
     response = responseRepository.save(response)
-    Assertions.assertEquals("Prisoner used the wrong app", response.rejectionReason)
+    Assertions.assertEquals("Prisoner used the wrong app", response.reason)
     Assertions.assertEquals(Decision.REJECTED, response.decision)
   }
 

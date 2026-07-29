@@ -66,7 +66,6 @@ class ResponseServiceImpl(
           Response(
             Generators.timeBasedEpochGenerator().generate(),
             response.reason,
-            response.rejectionReason,
             response.decision,
             LocalDateTime.now(ZoneOffset.UTC),
             staffId,
@@ -74,6 +73,12 @@ class ResponseServiceImpl(
           ),
         )
         val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
+        var rejectionReason: String? =
+          if (responseEntity.decision == Decision.REJECTED) {
+            response.reason
+          } else {
+            ""
+          }
 
         val activity =
           if (responseEntity.decision == Decision.APPROVED) {
@@ -98,7 +103,7 @@ class ResponseServiceImpl(
           app.applicationType!!,
           app.applicationGroup!!,
           group.name,
-          response.rejectionReason,
+          rejectionReason,
         )
         req["responseId"] = responseEntity!!.id.toString()
       }
@@ -185,7 +190,6 @@ class ResponseServiceImpl(
     prisonerId,
     appId,
     response.reason,
-    response.rejectionReason,
     response.decision,
     response.createdDate,
     staff,

@@ -65,16 +65,12 @@ class AppPrisonerFacingService(
     val applicationType = applicationTypeRepository.findById(app.applicationType!!)
       .orElseThrow { ApiException("No application type found for id: ${app.applicationType}", HttpStatus.BAD_REQUEST) }
     var reason: String? = null
-    var rejectionReason: String? = null
     if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED || app.status == AppStatus.REJECTED) {
       val responseId = UUID.fromString(app.requests[0].get("responseId") as String)
       val response = responseRepository.findById(responseId)
         .orElseThrow { ApiException("Response with id $responseId not found", HttpStatus.INTERNAL_SERVER_ERROR) }
       if (response.reason.isNotEmpty()) {
         reason = response.reason
-      }
-      if (response.rejectionReason != null) {
-        rejectionReason = response.rejectionReason
       }
     }
     return convertAppEntityToAppResponse(
@@ -84,7 +80,6 @@ class AppPrisonerFacingService(
       applicationType.applicationGroup!!,
       applicationType,
       reason,
-      rejectionReason,
     )
   }
 
@@ -149,7 +144,6 @@ class AppPrisonerFacingService(
       groups[0].id,
       applicationType.applicationGroup!!,
       applicationType,
-      null,
       null,
     )
   }
@@ -229,7 +223,6 @@ class AppPrisonerFacingService(
     applicationGroup: ApplicationGroup,
     applicationType: ApplicationType,
     reason: String?,
-    rejectionReason: String?,
   ): AppResponsePrisonerDto<Any, Any> = AppResponsePrisonerDto(
     app.id,
     app.reference,
@@ -249,7 +242,6 @@ class AppPrisonerFacingService(
     app.status,
     app.establishmentId,
     reason,
-    rejectionReason,
   )
 
   private fun convertRequestsToAppRequests(requests: List<Map<String, Any>>): List<MutableMap<String, Any>> {

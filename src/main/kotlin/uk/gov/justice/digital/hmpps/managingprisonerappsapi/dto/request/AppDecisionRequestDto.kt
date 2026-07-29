@@ -5,7 +5,6 @@ import java.util.*
 
 data class AppDecisionRequestDto(
   val reason: String,
-  val rejectionReason: String?,
   val decision: Decision,
   val appliesTo: List<UUID>,
 )

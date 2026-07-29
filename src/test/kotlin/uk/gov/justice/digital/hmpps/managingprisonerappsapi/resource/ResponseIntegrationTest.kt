@@ -144,7 +144,6 @@ class ResponseIntegrationTest(
       .bodyValue(
         AppDecisionRequestDto(
           "Approving as all looks OK",
-          "",
           Decision.APPROVED,
           listOf(id),
         ),
