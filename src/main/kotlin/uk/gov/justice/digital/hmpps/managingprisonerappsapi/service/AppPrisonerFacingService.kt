@@ -43,7 +43,7 @@ class AppPrisonerFacingService(
     val prisoner = validatePrisoner(prisonerId)
     validateEstablishment(prisoner.establishmentId!!)
     val pageRequest =
-      PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(Sort.Direction.ASC, "createdDate")
+      PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(Sort.Direction.DESC, "createdDate")
     val pageResult = appRepository.findAppsByRequestedBy(prisonerId, pageRequest)
     return PrisonerAppsPage(
       pageResult.pageable.pageNumber + 1,
