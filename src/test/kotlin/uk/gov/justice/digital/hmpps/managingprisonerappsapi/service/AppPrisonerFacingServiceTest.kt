@@ -150,13 +150,13 @@ class AppPrisonerFacingServiceTest {
     Mockito.`when`(
       appRepository.findAppsByRequestedBy(
         prisoner.username,
-        PageRequest.of(0, 5).withSort(Sort.Direction.ASC, "createdDate"),
+        PageRequest.of(0, 5).withSort(Sort.Direction.DESC, "createdDate"),
       ),
     )
       .thenReturn(
         PageImpl(
           listOf<App>(app),
-          PageRequest.of(0, 5).withSort(Sort.Direction.ASC, "createdDate"),
+          PageRequest.of(0, 5).withSort(Sort.Direction.DESC, "createdDate"),
           listOf<App>(app).size.toLong(),
         ),
       )
