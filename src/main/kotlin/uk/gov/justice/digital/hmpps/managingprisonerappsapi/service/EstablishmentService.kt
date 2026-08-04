@@ -12,6 +12,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGro
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import java.util.*
 
@@ -20,6 +22,8 @@ class EstablishmentService(
   private val establishmentRepository: EstablishmentRepository,
   private val applicationGroupRepository: ApplicationGroupRepository,
   private val applicationTypeRepository: ApplicationTypeRepository,
+  private val establishmentApplicationGroupRepository: EstablishmentApplicationGroupRepository,
+  private val establishmentApplicationTypeRepository: EstablishmentApplicationTypeRepository,
   private val staffService: StaffService,
 ) {
 
@@ -88,6 +92,51 @@ class EstablishmentService(
     setOf(),
   )
 
+  /*private fun getApplicationGroupsForEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
+
+    val configuredGroups = establishmentApplicationGroupRepository
+      .findByEstablishmentIdAndActiveOrderByDisplayOrder(establishmentId, true)
+
+    val response = mutableListOf<ApplicationGroupResponse>()
+
+    configuredGroups.forEach { configuredGroup ->
+      val appGroup = applicationGroupRepository.findById(configuredGroup.applicationGroup.id)
+        .orElse(null) ?: return@forEach
+
+      val configuredTypes = establishmentApplicationTypeRepository
+        .findByEstablishmentIdAndGroupIdAndActiveOrderByDisplayOrder(
+          establishmentId,
+          configuredGroup.applicationGroup.id,
+          true
+        )
+
+      val types = configuredTypes.mapNotNull { configuredType ->
+        applicationTypeRepository.findById(configuredType.applicationType.id)
+          .map { type ->
+            ApplicationTypeResponse(
+              id = type.id,
+              name = type.name,
+              genericType = type.genericType,
+              genericForm = type.genericForm,
+              logDetailRequired = type.logDetailRequired,
+              applicationGroup = null
+            )
+          }
+          .orElse(null)
+      }
+
+      if (types.isNotEmpty()) {
+        response.add(
+          ApplicationGroupResponse(
+            id = appGroup.id,
+            name = appGroup.name,
+            appTypes = types
+          )
+        )
+      }
+  }
+*/
+  // TODO - For removal
   private fun convertApplicationGroupsToAppGroupsResponse(applicationGroups: List<ApplicationGroup>, blackListedAppGroups: Set<Long>, blacklistedAppTypes: Set<Long>): List<ApplicationGroupResponse> {
     val appGroupsResponse = ArrayList<ApplicationGroupResponse>()
     applicationGroups.forEach { appGroup ->

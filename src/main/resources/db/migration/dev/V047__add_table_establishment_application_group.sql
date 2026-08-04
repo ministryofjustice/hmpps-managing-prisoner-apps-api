@@ -10,3 +10,9 @@ CREATE TABLE IF NOT EXISTS establishment_application_group
     last_modified_by VARCHAR(255),
     CONSTRAINT pk_est_app_group PRIMARY KEY (establishment_id, application_group_id)
 );
+
+CREATE INDEX idx_eag_establishment_active
+    ON establishment_application_group(establishment_id, active);
+
+CREATE INDEX idx_eag_display_order
+    ON establishment_application_group(establishment_id, display_order);

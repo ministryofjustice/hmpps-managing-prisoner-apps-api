@@ -1,11 +1,11 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 
-import java.time.LocalDateTime
 import jakarta.persistence.EmbeddedId
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.MapsId
+import java.time.LocalDateTime
 
 @Entity
 data class EstablishmentApplicationGroup(
@@ -21,6 +21,7 @@ data class EstablishmentApplicationGroup(
   val applicationGroup: ApplicationGroup,
 
   val displayOrder: Int = 0,
+  val active: Boolean = true,
   val createdDate: LocalDateTime? = null,
   val lastModifiedDate: LocalDateTime? = null,
   val createdBy: String? = null,
@@ -31,7 +32,7 @@ data class EstablishmentApplicationGroup(
     if (javaClass != other?.javaClass) return false
     other as EstablishmentApplicationGroup
     return id == other.id
-    }
+  }
 
   override fun hashCode(): Int = id.hashCode()
 }
