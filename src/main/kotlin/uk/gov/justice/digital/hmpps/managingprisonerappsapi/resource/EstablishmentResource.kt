@@ -198,4 +198,35 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
     val appTypes = establishmentService.getAppGroupsAndTypesByLoggedUserEstablishment(authentication.principal)
     return ResponseEntity.status(HttpStatus.OK).body(appTypes)
   }
+
+  /**
+   * Uses new establishmentApplication Group table
+   */
+  @Tag(name = "Establishments")
+  @Operation(
+    summary = "Get application groups and types by logged in user's establishment",
+    description = "This api endpoint is for getting an application groups and types by establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @GetMapping("/v1/establishments/apps/groups", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  fun getAppGroupsForEstablishment(authentication: Authentication): ResponseEntity<List<ApplicationGroupResponse>> {
+    authentication as AuthAwareAuthenticationToken
+    logger.info("Request received for get app types & Groups for ${authentication.principal}")
+    val appTypes = establishmentService.getAppGroupsAndTypesForLoggedUserEstablishment(authentication.principal)
+    return ResponseEntity.status(HttpStatus.OK).body(appTypes)
+  }
 }

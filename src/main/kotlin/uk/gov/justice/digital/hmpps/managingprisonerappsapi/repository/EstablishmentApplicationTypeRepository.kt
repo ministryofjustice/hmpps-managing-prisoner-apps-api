@@ -8,35 +8,13 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentA
 @Repository
 interface EstablishmentApplicationTypeRepository : JpaRepository<EstablishmentApplicationType, EstablishmentApplicationTypeId> {
 
-  fun findByEstablishmentIdOrderByDisplayOrder(establishmentId: String): List<EstablishmentApplicationType>
+  fun findByIdEstablishmentIdOrderByDisplayOrder(establishmentId: String): List<EstablishmentApplicationType>
 
-  fun findByEstablishmentIdAndActiveOrderByDisplayOrder(establishmentId: String, active: Boolean): List<EstablishmentApplicationType>
+  fun findByIdEstablishmentIdAndActiveOrderByDisplayOrder(establishmentId: String, active: Boolean): List<EstablishmentApplicationType>
 
-/*  @Query(
-    """
-        SELECT eat FROM EstablishmentApplicationType eat
-        WHERE eat.establishmentId = :establishmentId AND eat.active = :active
-        AND eat.applicationTypeId IN ( SELECT at.id FROM ApplicationType at
-            WHERE at.applicationGroup.id = :groupId
-        )
-        ORDER BY eat.displayOrder
-    """,
-  )
-  fun findByEstablishmentIdAndGroupIdAndActiveOrderByDisplayOrder(
+  fun findByIdEstablishmentIdAndIdApplicationGroupIdAndActiveOrderByDisplayOrder(
     establishmentId: String,
-    groupId: Long,
+    applicationGroupId: Long,
     active: Boolean,
-  ): List<EstablishmentApplicationType>*/
-
-/*  @Query(
-    """
-        SELECT COUNT(eat) FROM EstablishmentApplicationType eat
-        WHERE eat.establishmentId = :establishmentId
-        AND eat.active = true AND eat.applicationTypeId IN (
-            SELECT at.id FROM ApplicationType at
-            WHERE at.applicationGroup.id = :groupId
-        )
-    """,
-  )
-  fun countActiveTypesByEstablishmentAndGroup(establishmentId: String, groupId: Long): Long*/
+  ): List<EstablishmentApplicationType>
 }

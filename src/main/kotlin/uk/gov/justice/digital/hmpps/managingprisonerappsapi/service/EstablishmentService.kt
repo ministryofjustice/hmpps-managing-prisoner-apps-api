@@ -59,6 +59,7 @@ class EstablishmentService(
     return list
   }
 
+  // TODO - For removal & instead use getAppGroupsAndTypesForLoggedUserEstablishment()
   fun getAppGroupsAndTypesByLoggedUserEstablishment(staffId: String): List<ApplicationGroupResponse> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
@@ -69,10 +70,21 @@ class EstablishmentService(
     return convertApplicationGroupsToAppGroupsResponse(applicationGroupRepository.findAll(), establishment.blackListedAppGroups, establishment.blackListedAppTypes)
   }
 
+  fun getAppGroupsAndTypesForLoggedUserEstablishment(staffId: String): List<ApplicationGroupResponse> {
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
+    }
+    val establishment = establishmentRepository.findById(staff.establishmentId).orElseThrow {
+      ApiException("Establishment: ${staff.establishmentId} not enabled", HttpStatus.FORBIDDEN)
+    }
+    return getApplicationGroupsForEstablishment(staff.establishmentId)
+  }
+
   fun getAppGroupsAndTypesForPrisonerEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
     val establishment = establishmentRepository.findById(establishmentId).orElseThrow {
       ApiException("Establishment: $establishmentId not enabled", HttpStatus.FORBIDDEN)
     }
+    // TODO- Remove this line & use getApplicationGroupsForEstablishment()
     return convertApplicationGroupsToAppGroupsResponse(applicationGroupRepository.findAll(), establishment.blackListedAppGroups, establishment.blackListedAppTypes)
   }
 
@@ -92,26 +104,25 @@ class EstablishmentService(
     setOf(),
   )
 
-  /*private fun getApplicationGroupsForEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
-
+  private fun getApplicationGroupsForEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
     val configuredGroups = establishmentApplicationGroupRepository
-      .findByEstablishmentIdAndActiveOrderByDisplayOrder(establishmentId, true)
+      .findByIdEstablishmentIdAndActiveOrderByDisplayOrder(establishmentId, true)
 
     val response = mutableListOf<ApplicationGroupResponse>()
 
     configuredGroups.forEach { configuredGroup ->
-      val appGroup = applicationGroupRepository.findById(configuredGroup.applicationGroup.id)
+      val appGroup = applicationGroupRepository.findById(configuredGroup.id.applicationGroupId)
         .orElse(null) ?: return@forEach
 
-      val configuredTypes = establishmentApplicationTypeRepository
-        .findByEstablishmentIdAndGroupIdAndActiveOrderByDisplayOrder(
+      val configuredTypes =
+        establishmentApplicationTypeRepository.findByIdEstablishmentIdAndIdApplicationGroupIdAndActiveOrderByDisplayOrder(
           establishmentId,
-          configuredGroup.applicationGroup.id,
-          true
+          configuredGroup.id.applicationGroupId,
+          true,
         )
 
       val types = configuredTypes.mapNotNull { configuredType ->
-        applicationTypeRepository.findById(configuredType.applicationType.id)
+        applicationTypeRepository.findById(configuredType.id.applicationTypeId)
           .map { type ->
             ApplicationTypeResponse(
               id = type.id,
@@ -119,7 +130,7 @@ class EstablishmentService(
               genericType = type.genericType,
               genericForm = type.genericForm,
               logDetailRequired = type.logDetailRequired,
-              applicationGroup = null
+              count = null,
             )
           }
           .orElse(null)
@@ -130,13 +141,14 @@ class EstablishmentService(
           ApplicationGroupResponse(
             id = appGroup.id,
             name = appGroup.name,
-            appTypes = types
-          )
+            appTypes = types,
+          ),
         )
       }
+    }
+    return response
   }
-*/
-  // TODO - For removal
+
   private fun convertApplicationGroupsToAppGroupsResponse(applicationGroups: List<ApplicationGroup>, blackListedAppGroups: Set<Long>, blacklistedAppTypes: Set<Long>): List<ApplicationGroupResponse> {
     val appGroupsResponse = ArrayList<ApplicationGroupResponse>()
     applicationGroups.forEach { appGroup ->

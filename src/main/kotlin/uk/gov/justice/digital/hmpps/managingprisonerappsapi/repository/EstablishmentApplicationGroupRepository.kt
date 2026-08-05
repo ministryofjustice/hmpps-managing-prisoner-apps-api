@@ -18,9 +18,9 @@ Note: The composite key naming convention requires id.establishmentId and id.app
 @Repository
 interface EstablishmentApplicationGroupRepository : JpaRepository<EstablishmentApplicationGroup, EstablishmentApplicationGroupId> {
 
-  fun findByEstablishmentIdOrderByDisplayOrder(establishmentId: String): List<EstablishmentApplicationGroup>
+  fun findByIdEstablishmentIdOrderByDisplayOrder(establishmentId: String): List<EstablishmentApplicationGroup>
 
-  fun findByEstablishmentIdAndActiveOrderByDisplayOrder(
+  fun findByIdEstablishmentIdAndActiveOrderByDisplayOrder(
     establishmentId: String,
     active: Boolean,
   ): List<EstablishmentApplicationGroup>
