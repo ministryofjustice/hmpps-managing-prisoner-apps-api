@@ -12,6 +12,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGro
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import java.util.*
 
@@ -20,6 +22,8 @@ class EstablishmentService(
   private val establishmentRepository: EstablishmentRepository,
   private val applicationGroupRepository: ApplicationGroupRepository,
   private val applicationTypeRepository: ApplicationTypeRepository,
+  private val establishmentApplicationGroupRepository: EstablishmentApplicationGroupRepository,
+  private val establishmentApplicationTypeRepository: EstablishmentApplicationTypeRepository,
   private val staffService: StaffService,
 ) {
 
@@ -55,6 +59,7 @@ class EstablishmentService(
     return list
   }
 
+  // TODO - For removal & instead use getAppGroupsAndTypesForLoggedUserEstablishment()
   fun getAppGroupsAndTypesByLoggedUserEstablishment(staffId: String): List<ApplicationGroupResponse> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
@@ -65,10 +70,21 @@ class EstablishmentService(
     return convertApplicationGroupsToAppGroupsResponse(applicationGroupRepository.findAll(), establishment.blackListedAppGroups, establishment.blackListedAppTypes)
   }
 
+  fun getAppGroupsAndTypesForLoggedUserEstablishment(staffId: String): List<ApplicationGroupResponse> {
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
+    }
+    val establishment = establishmentRepository.findById(staff.establishmentId).orElseThrow {
+      ApiException("Establishment: ${staff.establishmentId} not enabled", HttpStatus.FORBIDDEN)
+    }
+    return getApplicationGroupsForEstablishment(staff.establishmentId)
+  }
+
   fun getAppGroupsAndTypesForPrisonerEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
     val establishment = establishmentRepository.findById(establishmentId).orElseThrow {
       ApiException("Establishment: $establishmentId not enabled", HttpStatus.FORBIDDEN)
     }
+    // TODO- Remove this line & use getApplicationGroupsForEstablishment()
     return convertApplicationGroupsToAppGroupsResponse(applicationGroupRepository.findAll(), establishment.blackListedAppGroups, establishment.blackListedAppTypes)
   }
 
@@ -87,6 +103,51 @@ class EstablishmentService(
     setOf(),
     setOf(),
   )
+
+  private fun getApplicationGroupsForEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
+    val configuredGroups = establishmentApplicationGroupRepository
+      .findByIdEstablishmentIdAndActiveOrderByDisplayOrder(establishmentId, true)
+
+    val response = mutableListOf<ApplicationGroupResponse>()
+
+    configuredGroups.forEach { configuredGroup ->
+      val appGroup = applicationGroupRepository.findById(configuredGroup.id.applicationGroupId)
+        .orElse(null) ?: return@forEach
+
+      val configuredTypes =
+        establishmentApplicationTypeRepository.findByIdEstablishmentIdAndIdApplicationGroupIdAndActiveOrderByDisplayOrder(
+          establishmentId,
+          configuredGroup.id.applicationGroupId,
+          true,
+        )
+
+      val types = configuredTypes.mapNotNull { configuredType ->
+        applicationTypeRepository.findById(configuredType.id.applicationTypeId)
+          .map { type ->
+            ApplicationTypeResponse(
+              id = type.id,
+              name = type.name,
+              genericType = type.genericType,
+              genericForm = type.genericForm,
+              logDetailRequired = type.logDetailRequired,
+              count = null,
+            )
+          }
+          .orElse(null)
+      }
+
+      if (types.isNotEmpty()) {
+        response.add(
+          ApplicationGroupResponse(
+            id = appGroup.id,
+            name = appGroup.name,
+            appTypes = types,
+          ),
+        )
+      }
+    }
+    return response
+  }
 
   private fun convertApplicationGroupsToAppGroupsResponse(applicationGroups: List<ApplicationGroup>, blackListedAppGroups: Set<Long>, blacklistedAppTypes: Set<Long>): List<ApplicationGroupResponse> {
     val appGroupsResponse = ArrayList<ApplicationGroupResponse>()
