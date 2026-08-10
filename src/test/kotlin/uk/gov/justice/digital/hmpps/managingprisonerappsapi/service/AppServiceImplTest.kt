@@ -91,7 +91,7 @@ class AppServiceImplTest {
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstName,
       requestedByLastName,
-      AppStatus.PENDING,
+      AppStatus.NEW,
       groupId,
       false,
     )

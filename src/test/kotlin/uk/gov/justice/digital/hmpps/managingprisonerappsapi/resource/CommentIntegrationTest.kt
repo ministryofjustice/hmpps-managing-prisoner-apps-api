@@ -282,7 +282,7 @@ class CommentIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(4),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),

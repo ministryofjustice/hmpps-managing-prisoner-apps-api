@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.FileRequestDto
@@ -83,7 +84,7 @@ class AppServiceImpl(
       .orElseThrow<ApiException> { throw ApiException("No app exist with id $appId", HttpStatus.NOT_FOUND) }
     validateStaffPermission(staff, app)
 
-    if (app.status != AppStatus.PENDING) {
+    if (app.status != AppStatus.NEW && app.status != AppStatus.IN_PROGRESS) {
       throw ApiException("App is closed and cannot be updated", HttpStatus.FORBIDDEN)
     }
     appUpdateDto.formData.forEach { l ->
@@ -443,6 +444,58 @@ class AppServiceImpl(
     )
   }
 
+  override fun updateAppStatusToInProgress(
+    prisonerId: String,
+    staffId: String,
+    appId: UUID,
+    appStatusUpdateDto: AppStatusUpdateDto,
+  ): AppResponseDto<Any, Any> {
+    if (appStatusUpdateDto.status != AppStatus.IN_PROGRESS) {
+      throw ApiException("App Status can only be updated to IN_PROGRESS", HttpStatus.FORBIDDEN)
+    }
+    var app = appRepository.findAppsByIdAndRequestedBy(appId, prisonerId)
+      .orElseThrow<ApiException> { throw ApiException("No app exist with id $appId", HttpStatus.NOT_FOUND) }
+
+    if (app.status != AppStatus.NEW) {
+      throw ApiException("App Status cannot be updated", HttpStatus.FORBIDDEN)
+    }
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
+    }
+
+    validateStaffPermission(staff, app)
+
+    val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
+      throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
+    }
+    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
+      throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
+    }
+
+    app.lastModifiedDate = LocalDateTime.now(ZoneOffset.UTC)
+    app.lastModifiedBy = staffId
+    app.status = appStatusUpdateDto.status
+    app = appRepository.save(app)
+
+    val group = groupsService.getGroupById(app.assignedGroup, staff.establishmentId)
+
+    activityService.addActivity(
+      app.assignedGroup,
+      EntityType.ASSIGNED_GROUP,
+      app.id,
+      Activity.APP_IN_PROGRESS,
+      app.establishmentId,
+      staffId,
+      LocalDateTime.now(ZoneOffset.UTC),
+      prisonerId,
+      app.applicationType!!,
+      app.applicationGroup!!,
+      group.name,
+      "",
+    )
+    return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup, applicationGroup, applicationType)
+  }
+
   override fun searchRequestedByTextSearch(staffId: String, text: String): List<RequestedByNameSearchResult> {
     if (text.isBlank() || text.length < 3) {
       throw ApiException("Text search cannot be empty or just whitespaces or less than 3 chars", HttpStatus.BAD_REQUEST)
@@ -486,7 +539,7 @@ class AppServiceImpl(
       prisoner.username,
       prisoner.firstName,
       prisoner.lastName,
-      AppStatus.PENDING,
+      AppStatus.NEW,
       prisoner.establishmentId!!,
       firstNightCenter,
       convertAppFilestoAppFileEnityList(appRequest.fileRequestDtos, staff.username) as MutableList<AppFile>,

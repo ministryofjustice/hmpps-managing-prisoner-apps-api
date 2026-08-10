@@ -97,7 +97,7 @@ class AppPrisonerFacingService(
     // validate no app request for give aplication type is in pending status.
     val applicationTypeCount = appRepository.countAppsByStatusAndApplicationTypeAndCreatedBy(
       prisoner.establishmentId!!,
-      AppStatus.PENDING,
+      listOf(AppStatus.NEW, AppStatus.IN_PROGRESS),
       appRequest.applicationType!!,
       prisoner.username,
       UserCategory.PRISONER,
@@ -161,7 +161,7 @@ class AppPrisonerFacingService(
     }
     val apps = appRepository.getAppsByEstablishmentIdAndStatusAndApplicationTypeAndCreatedByAndSubmittedByTypeOrderByCreatedDateDesc(
       prisoner.establishmentId!!,
-      AppStatus.PENDING,
+      listOf(AppStatus.NEW, AppStatus.IN_PROGRESS),
       appType,
       prisoner.username,
       UserCategory.PRISONER,
@@ -210,7 +210,7 @@ class AppPrisonerFacingService(
       prisoner.username,
       prisoner.firstName,
       prisoner.lastName,
-      AppStatus.PENDING,
+      AppStatus.NEW,
       prisoner.establishmentId!!,
       firstNightCenter,
     )

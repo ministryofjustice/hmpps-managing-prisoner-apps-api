@@ -146,7 +146,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeOne, appResponse.applicationType.id)
     Assertions.assertEquals(requestedByFirst, appResponse.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, appResponse.status)
+    Assertions.assertEquals(AppStatus.NEW, appResponse.status)
     Assertions.assertEquals(false, appResponse.firstNightCenter)
     Assertions.assertEquals(1, appResponse.requests.size)
     Assertions.assertNotNull(appResponse.requests.get(0)["id"])
@@ -174,7 +174,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeOne, appResponse.applicationType.id)
     Assertions.assertEquals(requestedByFirst, appResponse.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, appResponse.status)
+    Assertions.assertEquals(AppStatus.NEW, appResponse.status)
     Assertions.assertEquals(false, appResponse.firstNightCenter)
     Assertions.assertEquals(1, appResponse.requests.size)
     Assertions.assertEquals(newContactNumber, appResponse.requests.get(0)["contact-number"])
@@ -227,7 +227,7 @@ open class AppResourceIntegrationTest(
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(false, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
@@ -295,7 +295,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeThree, response.applicationType.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(true, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
@@ -339,7 +339,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(false, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
@@ -377,7 +377,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(false, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
@@ -391,7 +391,7 @@ open class AppResourceIntegrationTest(
     val searchQueryDto = AppsSearchQueryDto(
       1,
       10,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       setOf(),
       null,
       setOf(),
@@ -469,7 +469,7 @@ open class AppResourceIntegrationTest(
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(assignedGroupSecond, response.assignedGroup.id)
 
@@ -504,7 +504,7 @@ open class AppResourceIntegrationTest(
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
 
@@ -561,7 +561,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
           establishmentIdFirst,
           1,
@@ -603,7 +603,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
           establishmentIdFirst,
           1,
@@ -647,7 +647,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
           establishmentIdFirst,
           1,
@@ -758,7 +758,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(4),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -773,7 +773,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(2),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -789,7 +789,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(1),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -804,7 +804,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(2).minusHours(1),
         requestedBySecondMainName,
         requestedBySecondSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -819,7 +819,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -834,7 +834,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
         requestedByThirdSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupSecond,
         false,
       ),
@@ -849,7 +849,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
         requestedByThirdSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupSecond,
         false,
       ),
@@ -864,7 +864,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
         requestedByThirdSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupSecond,
         false,
       ),

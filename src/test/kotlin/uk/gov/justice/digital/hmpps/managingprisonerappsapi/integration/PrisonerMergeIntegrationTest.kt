@@ -182,7 +182,7 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     requestedBy = NEW_NOMS_NUMBER,
     requestedByFirstName = "Jane",
     requestedByLastName = "Smith",
-    status = AppStatus.PENDING,
+    status = AppStatus.NEW,
     establishmentId = "MDI",
     firstNightCenter = false,
   )
@@ -198,7 +198,7 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     requestedBy = OLD_NOMS_NUMBER,
     requestedByFirstName = "John",
     requestedByLastName = "Doe",
-    status = AppStatus.PENDING,
+    status = AppStatus.NEW,
     establishmentId = "MDI",
     firstNightCenter = false,
   )

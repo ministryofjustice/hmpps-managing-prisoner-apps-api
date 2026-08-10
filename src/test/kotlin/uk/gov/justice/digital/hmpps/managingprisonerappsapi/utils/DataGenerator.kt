@@ -82,7 +82,7 @@ class DataGenerator {
       requestedBy = "testprisoner@moj",
       requestedByFirstName = "Test",
       requestedByLastName = "Prisoner",
-      status = AppStatus.PENDING,
+      status = AppStatus.NEW,
       establishmentId = Generators.timeBasedEpochGenerator().generate().toString(),
       firstNightCenter = false,
     )

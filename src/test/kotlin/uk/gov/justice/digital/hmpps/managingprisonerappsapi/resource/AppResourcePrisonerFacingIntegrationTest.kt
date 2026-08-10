@@ -144,7 +144,7 @@ class AppResourcePrisonerFacingIntegrationTest(
 
     Assertions.assertEquals(applicationTypeOne, appResponse.applicationType.id)
     Assertions.assertEquals(loggedUserId, appResponse.requestedBy.userId)
-    Assertions.assertEquals(AppStatus.PENDING, appResponse.status)
+    Assertions.assertEquals(AppStatus.NEW, appResponse.status)
     Assertions.assertEquals(1, appResponse.requests.size)
     Assertions.assertNotNull(appResponse.requests.get(0)["id"])
     Assertions.assertEquals(appResponse.requests.get(0)["contact-number"], CONTACT_NUMBER)
@@ -475,7 +475,7 @@ class AppResourcePrisonerFacingIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(4),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
