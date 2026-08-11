@@ -677,6 +677,231 @@ open class AppResourceIntegrationTest(
     Assertions.assertNotNull(response.assignedGroup.name)
   }
 
+  @Test
+  fun `updateAppToInProgress successfully updates app status to IN_PROGRESS`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.NEW,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    val response = webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Any, Any>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponseDto<Any, Any>
+
+    Assertions.assertEquals(AppStatus.IN_PROGRESS, response.status)
+    Assertions.assertEquals(app.id, response.id)
+    Assertions.assertEquals(requestedByFirst, response.requestedBy)
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when status is not IN_PROGRESS`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.NEW,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.APPROVED,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isForbidden
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when app not found`() {
+    val nonExistentAppId = UUID.randomUUID()
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/$nonExistentAppId/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isNotFound
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when app status is already IN_PROGRESS`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.IN_PROGRESS,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isForbidden
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when app status is APPROVED`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.APPROVED,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isForbidden
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when prisoner id does not match app`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.NEW,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedBySecond/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isNotFound
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when staff does not have MANAGING_PRISONER_APPS role`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.NEW,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_OTHER")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isForbidden
+  }
+
   private fun populateEstablishments() {
     establishmentRepository.save(
       Establishment(

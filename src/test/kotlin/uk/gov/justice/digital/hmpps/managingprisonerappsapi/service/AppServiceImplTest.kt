@@ -513,6 +513,147 @@ class AppServiceImplTest {
     assertApp(app, appResponse)
   }
 
+  @Test
+  fun `updateAppStatusToInProgress successfully updates app status to IN_PROGRESS`() {
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+    val group = AssignedGroupDto(
+      groupId,
+      "Test Group",
+      EstablishmentDto(
+        establishmentId,
+        "Test Establishment",
+        false,
+        setOf(),
+        setOf(),
+      ),
+      1L,
+      GroupType.WING,
+    )
+
+    Mockito.`when`(appRepository.findAppsByIdAndRequestedBy(app.id, requestedBy)).thenReturn(Optional.of(app))
+    Mockito.`when`(staffService.getStaffById(createdBy)).thenReturn(Optional.of(staff))
+    Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
+    Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(appRepository.save(any())).thenReturn(app)
+    Mockito.`when`(groupService.getGroupById(groupId, establishmentId)).thenReturn(group)
+    Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(Optional.of(establishment))
+
+    val appResponse = appService.updateAppStatusToInProgress(requestedBy, createdBy, app.id, appStatusUpdateDto)
+
+    assertEquals(AppStatus.IN_PROGRESS, app.status)
+    assertEquals(app.id, appResponse.id)
+    assertEquals(AppStatus.IN_PROGRESS, appResponse.status)
+  }
+
+  @Test
+  fun `updateAppStatusToInProgress throws exception when status is not IN_PROGRESS`() {
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.APPROVED,
+      comment = null,
+    )
+
+    val exception = assertThrows(ApiException::class.java) {
+      appService.updateAppStatusToInProgress(requestedBy, createdBy, app.id, appStatusUpdateDto)
+    }
+
+    assertEquals(HttpStatus.FORBIDDEN, exception.status)
+    assertEquals("App Status can only be updated to IN_PROGRESS", exception.message)
+  }
+
+  @Test
+  fun `updateAppStatusToInProgress throws exception when app not found`() {
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    Mockito.`when`(appRepository.findAppsByIdAndRequestedBy(app.id, requestedBy)).thenReturn(Optional.empty())
+
+    val exception = assertThrows(ApiException::class.java) {
+      appService.updateAppStatusToInProgress(requestedBy, createdBy, app.id, appStatusUpdateDto)
+    }
+
+    assertEquals(HttpStatus.NOT_FOUND, exception.status)
+    assertEquals("No app exist with id ${app.id}", exception.message)
+  }
+
+  @Test
+  fun `updateAppStatusToInProgress throws exception when app status is not NEW`() {
+    val appInProgress = DataGenerator.generateApp(
+      establishmentId,
+      null,
+      1,
+      1,
+      requestedBy,
+      LocalDateTime.now(ZoneOffset.UTC),
+      requestedByFirstName,
+      requestedByLastName,
+      AppStatus.IN_PROGRESS,
+      groupId,
+      false,
+    )
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    Mockito.`when`(appRepository.findAppsByIdAndRequestedBy(appInProgress.id, requestedBy)).thenReturn(Optional.of(appInProgress))
+
+    val exception = assertThrows(ApiException::class.java) {
+      appService.updateAppStatusToInProgress(requestedBy, createdBy, appInProgress.id, appStatusUpdateDto)
+    }
+
+    assertEquals(HttpStatus.FORBIDDEN, exception.status)
+    assertEquals("App Status cannot be updated", exception.message)
+  }
+
+  @Test
+  fun `updateAppStatusToInProgress throws exception when staff not found`() {
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    Mockito.`when`(appRepository.findAppsByIdAndRequestedBy(app.id, requestedBy)).thenReturn(Optional.of(app))
+    Mockito.`when`(staffService.getStaffById(createdBy)).thenReturn(Optional.empty())
+
+    val exception = assertThrows(ApiException::class.java) {
+      appService.updateAppStatusToInProgress(requestedBy, createdBy, app.id, appStatusUpdateDto)
+    }
+
+    assertEquals(HttpStatus.FORBIDDEN, exception.status)
+    assertEquals("Staff with id $createdBy not found", exception.message)
+  }
+
+  @Test
+  fun `updateAppStatusToInProgress throws exception when staff and app establishment do not match`() {
+    val differentEstablishmentStaff = Staff(
+      createdBy,
+      Generators.timeBasedEpochGenerator().generate().toString(),
+      staffFullName,
+      UserCategory.STAFF,
+      "DIFFERENT_ESTABLISHMENT",
+      "Staff",
+      UUID.randomUUID(),
+    )
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    Mockito.`when`(appRepository.findAppsByIdAndRequestedBy(app.id, requestedBy)).thenReturn(Optional.of(app))
+    Mockito.`when`(staffService.getStaffById(createdBy)).thenReturn(Optional.of(differentEstablishmentStaff))
+
+    val exception = assertThrows(ApiException::class.java) {
+      appService.updateAppStatusToInProgress(requestedBy, createdBy, app.id, appStatusUpdateDto)
+    }
+
+    assertEquals(HttpStatus.FORBIDDEN, exception.status)
+  }
+
   private fun assertApp(app: App, appResponseDto: AppResponseDto<Any, Any>) {
     assertEquals(app.id, appResponseDto.id)
     assertEquals(app.appType, appResponseDto.appType)
