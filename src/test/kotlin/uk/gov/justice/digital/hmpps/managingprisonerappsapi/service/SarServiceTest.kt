@@ -98,7 +98,7 @@ class SarServiceTest {
       requestedDate,
       firstName,
       lastName,
-      AppStatus.PENDING,
+      AppStatus.NEW,
       assignedGroup,
       false,
     ).apply {
@@ -184,7 +184,7 @@ class SarServiceTest {
 
     val prnApp = sarContent.apps.first()
     assertEquals(includedApp.id, prnApp.id)
-    assertEquals(AppStatus.PENDING, prnApp.status)
+    assertEquals(AppStatus.NEW, prnApp.status)
     assertEquals("Add social contact", prnApp.type)
     assertEquals(establishmentId, prnApp.establishment)
     val expectedFormDataItems = includedApp.requests.flatMap { requestMap ->

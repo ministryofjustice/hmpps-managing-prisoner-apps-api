@@ -116,7 +116,12 @@ class HistoryServiceImpl(
         }
       }
       var groupName: String = ""
-      if (h.activity != Activity.FORWARDING_COMMENT_ADDED && h.activity != Activity.APP_FORWARDED_TO_A_GROUP && h.activity != Activity.APP_SUBMITTED && h.activity != Activity.FILE_ADDED) {
+      if (h.activity != Activity.FORWARDING_COMMENT_ADDED &&
+        h.activity != Activity.APP_FORWARDED_TO_A_GROUP &&
+        h.activity != Activity.APP_SUBMITTED &&
+        h.activity != Activity.FILE_ADDED &&
+        h.activity != Activity.APP_IN_PROGRESS
+      ) {
         map.put(
           "${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}",
           HistoryResponse(
@@ -146,6 +151,20 @@ class HistoryServiceImpl(
             h.entityId,
             h.entityType,
             ActivityMessage("Logged by $createdBy", "Assigned to $groupName"),
+            h.createdDate,
+          ),
+        )
+      }
+      if (h.activity == Activity.APP_IN_PROGRESS) {
+        groupName = groupService.getGroupById(h.entityId).name
+        map.put(
+          "${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}",
+          HistoryResponse(
+            h.id,
+            h.appId,
+            h.entityId,
+            h.entityType,
+            ActivityMessage("Set to In Progress by $createdBy", null),
             h.createdDate,
           ),
         )
@@ -189,6 +208,7 @@ class HistoryServiceImpl(
     val x: String
     when (activity) {
       Activity.APP_SUBMITTED -> x = "Logged by $staffName"
+      Activity.APP_IN_PROGRESS -> x = "Marked as in progress by $staffName"
       Activity.APP_REQUEST_FORM_DATA_UPDATED -> x = "Form data updated by $staffName"
       Activity.COMMENT_ADDED -> x = "Message added by $staffName"
       Activity.FORWARDING_COMMENT_ADDED, Activity.APP_FORWARDED_TO_A_GROUP ->

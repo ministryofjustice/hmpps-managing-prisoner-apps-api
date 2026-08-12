@@ -146,7 +146,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeOne, appResponse.applicationType.id)
     Assertions.assertEquals(requestedByFirst, appResponse.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, appResponse.status)
+    Assertions.assertEquals(AppStatus.NEW, appResponse.status)
     Assertions.assertEquals(false, appResponse.firstNightCenter)
     Assertions.assertEquals(1, appResponse.requests.size)
     Assertions.assertNotNull(appResponse.requests.get(0)["id"])
@@ -174,7 +174,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeOne, appResponse.applicationType.id)
     Assertions.assertEquals(requestedByFirst, appResponse.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, appResponse.status)
+    Assertions.assertEquals(AppStatus.NEW, appResponse.status)
     Assertions.assertEquals(false, appResponse.firstNightCenter)
     Assertions.assertEquals(1, appResponse.requests.size)
     Assertions.assertEquals(newContactNumber, appResponse.requests.get(0)["contact-number"])
@@ -227,7 +227,7 @@ open class AppResourceIntegrationTest(
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(false, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
@@ -295,7 +295,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeThree, response.applicationType.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(true, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
@@ -339,7 +339,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(false, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
@@ -377,7 +377,7 @@ open class AppResourceIntegrationTest(
 
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(false, response.firstNightCenter)
     Assertions.assertEquals(1, response.requests.size)
     Assertions.assertNotNull(response.requests.get(0)["id"])
@@ -391,7 +391,7 @@ open class AppResourceIntegrationTest(
     val searchQueryDto = AppsSearchQueryDto(
       1,
       10,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       setOf(),
       null,
       setOf(),
@@ -469,7 +469,7 @@ open class AppResourceIntegrationTest(
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(assignedGroupSecond, response.assignedGroup.id)
 
@@ -504,7 +504,7 @@ open class AppResourceIntegrationTest(
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
-    Assertions.assertEquals(AppStatus.PENDING, response.status)
+    Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
 
@@ -561,7 +561,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
           establishmentIdFirst,
           1,
@@ -603,7 +603,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
           establishmentIdFirst,
           1,
@@ -647,7 +647,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
           establishmentIdFirst,
           1,
@@ -675,6 +675,231 @@ open class AppResourceIntegrationTest(
     Assertions.assertEquals(1, response.requests?.size)
     Assertions.assertEquals(app.assignedGroup, assignedGroupDto.id)
     Assertions.assertNotNull(response.assignedGroup.name)
+  }
+
+  @Test
+  fun `updateAppToInProgress successfully updates app status to IN_PROGRESS`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.NEW,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    val response = webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Any, Any>>() {})
+      .consumeWith(System.out::println)
+      .returnResult()
+      .responseBody as AppResponseDto<Any, Any>
+
+    Assertions.assertEquals(AppStatus.IN_PROGRESS, response.status)
+    Assertions.assertEquals(app.id, response.id)
+    Assertions.assertEquals(requestedByFirst, response.requestedBy)
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when status is not IN_PROGRESS`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.NEW,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.APPROVED,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isForbidden
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when app not found`() {
+    val nonExistentAppId = UUID.randomUUID()
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/$nonExistentAppId/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isNotFound
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when app status is already IN_PROGRESS`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.IN_PROGRESS,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isForbidden
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when app status is APPROVED`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.APPROVED,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isForbidden
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when prisoner id does not match app`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.NEW,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedBySecond/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isNotFound
+  }
+
+  @Test
+  fun `updateAppToInProgress fails when staff does not have MANAGING_PRISONER_APPS role`() {
+    val app = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        requestedByFirst,
+        LocalDateTime.now(ZoneOffset.UTC),
+        requestedByFirstMainName,
+        requestedByFirstSurname,
+        AppStatus.NEW,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(
+      status = AppStatus.IN_PROGRESS,
+      comment = null,
+    )
+
+    webTestClient.patch()
+      .uri("/v1/prisoners/$requestedByFirst/apps/${app.id}/status")
+      .headers(setAuthorisation(roles = listOf("ROLE_OTHER")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .bodyValue(appStatusUpdateDto)
+      .exchange()
+      .expectStatus().isForbidden
   }
 
   private fun populateEstablishments() {
@@ -758,7 +983,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(4),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -773,7 +998,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(2),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -789,7 +1014,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(1),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -804,7 +1029,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC).minusDays(2).minusHours(1),
         requestedBySecondMainName,
         requestedBySecondSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -819,7 +1044,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -834,7 +1059,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
         requestedByThirdSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupSecond,
         false,
       ),
@@ -849,7 +1074,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
         requestedByThirdSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupSecond,
         false,
       ),
@@ -864,7 +1089,7 @@ open class AppResourceIntegrationTest(
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
         requestedByThirdSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupSecond,
         false,
       ),

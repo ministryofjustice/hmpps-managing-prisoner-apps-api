@@ -148,7 +148,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -163,7 +163,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -178,7 +178,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
         LocalDateTime.now(ZoneOffset.UTC).minusDays(1),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -193,7 +193,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
         LocalDateTime.now(ZoneOffset.UTC).minusDays(2),
         requestedBySecondMainName,
         requestedBySecondSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         false,
       ),
@@ -208,7 +208,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstMainName,
         requestedByFirstSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupFirst,
         true,
       ),
@@ -223,7 +223,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
         requestedByThirdSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupSecond,
         false,
       ),
@@ -238,7 +238,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
         requestedByThirdSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupSecond,
         false,
       ),
@@ -253,7 +253,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByThirdMainName,
         requestedByThirdSurname,
-        AppStatus.PENDING,
+        AppStatus.NEW,
         assignedGroupSecond,
         false,
       ),
@@ -262,7 +262,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
     // By establishment Id and status
     var countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdFirst,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       null,
       null,
       null,
@@ -276,7 +276,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
 
     var countResultByAssignedGroup = appRepository.countBySearchFilterGroupByAssignedGroup(
       establishmentIdFirst,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       null,
       null,
       null,
@@ -288,7 +288,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
 
     var pageResult = appRepository.appsBySearchFilter(
       establishmentIdFirst,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       null,
       null,
       null,
@@ -300,7 +300,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
     // By establishment and status and appType
     countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdSecond,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       setOf(1L),
       null,
       null,
@@ -312,7 +312,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
 
     pageResult = appRepository.appsBySearchFilter(
       establishmentIdSecond,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       setOf(1L),
       null,
       null,
@@ -324,7 +324,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
     // By EstablishmentId AND status and requestedBy
     countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdFirst,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       null,
       requestedByFirst,
       null,
@@ -336,7 +336,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
 
     pageResult = appRepository.appsBySearchFilter(
       establishmentIdFirst,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       null,
       requestedByFirst,
       null,
@@ -348,7 +348,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
     // By EstablishmentId and Status and assignedGroup
     countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdFirst,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       null,
       null,
       setOf(assignedGroupFirst),
@@ -357,7 +357,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
     Assertions.assertEquals(1, countResult.size)
     pageResult = appRepository.appsBySearchFilter(
       establishmentIdFirst,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       null,
       null,
       setOf(assignedGroupFirst),
@@ -369,7 +369,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
     // By establishment id and status and appType and requestedBy and assignedGroup and firstNightCenter
     countResult = appRepository.countBySearchFilterGroupByAppType(
       establishmentIdSecond,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       setOf(1L),
       requestedByThird,
       setOf(assignedGroupSecond),
@@ -381,7 +381,7 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
 
     var pageResult1 = appRepository.appsBySearchFilter(
       establishmentIdSecond,
-      setOf(AppStatus.PENDING),
+      setOf(AppStatus.NEW),
       setOf(1L),
       requestedByThird,
       setOf(assignedGroupSecond),

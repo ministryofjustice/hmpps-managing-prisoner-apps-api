@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdateDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
@@ -305,5 +307,42 @@ class AppResource(var appService: AppService) {
     authentication as AuthAwareAuthenticationToken
     val searchResult = appService.searchRequestedByTextSearch(authentication.principal, name)
     return ResponseEntity.status(HttpStatus.OK).body(searchResult)
+  }
+
+  @Tag(name = "Apps")
+  @Operation(
+    summary = "Update App status to InProgress",
+    description = "This api endpoint is for updating app status to InProgress. The logged staff and prisoner should belong to the same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "App status updated to InProgress"),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PatchMapping(
+    "prisoners/{prisonerId}/apps/{appId}/status",
+    produces = [MediaType.APPLICATION_JSON_VALUE],
+    consumes = [MediaType.APPLICATION_JSON_VALUE],
+  )
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  fun updateAppToInProgress(
+    @PathVariable prisonerId: String,
+    @PathVariable appId: UUID,
+    @RequestBody appStatusUpdateDto: AppStatusUpdateDto,
+    authentication: Authentication,
+  ): ResponseEntity<AppResponseDto<Any, Any>> {
+    authentication as AuthAwareAuthenticationToken
+    logger.info("Request received for updating app status for $prisonerId by ${authentication.principal}")
+    val appResponseDto = appService.updateAppStatusToInProgress(prisonerId, authentication.principal, appId, appStatusUpdateDto)
+    return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 }

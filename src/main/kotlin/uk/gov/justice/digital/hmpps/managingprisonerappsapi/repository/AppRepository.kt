@@ -114,7 +114,7 @@ interface AppRepository : JpaRepository<App, UUID> {
   @Query(
     value = "SELECT COUNT(*) as count, a.applicationType as applicationType FROM App a " +
       " WHERE (a.establishmentId = :establishmentId)" +
-      " AND (a.status = :status)" +
+      " AND (a.status in :status)" +
       " AND (a.applicationType = :applicationType)" +
       " AND (a.createdBy = :createdBy)" +
       " AND (a.submittedByType = :submittedByType)" +
@@ -123,15 +123,25 @@ interface AppRepository : JpaRepository<App, UUID> {
   )
   fun countAppsByStatusAndApplicationTypeAndCreatedBy(
     establishmentId: String,
-    status: AppStatus,
+    status: List<AppStatus>,
     applicationType: Long,
     createdBy: String,
     submittedByType: UserCategory,
   ): Optional<AppByAppTypeCounts>
 
+  @Query(
+    value = "SELECT a FROM App a " +
+      " WHERE (a.establishmentId = :establishmentId)" +
+      " AND (a.status in :status)" +
+      " AND (a.applicationType = :applicationType)" +
+      " AND (a.createdBy = :createdBy)" +
+      " AND (a.submittedByType = :submittedByType)" +
+      " ORDER BY a.createdDate DESC",
+    nativeQuery = false,
+  )
   fun getAppsByEstablishmentIdAndStatusAndApplicationTypeAndCreatedByAndSubmittedByTypeOrderByCreatedDateDesc(
     establishmentId: String,
-    status: AppStatus,
+    status: List<AppStatus>,
     applicationType: Long,
     createdBy: String,
     submittedByType: UserCategory,
