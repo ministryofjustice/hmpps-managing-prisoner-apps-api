@@ -20,7 +20,12 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppStatsContext
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.MessageType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetryService
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -34,6 +39,9 @@ class CommentServiceImpl(
   private val activityService: ActivityService,
   private val prisonerService: PrisonerService,
   private val groupService: GroupService,
+  private val applicationTypeRepository: ApplicationTypeRepository,
+  private val applicationGroupRepository: ApplicationGroupRepository,
+  private val statsTelemetryService: StatsTelemetryService,
 ) : CommentService {
 
   override fun saveComment(comment: Comment): Comment = commentRepository.save(comment)
@@ -44,6 +52,7 @@ class CommentServiceImpl(
     appId: UUID,
     commentRequestDto: CommentRequestDto,
   ): CommentResponseDto<Any> {
+    val createdDate = LocalDateTime.now(ZoneOffset.UTC)
     val staff = getStaff(staffId)
     val app = getAppById(appId)
     if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED) {
@@ -57,7 +66,7 @@ class CommentServiceImpl(
       Comment(
         Generators.timeBasedEpochGenerator().generate(),
         commentRequestDto.message,
-        LocalDateTime.now(ZoneOffset.UTC),
+        createdDate,
         staffId,
         appId,
         commentRequestDto.visibility,
@@ -72,13 +81,36 @@ class CommentServiceImpl(
       Activity.COMMENT_ADDED,
       app.establishmentId,
       staffId,
-      LocalDateTime.now(ZoneOffset.UTC),
+      createdDate,
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
       group.name,
       "",
     )
+
+    var establishmentName = group.establishment.name
+    val department = group.name
+    val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
+    val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
+
+    val appStatsContext = AppStatsContext(
+      app.id,
+      establishmentName,
+      app.applicationType!!,
+      appTypeName,
+      app.applicationGroup!!,
+      appGroupName,
+      department,
+    )
+    statsTelemetryService.logMessageAdded(
+      appStatsContext,
+      UserCategory.STAFF,
+      commentRequestDto.visibility,
+      MessageType.STAFF_NOTE,
+      createdDate,
+    )
+
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }
 
@@ -87,6 +119,7 @@ class CommentServiceImpl(
     appId: UUID,
     commentRequestDto: CommentRequestDto,
   ): CommentResponseDto<Any> {
+    val createdDate = LocalDateTime.now(ZoneOffset.UTC)
     val prisoner = validatePrisoner(prisonerId)
     val app = getAppById(appId)
     validatePrisonerByRequestedBy(prisonerId, app)
@@ -95,7 +128,7 @@ class CommentServiceImpl(
       Comment(
         Generators.timeBasedEpochGenerator().generate(),
         commentRequestDto.message,
-        LocalDateTime.now(ZoneOffset.UTC),
+        createdDate,
         prisonerId,
         appId,
         CommentVisibility.STAFF_AND_PRISONER,
@@ -109,13 +142,36 @@ class CommentServiceImpl(
       Activity.COMMENT_ADDED,
       app.establishmentId,
       prisonerId,
-      LocalDateTime.now(ZoneOffset.UTC),
+      createdDate,
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
       group.name,
       "",
     )
+
+    var establishmentName = group.establishment.name
+    val department = group.name
+    val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
+    val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
+
+    val appStatsContext = AppStatsContext(
+      app.id,
+      establishmentName,
+      app.applicationType!!,
+      appTypeName,
+      app.applicationGroup!!,
+      appGroupName,
+      department,
+    )
+    statsTelemetryService.logMessageAdded(
+      appStatsContext,
+      UserCategory.PRISONER,
+      CommentVisibility.STAFF_AND_PRISONER,
+      MessageType.PRISONER_COMMENT,
+      createdDate,
+    )
+
     return convertCommentToCommentResponseDto(prisonerId, prisoner.username, comment)
   }
 

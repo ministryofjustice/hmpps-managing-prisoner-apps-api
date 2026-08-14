@@ -29,6 +29,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.Prisone
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppPrisonerFacingService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.CommentService
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppJourneyEventsRequest
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.*
@@ -311,5 +312,52 @@ class PrisonerFacingResource(
     val comments =
       commentService.getCommentsByAppIdForPrisoner(authentication.principal, appId, createdBy, page, size)
     return ResponseEntity.status(HttpStatus.OK).body(comments)
+  }
+
+  @PostMapping(
+    "/prisoners/apps/journey-events",
+    consumes = [MediaType.APPLICATION_JSON_VALUE],
+  )
+  @Tag(name = "Stats")
+  @Operation(
+    summary = "Record frontend journey events for stats tracking",
+    description = """
+      Called by the Frontend after an app is successfully submitted.
+      Example payload:
+      {
+         "appId": "UUID",
+         "events": [
+           { "event": "app_group_viewed",        "timestamp": "2026-08-11T08:40:55.998Z" },
+           { "event": "app_type_viewed",         "timestamp": "2026-08-11T08:41:58.181Z" },
+           { "event": "app_creation_page_viewed","timestamp": "2026-08-11T08:42:01.113Z" },
+           { "event": "app_submitted",           "timestamp": "2026-08-11T08:45:10.283Z" }
+         ]
+      }
+      Returns 204 No Content on success.
+    """,
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "204", description = "Journey events processed successfully"),
+      ApiResponse(
+        responseCode = "404",
+        description = "App not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  fun recordJourneyEvents(
+    @RequestBody request: AppJourneyEventsRequest,
+    authentication: Authentication,
+  ): ResponseEntity<Void> {
+    logger.info("Recording journey events for appId=${request.appId}")
+    authentication as AuthAwareAuthenticationToken
+    appPrisonerFacingService.processJourneyEvents(request.appId, authentication.principal, request)
+    return ResponseEntity.noContent().build()
   }
 }

@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
 import com.fasterxml.uuid.Generators
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
@@ -10,6 +11,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppList
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisonerDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerApplicationTypeCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
@@ -22,22 +24,35 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppJourneyEventsRequest
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppStatsContext
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetryService
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 
 @Service
 class AppPrisonerFacingService(
   private val appRepository: AppRepository,
   private val responseRepository: ResponseRepository,
   private val applicationTypeRepository: ApplicationTypeRepository,
+  private val applicationGroupRepository: ApplicationGroupRepository,
+  private val groupRepository: GroupRepository,
   private val prisonerService: PrisonerService,
+  private val staffService: StaffService,
   private val groupService: GroupService,
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
+  private val statsTelemetryService: StatsTelemetryService,
 ) {
+  companion object {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+  }
 
   fun getAppsByPrisonerId(prisonerId: String, pageNumber: Long, pageSize: Long): PrisonerAppsPage {
     val prisoner = validatePrisoner(prisonerId)
@@ -93,7 +108,7 @@ class AppPrisonerFacingService(
     // validate prisoner exist
     val prisoner = validatePrisoner(prisonerId)
     // validate establishment onboarded
-    validateEstablishment(prisoner.establishmentId!!)
+    val establishmentDto = validateEstablishment(prisoner.establishmentId!!)
     // validate no app request for give aplication type is in pending status.
     val applicationTypeCount = appRepository.countAppsByStatusAndApplicationTypeAndCreatedBy(
       prisoner.establishmentId!!,
@@ -138,6 +153,7 @@ class AppPrisonerFacingService(
       groups[0].name,
       "",
     )
+
     return convertAppEntityToAppResponse(
       appEntity,
       prisoner,
@@ -180,6 +196,57 @@ class AppPrisonerFacingService(
       date,
       UserCategory.PRISONER,
     )
+  }
+
+  /**
+   * Receives the list of frontend journey events captured during app creation and
+   * emits the appropriate STATS_ telemetry events to Application Insights.
+   *
+   * Derives:
+   *  - STATS_TAXONOMY_NAVIGATION_TIME  (app_group_viewed → app_type_viewed)         Req 1
+   *  - STATS_APP_CREATION_TIME         (app_creation_page_viewed → app_submitted)   Req 2
+   */
+  fun processJourneyEvents(appId: UUID, staffId: String, request: AppJourneyEventsRequest) {
+    val app = appRepository.findById(appId).orElseThrow {
+      ApiException("No app found with id $appId", HttpStatus.NOT_FOUND)
+    }
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
+    }
+    validateStaffPermission(staff, app)
+
+    val appTypeId = app.applicationType ?: run {
+      logger.warn("processJourneyEvents: appId=$appId has no applicationType — skipping stats")
+      return
+    }
+    val appGroupId = app.applicationGroup
+      ?: run {
+        logger.warn("processJourneyEvents: appId=$appId has no applicationGroup — skipping stats")
+        return
+      }
+    val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
+    val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
+    val department = groupRepository.findById(app.assignedGroup).map { it.name }.orElse(null)
+
+    val appStatsContext = AppStatsContext(
+      appId = appId,
+      establishment = app.establishmentId,
+      appTypeId = appTypeId,
+      appTypeName = appTypeName,
+      appGroupId = appGroupId,
+      appGroupName = appGroupName,
+      department = department,
+    )
+    statsTelemetryService.logJourneyEvents(
+      appStatsContext = appStatsContext,
+      request = request,
+    )
+  }
+
+  private fun validateStaffPermission(staff: Staff, app: App) {
+    if (staff.establishmentId != app.establishmentId) {
+      throw ApiException("Staff with id ${staff.username} do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
+    }
   }
 
   private fun convertAppRequestToAppRequestEntity(
@@ -286,9 +353,7 @@ class AppPrisonerFacingService(
     return prisoner
   }
 
-  private fun validateEstablishment(establishmentId: String) {
-    establishmentService.getEstablishmentById(establishmentId).orElseThrow {
-      ApiException("Establishment with id $establishmentId not onboarded", HttpStatus.FORBIDDEN)
-    }
+  private fun validateEstablishment(establishmentId: String): EstablishmentDto = establishmentService.getEstablishmentById(establishmentId).orElseThrow {
+    ApiException("Establishment with id $establishmentId not onboarded", HttpStatus.FORBIDDEN)
   }
 }

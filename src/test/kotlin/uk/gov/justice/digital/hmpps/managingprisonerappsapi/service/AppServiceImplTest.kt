@@ -32,6 +32,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.Applicati
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ESTABLISHMENT_ID_1
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetryService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.CONTACT_NUMBER
 import java.time.LocalDateTime
@@ -62,6 +64,8 @@ class AppServiceImplTest {
   private lateinit var establishmentService: EstablishmentService
   private lateinit var applicationGroupRepository: ApplicationGroupRepository
   private lateinit var applicationTypeRepository: ApplicationTypeRepository
+  private lateinit var statsTelemetryService: StatsTelemetryService
+  private lateinit var groupRepository: GroupRepository
 
   private lateinit var appService: AppService
   private lateinit var app: App
@@ -81,6 +85,8 @@ class AppServiceImplTest {
     establishmentService = Mockito.mock(EstablishmentService::class.java)
     applicationTypeRepository = Mockito.mock(ApplicationTypeRepository::class.java)
     applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
+    statsTelemetryService = Mockito.mock(StatsTelemetryService::class.java)
+    groupRepository = Mockito.mock(GroupRepository::class.java)
 
     app = DataGenerator.generateApp(
       establishmentId,
@@ -145,6 +151,8 @@ class AppServiceImplTest {
       establishmentService,
       applicationGroupRepository,
       applicationTypeRepository,
+      statsTelemetryService,
+      groupRepository,
     )
   }
 

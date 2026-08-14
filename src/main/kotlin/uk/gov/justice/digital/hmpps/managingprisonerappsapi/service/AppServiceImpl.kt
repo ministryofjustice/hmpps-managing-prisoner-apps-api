@@ -43,6 +43,10 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppReposi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppStatsContext
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.MessageType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetryService
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -59,7 +63,8 @@ class AppServiceImpl(
   private val establishmentService: EstablishmentService,
   private val applicationGroupRepository: ApplicationGroupRepository,
   private val applicationTypeRepository: ApplicationTypeRepository,
-
+  private val statsTelemetryService: StatsTelemetryService,
+  private val groupRepository: GroupRepository,
 ) : AppService {
 
   companion object {
@@ -340,6 +345,29 @@ class AppServiceImpl(
         "",
       )
     }
+
+    var establishmentName = group.establishment.name
+    val department = group.name
+    val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
+    val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
+
+    val appStatsContext = AppStatsContext(
+      app.id,
+      establishmentName,
+      app.applicationType!!,
+      appTypeName,
+      app.applicationGroup!!,
+      appGroupName,
+      department,
+    )
+    statsTelemetryService.logMessageAdded(
+      appStatsContext,
+      UserCategory.STAFF,
+      CommentVisibility.STAFF_ONLY,
+      MessageType.FORWARDING_COMMENT,
+      createdDate,
+    )
+
     val applicationGroup = applicationGroupRepository.findById(app.applicationGroup!!).orElseThrow {
       throw ApiException("No applicationGroup found with id ${app.applicationGroup}", HttpStatus.NOT_FOUND)
     }
@@ -472,7 +500,9 @@ class AppServiceImpl(
       throw ApiException("No applicationType found with id ${app.applicationType}", HttpStatus.NOT_FOUND)
     }
 
-    app.lastModifiedDate = LocalDateTime.now(ZoneOffset.UTC)
+    val createdDate = LocalDateTime.now(ZoneOffset.UTC)
+    val fromStatus = app.status
+    app.lastModifiedDate = createdDate
     app.lastModifiedBy = staffId
     app.status = appStatusUpdateDto.status
     app = appRepository.save(app)
@@ -486,13 +516,36 @@ class AppServiceImpl(
       Activity.APP_IN_PROGRESS,
       app.establishmentId,
       staffId,
-      LocalDateTime.now(ZoneOffset.UTC),
+      createdDate,
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
       group.name,
       "",
     )
+
+    val toStatus = app.status
+    var establishmentName = group.establishment.name
+    val department = group.name
+    val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
+    val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
+
+    val appStatsContext = AppStatsContext(
+      app.id,
+      establishmentName,
+      app.applicationType!!,
+      appTypeName,
+      app.applicationGroup!!,
+      appGroupName,
+      department,
+    )
+    statsTelemetryService.logStatusChanged(
+      appStatsContext,
+      fromStatus,
+      toStatus,
+      createdDate,
+    )
+
     return convertAppToAppResponseDto(app, app.requestedBy, app.assignedGroup, applicationGroup, applicationType)
   }
 

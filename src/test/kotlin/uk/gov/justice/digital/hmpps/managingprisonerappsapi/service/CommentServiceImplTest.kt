@@ -22,13 +22,18 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.StaffDt
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetryService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -59,6 +64,11 @@ class CommentServiceImplTest {
   private lateinit var commentByStaff: Comment
   private lateinit var commentByPrisoner: Comment
   private lateinit var groupService: GroupService
+  private lateinit var applicationGroupRepository: ApplicationGroupRepository
+  private lateinit var applicationTypeRepository: ApplicationTypeRepository
+  private lateinit var statsTelemetryService: StatsTelemetryService
+  private lateinit var applicationType: ApplicationType
+  private lateinit var applicationGroup: ApplicationGroup
 
   @BeforeEach
   fun beforeEach() {
@@ -124,6 +134,12 @@ class CommentServiceImplTest {
     prisonerService = Mockito.mock(PrisonerService::class.java)
     activityService = Mockito.mock(ActivityService::class.java)
     groupService = Mockito.mock(GroupService::class.java)
+    applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
+    applicationTypeRepository = Mockito.mock(ApplicationTypeRepository::class.java)
+    statsTelemetryService = Mockito.mock(StatsTelemetryService::class.java)
+    applicationType = ApplicationType(1, "Add social contact", false, false, false)
+    applicationGroup = ApplicationGroup(1, "PIN phones", listOf(applicationType))
+
     commentServiceImpl = CommentServiceImpl(
       staffService,
       appService,
@@ -132,6 +148,9 @@ class CommentServiceImplTest {
       activityService,
       prisonerService,
       groupService,
+      applicationTypeRepository,
+      applicationGroupRepository,
+      statsTelemetryService,
     )
   }
 
@@ -144,6 +163,8 @@ class CommentServiceImplTest {
     Mockito.`when`(staffService.getStaffById(createdBy))
       .thenReturn(Optional.of(staff))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
+    Mockito.`when`(applicationTypeRepository.findById(1L)).thenReturn(Optional.of<ApplicationType>(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     Mockito.`when`(groupService.getGroupById(app.assignedGroup, staff.establishmentId)).thenReturn(
       AssignedGroupDto(
         groupId,
@@ -171,6 +192,8 @@ class CommentServiceImplTest {
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy))
       .thenReturn(Optional.of(prisoner))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
+    Mockito.`when`(applicationTypeRepository.findById(1L)).thenReturn(Optional.of<ApplicationType>(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     Mockito.`when`(groupService.getGroupById(app.assignedGroup, prisoner.establishmentId!!)).thenReturn(
       AssignedGroupDto(
         groupId,

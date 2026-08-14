@@ -25,7 +25,9 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppReposi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ESTABLISHMENT_ID_1
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetryService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -48,14 +50,17 @@ class AppPrisonerFacingServiceTest {
   private lateinit var activityService: ActivityService
   private lateinit var historyService: HistoryService
   private lateinit var establishmentService: EstablishmentService
+  private lateinit var statsTelemetryService: StatsTelemetryService
   private lateinit var applicationGroupRepository: ApplicationGroupRepository
   private lateinit var applicationTypeRepository: ApplicationTypeRepository
   private lateinit var responseRepository: ResponseRepository
+  private lateinit var groupRepository: GroupRepository
 
   private lateinit var appService: AppPrisonerFacingService
   private lateinit var app: App
   private lateinit var applicationGroup: ApplicationGroup
   private lateinit var applicationType: ApplicationType
+  private val assignedGroup = UUID.randomUUID()
 
   @BeforeEach
   fun setUp() {
@@ -65,9 +70,11 @@ class AppPrisonerFacingServiceTest {
     activityService = Mockito.mock(ActivityService::class.java)
     historyService = Mockito.mock(HistoryService::class.java)
     establishmentService = Mockito.mock(EstablishmentService::class.java)
+    statsTelemetryService = Mockito.mock(StatsTelemetryService::class.java)
     applicationTypeRepository = Mockito.mock(ApplicationTypeRepository::class.java)
     applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
     responseRepository = Mockito.mock(ResponseRepository::class.java)
+    groupRepository = Mockito.mock(GroupRepository::class.java)
     // app.submittedByType = SubmittedByType.PRISONER
 
     establishment =
@@ -132,10 +139,13 @@ class AppPrisonerFacingServiceTest {
       appRepository,
       responseRepository,
       applicationTypeRepository,
+      applicationGroupRepository,
+      groupRepository,
       prisonerService,
       groupService,
       establishmentService,
       activityService,
+      statsTelemetryService,
     )
   }
 
@@ -180,7 +190,10 @@ class AppPrisonerFacingServiceTest {
 
   @Test
   fun submitApp() {
-    Mockito.`when`(applicationTypeRepository.findById(1L)).thenReturn(Optional.of<ApplicationType>(applicationType))
+    val group = DataGenerator.generateGroups(groupId, establishmentId, "Test Group", emptyList(), GroupType.DEPARTMENT)
+    Mockito.`when`(applicationTypeRepository.findById(1L)).thenReturn(Optional.of(applicationType))
+    Mockito.`when`(applicationGroupRepository.findById(1L)).thenReturn(Optional.of(applicationGroup))
+    Mockito.`when`(groupRepository.findById(groupId)).thenReturn(Optional.of(group))
     Mockito.`when`(appRepository.save(any())).thenReturn(app)
     Mockito.`when`(prisonerService.getPrisonerById(prisoner.username)).thenReturn(Optional.of<Prisoner>(prisoner))
     Mockito.`when`(establishmentService.getEstablishmentById(prisoner.establishmentId!!))
