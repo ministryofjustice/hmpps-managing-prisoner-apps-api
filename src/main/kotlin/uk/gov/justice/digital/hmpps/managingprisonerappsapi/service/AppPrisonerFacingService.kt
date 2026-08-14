@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGro
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
@@ -34,7 +35,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetry
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 
 @Service
 class AppPrisonerFacingService(

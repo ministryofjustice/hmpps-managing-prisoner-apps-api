@@ -47,6 +47,7 @@ class AppPrisonerFacingServiceTest {
   private lateinit var appRepository: AppRepository
   private lateinit var prisonerService: PrisonerService
   private lateinit var groupService: GroupService
+  private lateinit var staffService: StaffService
   private lateinit var activityService: ActivityService
   private lateinit var historyService: HistoryService
   private lateinit var establishmentService: EstablishmentService
@@ -75,6 +76,7 @@ class AppPrisonerFacingServiceTest {
     applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
     responseRepository = Mockito.mock(ResponseRepository::class.java)
     groupRepository = Mockito.mock(GroupRepository::class.java)
+    staffService = Mockito.mock(StaffService::class.java)
     // app.submittedByType = SubmittedByType.PRISONER
 
     establishment =
@@ -142,6 +144,7 @@ class AppPrisonerFacingServiceTest {
       applicationGroupRepository,
       groupRepository,
       prisonerService,
+      staffService,
       groupService,
       establishmentService,
       activityService,
