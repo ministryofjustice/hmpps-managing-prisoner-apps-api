@@ -368,8 +368,7 @@ class StatsTelemetryService(private val telemetryClient: TelemetryClient) {
       extraDimensions(dimensions)
 
       telemetryClient.trackEvent(activity.name, dimensions, null)
-// TODO - Remove log
-      log.info("telemetry for [${activity.name}] - {}", dimensions)
+      log.debug("telemetry for [${activity.name}] - {}", dimensions)
     } catch (e: Exception) {
       log.error("Failed to send stats telemetry event [${activity.name}] for appId=${appStatsContext.appId}: ${e.message}", e)
     }
