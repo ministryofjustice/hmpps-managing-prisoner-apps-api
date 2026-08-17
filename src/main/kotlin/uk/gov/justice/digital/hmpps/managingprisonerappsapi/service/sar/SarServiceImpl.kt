@@ -177,6 +177,8 @@ class SarServiceImpl(
   override fun convertActivityToStatement(activity: Activity, entityId: UUID): String {
     if (activity == Activity.APP_SUBMITTED) {
       return "App request submitted."
+    } else if (activity == Activity.APP_IN_PROGRESS) {
+      return "App request in progress."
     } else if (activity == Activity.APP_DECLINED) {
       return "App request declined."
     } else if (activity == Activity.APP_APPROVED) {
