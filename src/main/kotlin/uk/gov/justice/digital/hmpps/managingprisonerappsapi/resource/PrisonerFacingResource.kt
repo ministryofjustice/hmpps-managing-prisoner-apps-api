@@ -314,10 +314,6 @@ class PrisonerFacingResource(
     return ResponseEntity.status(HttpStatus.OK).body(comments)
   }
 
-  @PostMapping(
-    "/prisoners/apps/journey-events",
-    consumes = [MediaType.APPLICATION_JSON_VALUE],
-  )
   @Tag(name = "Stats")
   @Operation(
     summary = "Record frontend journey events for stats tracking",
@@ -335,7 +331,7 @@ class PrisonerFacingResource(
       }
       Returns 204 No Content on success.
     """,
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
     responses = [
       ApiResponse(responseCode = "204", description = "Journey events processed successfully"),
       ApiResponse(
@@ -350,7 +346,11 @@ class PrisonerFacingResource(
       ),
     ],
   )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  @PostMapping(
+    "/prisoners/apps/journey-events",
+    consumes = [MediaType.APPLICATION_JSON_VALUE],
+  )
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   fun recordJourneyEvents(
     @RequestBody request: AppJourneyEventsRequest,
     authentication: Authentication,

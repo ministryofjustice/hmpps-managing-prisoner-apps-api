@@ -206,14 +206,11 @@ class AppPrisonerFacingService(
    *  - STATS_TAXONOMY_NAVIGATION_TIME  (app_group_viewed → app_type_viewed)         Req 1
    *  - STATS_APP_CREATION_TIME         (app_creation_page_viewed → app_submitted)   Req 2
    */
-  fun processJourneyEvents(appId: UUID, staffId: String, request: AppJourneyEventsRequest) {
+  fun processJourneyEvents(appId: UUID, prisonerId: String, request: AppJourneyEventsRequest) {
     val app = appRepository.findById(appId).orElseThrow {
       ApiException("No app found with id $appId", HttpStatus.NOT_FOUND)
     }
-    val staff = staffService.getStaffById(staffId).orElseThrow {
-      ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
-    }
-    validateStaffPermission(staff, app)
+    validatePrisonerByRequestedBy(prisonerId, app)
 
     val appTypeId = app.applicationType ?: run {
       logger.warn("processJourneyEvents: appId=$appId has no applicationType — skipping stats")
