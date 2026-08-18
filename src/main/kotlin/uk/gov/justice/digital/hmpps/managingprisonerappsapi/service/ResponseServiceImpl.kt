@@ -16,7 +16,11 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppStatsContext
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetryService
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -27,9 +31,12 @@ class ResponseServiceImpl(
   private val prisonerService: PrisonerService,
   private val staffService: StaffService,
   private val responseRepository: ResponseRepository,
+  private val applicationTypeRepository: ApplicationTypeRepository,
+  private val applicationGroupRepository: ApplicationGroupRepository,
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
   private val groupService: GroupService,
+  private val statsTelemetryService: StatsTelemetryService,
 ) : ResponseService {
 
   companion object {
@@ -54,6 +61,9 @@ class ResponseServiceImpl(
         HttpStatus.FORBIDDEN,
       )
     }
+
+    val createdDate = LocalDateTime.now(ZoneOffset.UTC)
+    val fromStatus = app.status
     val reqs = ArrayList<MutableMap<String, Any>>()
     var responseEntity: Response? = null
     app.requests.forEach { request ->
@@ -67,7 +77,7 @@ class ResponseServiceImpl(
             Generators.timeBasedEpochGenerator().generate(),
             response.reason,
             response.decision,
-            LocalDateTime.now(ZoneOffset.UTC),
+            createdDate,
             staffId,
             app.id,
           ),
@@ -98,7 +108,7 @@ class ResponseServiceImpl(
           activity,
           app.establishmentId,
           staffId,
-          LocalDateTime.now(ZoneOffset.UTC),
+          createdDate,
           prisonerId,
           app.applicationType!!,
           app.applicationGroup!!,
@@ -109,6 +119,7 @@ class ResponseServiceImpl(
       }
       reqs.add(req)
     }
+
     app.requests = reqs
     if (response.decision == Decision.APPROVED) {
       app.status = AppStatus.APPROVED
@@ -120,6 +131,47 @@ class ResponseServiceImpl(
       app.status = AppStatus.REJECTED
     }
     appService.saveApp(app)
+
+    val toStatus = app.status
+    val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
+    val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
+    val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
+
+    var establishmentName = group.establishment.name
+    val department = group.name
+
+    val appStatsContext = AppStatsContext(
+      app.id,
+      establishmentName,
+      app.applicationType!!,
+      appTypeName,
+      app.applicationGroup!!,
+      appGroupName,
+      department,
+    )
+
+    if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED || app.status == AppStatus.REJECTED) {
+      statsTelemetryService.logAppDecisionTime(
+        appStatsContext,
+        app.status,
+        app.createdDate,
+        createdDate,
+      )
+      if (app.status == AppStatus.REJECTED) {
+        statsTelemetryService.logAppRejected(
+          appStatsContext,
+          response.reason,
+          createdDate,
+        )
+      }
+    } else {
+      statsTelemetryService.logStatusChanged(
+        appStatsContext,
+        fromStatus,
+        toStatus,
+        createdDate,
+      )
+    }
 
     return convertResponseToAppDecisionResponse(
       prisonerId,
