@@ -35,7 +35,7 @@ dependencies {
 
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
   testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
-  testImplementation("net.javacrumbs.json-unit:json-unit-assertj:5.1.2")
+  testImplementation("net.javacrumbs.json-unit:json-unit-assertj:6.2.0")
 
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.46") {
     exclude(group = "io.swagger.core.v3")
