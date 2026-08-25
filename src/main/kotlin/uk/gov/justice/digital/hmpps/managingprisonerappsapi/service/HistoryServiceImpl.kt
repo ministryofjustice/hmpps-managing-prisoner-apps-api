@@ -8,12 +8,15 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.Activit
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.StaffType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
 import java.time.LocalDateTime
 import java.util.*
 
@@ -21,19 +24,16 @@ import java.util.*
 class HistoryServiceImpl(
   private val historyRepository: HistoryRepository,
   private val staffService: StaffService,
-  private val prisonerService: PrisonerService,
   private val groupService: GroupService,
   private val appRepository: AppRepository,
   private val commentRepository: CommentRepository,
+  private val responseRepository: ResponseRepository,
 ) : HistoryService {
   companion object {
     val logger = LoggerFactory.getLogger(this::class.java)
   }
 
   override fun getHistoryByAppId(appId: UUID, establishment: String): List<HistoryResponse> {
-    /*val staff = staffService.getStaffById(user).orElseThrow {
-      ApiException("Staff with id $user does not exist", HttpStatus.FORBIDDEN)
-    }*/
     val history = historyRepository.findByAppIdAndEstablishmentOrderByCreatedDate(appId, establishment)
     return convertHistoryEntityToHistory(appId, history)
   }
@@ -64,41 +64,12 @@ class HistoryServiceImpl(
     )
   }
 
-  private fun convertHistoryEntityToHistory1(history: List<History>): List<HistoryResponse> {
-    val list = mutableListOf<HistoryResponse>()
-    history.forEach { h ->
-      val createdBy = staffService.getStaffById(h.createdBy).orElseThrow {
-        ApiException("Staff with id ${h.createdBy} does not exist", HttpStatus.NOT_FOUND)
-      }
-      var groupName: String = ""
-      if (h.activity == Activity.APP_FORWARDED_TO_A_GROUP) {
-        groupName = groupService.getGroupById(h.entityId).name
-      }
-
-      val historyResponse = HistoryResponse(
-        h.id,
-        h.appId,
-        h.entityId,
-        h.entityType,
-        ActivityMessage(
-          if (h.activity == Activity.APP_FORWARDED_TO_A_GROUP) {
-            convertActivityToReadableMessage(h.activity, "${createdBy.fullName} to group $groupName")
-          } else {
-            convertActivityToReadableMessage(h.activity, createdBy.fullName)
-          },
-          null,
-        ),
-        h.createdDate,
-      )
-      list.add(historyResponse)
-    }
-    return list
-  }
-
   private fun convertHistoryEntityToHistory(appId: UUID, history: List<History>): List<HistoryResponse> {
     val map = mutableMapOf<String, HistoryResponse>()
+
     val app = appRepository.findById(appId)
       .orElseThrow { ApiException("App with id $appId does not exist", HttpStatus.NOT_FOUND) }
+
     history.forEach { h ->
       var createdBy: String
       if (h.createdBy == StaffType.MANAGE_APPS_ADMIN.name) {
@@ -116,109 +87,129 @@ class HistoryServiceImpl(
         }
       }
       var groupName: String = ""
-      if (h.activity != Activity.FORWARDING_COMMENT_ADDED &&
-        h.activity != Activity.APP_FORWARDED_TO_A_GROUP &&
-        h.activity != Activity.APP_SUBMITTED &&
-        h.activity != Activity.FILE_ADDED &&
-        h.activity != Activity.APP_IN_PROGRESS
-      ) {
-        map.put(
-          "${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}",
-          HistoryResponse(
-            h.id,
-            h.appId,
-            h.entityId,
-            h.entityType,
-            ActivityMessage(
-              if (h.activity == Activity.APP_FORWARDED_TO_A_GROUP) {
-                convertActivityToReadableMessage(h.activity, "$createdBy to group $groupName")
-              } else {
-                convertActivityToReadableMessage(h.activity, createdBy)
-              },
-              null,
-            ),
-            h.createdDate,
-          ),
-        )
-      }
+
       if (h.activity == Activity.APP_SUBMITTED) {
         groupName = groupService.getGroupById(h.entityId).name
-        map.put(
-          "${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}",
-          HistoryResponse(
-            h.id,
-            h.appId,
-            h.entityId,
-            h.entityType,
-            ActivityMessage("Logged by $createdBy", "Assigned to $groupName"),
-            h.createdDate,
-          ),
+        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
+          h.id,
+          h.appId,
+          h.entityId,
+          h.entityType,
+          ActivityMessage("Application logged", createdBy, "Assigned to $groupName"),
+          h.createdDate,
         )
-      }
-      if (h.activity == Activity.APP_IN_PROGRESS) {
-        groupName = groupService.getGroupById(h.entityId).name
-        map.put(
-          "${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}",
-          HistoryResponse(
-            h.id,
-            h.appId,
-            h.entityId,
-            h.entityType,
-            ActivityMessage("Set to In Progress by $createdBy", null),
-            h.createdDate,
-          ),
+      } else if (h.activity == Activity.APP_IN_PROGRESS) {
+        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
+          h.id,
+          h.appId,
+          h.entityId,
+          h.entityType,
+          ActivityMessage("Application set to In Progress", createdBy, null),
+          h.createdDate,
         )
-      }
-      if (h.activity == Activity.APP_FORWARDED_TO_A_GROUP) {
+      } else if (h.activity == Activity.PRISONER_ID_UPDATE) {
+        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
+          h.id,
+          h.appId,
+          h.entityId,
+          h.entityType,
+          ActivityMessage("Prisoner ID merged with ${h.reference}", createdBy, null),
+          h.createdDate,
+        )
+      } else if (h.activity == Activity.APP_REQUEST_FORM_DATA_UPDATED) {
+        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
+          h.id,
+          h.appId,
+          h.entityId,
+          h.entityType,
+          ActivityMessage("Form data updated", createdBy, null),
+          h.createdDate,
+        )
+      } else if (h.activity == Activity.APP_FORWARDED_TO_A_GROUP) {
         groupName = groupService.getGroupById(h.entityId).name
-        map.put(
-          "${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}",
-          HistoryResponse(
+        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
+          h.id,
+          h.appId,
+          h.entityId,
+          h.entityType,
+          ActivityMessage(
+            "Application forwarded",
+            createdBy,
+            "Forwarded to $groupName",
+          ),
+          h.createdDate,
+        )
+      } else if (h.activity == Activity.FORWARDING_COMMENT_ADDED && h.entityType == EntityType.COMMENT) {
+        val comment = commentRepository.findById(h.entityId)
+        if (comment.isPresent) {
+          map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
             h.id,
             h.appId,
             h.entityId,
             h.entityType,
             ActivityMessage(
-              "Forwarded to group $groupName by $createdBy",
-              null,
+              "Comment",
+              createdBy,
+              comment.get().message,
             ),
             h.createdDate,
-          ),
-        )
-      }
-      if (h.activity == Activity.FORWARDING_COMMENT_ADDED && h.entityType == EntityType.COMMENT) {
-        map.keys.forEach { k ->
-          if (k.contains("${Activity.APP_FORWARDED_TO_A_GROUP}_${h.createdBy}_${h.createdDate}")) {
-            var value = map[k]
-            var activityMessage = value!!.activityMessage
-            val comment = commentRepository.findById(h.entityId)
-            if (comment.isPresent) {
-              val message = ActivityMessage(activityMessage.header, comment.get().message)
-              value.activityMessage = message
-              map[k] = value
+          )
+        }
+      } else if (h.activity == Activity.COMMENT_ADDED && h.entityType == EntityType.COMMENT) {
+        val comment = commentRepository.findById(h.entityId)
+        if (comment.isPresent) {
+          var messageHeader: String = ""
+          if (comment.get().visibility == CommentVisibility.STAFF_ONLY) {
+            messageHeader = "Comment"
+          } else if (comment.get().visibility == CommentVisibility.STAFF_AND_PRISONER) {
+            if (comment.get().createdByUserType == UserCategory.PRISONER) {
+              messageHeader = "Message from prisoner"
+            } else {
+              messageHeader = "Message to prisoner"
             }
           }
+          map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
+            h.id,
+            h.appId,
+            h.entityId,
+            h.entityType,
+            ActivityMessage(
+              messageHeader,
+              createdBy,
+              comment.get().message,
+            ),
+            h.createdDate,
+          )
         }
+      } else if (h.entityType == EntityType.RESPONSE) {
+        var response = responseRepository.findById(h.entityId)
+        var messageHeader: String = "Application closed."
+        var messageBody: String = ""
+        if (response.isPresent) {
+          messageBody = response.get().reason
+        }
+        if (h.activity == Activity.APP_APPROVED) {
+          messageBody = "Application approved. $messageBody"
+        } else if (h.activity == Activity.APP_DECLINED) {
+          messageBody = "Application declined. $messageBody"
+        } else if (h.activity == Activity.APP_REJECTED) {
+          messageBody = "Application rejected. $messageBody"
+        }
+
+        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
+          h.id,
+          h.appId,
+          h.entityId,
+          h.entityType,
+          ActivityMessage(
+            messageHeader,
+            createdBy,
+            messageBody,
+          ),
+          h.createdDate,
+        )
       }
     }
     return map.values.toList()
-  }
-
-  private fun convertActivityToReadableMessage(activity: Activity, staffName: String): String {
-    val x: String
-    when (activity) {
-      Activity.APP_SUBMITTED -> x = "Logged by $staffName"
-      Activity.APP_IN_PROGRESS -> x = "Marked as in progress by $staffName"
-      Activity.APP_REQUEST_FORM_DATA_UPDATED -> x = "Form data updated by $staffName"
-      Activity.COMMENT_ADDED -> x = "Message added by $staffName"
-      Activity.FORWARDING_COMMENT_ADDED, Activity.APP_FORWARDED_TO_A_GROUP ->
-        x = "Forwarding message added by $staffName"
-      Activity.APP_APPROVED -> x = "Marked as approved by $staffName"
-      Activity.APP_DECLINED -> x = "Marked as declined by $staffName"
-      Activity.APP_REJECTED -> x = "Marked as rejected by $staffName"
-      Activity.PRISONER_ID_UPDATE -> x = "Prisoner merged by $staffName"
-      else -> throw ApiException("Unknown activity type: $activity", HttpStatus.INTERNAL_SERVER_ERROR)
-    }
-    return x
   }
 }
