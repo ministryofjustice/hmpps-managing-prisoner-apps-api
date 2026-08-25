@@ -19,5 +19,6 @@ data class HistoryResponse(
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class ActivityMessage(
   val header: String,
+  val createdBy: String,
   var body: String?,
 )
