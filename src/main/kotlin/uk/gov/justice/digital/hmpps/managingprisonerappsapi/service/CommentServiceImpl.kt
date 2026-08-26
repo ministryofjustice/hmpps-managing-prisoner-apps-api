@@ -243,26 +243,43 @@ class CommentServiceImpl(
     prisonerId: String,
     staffId: String,
     appId: UUID,
-    visibility: CommentVisibility,
     pageNumber: Long,
     pageSize: Long,
   ): PageResultComments {
-    val staff = getStaff(staffId)
-    val app = getAppById(appId)
-    validateStaffPermission(staff, app)
-    validatePrisonerByRequestedBy(prisonerId, app)
+    validateRequest(staffId, appId, prisonerId)
     val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt()).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))
-
-    val pageResult = when (visibility) {
-      CommentVisibility.STAFF_ONLY -> commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateAsc(appId, CommentVisibility.STAFF_ONLY, pageRequest)
-      CommentVisibility.STAFF_AND_PRISONER -> commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateAsc(appId, CommentVisibility.STAFF_AND_PRISONER, pageRequest)
-    }
+    val pageResult = commentRepository.getCommentsByAppIdAndVisibility(appId, CommentVisibility.STAFF_ONLY, pageRequest)
     return PageResultComments(
       (pageResult.pageable.pageNumber + 1),
       pageResult.totalElements.toLong(),
       pageResult.isLast,
       convertCommentsToCommentResponseDtoList(prisonerId, pageResult.content),
     )
+  }
+
+  override fun getMessagesByAppIdForStaff(
+    prisonerId: String,
+    staffId: String,
+    appId: UUID,
+    pageNumber: Long,
+    pageSize: Long,
+  ): PageResultComments {
+    validateRequest(staffId, appId, prisonerId)
+    val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt()).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))
+    val pageResult = commentRepository.getCommentsByAppIdAndVisibility(appId, CommentVisibility.STAFF_AND_PRISONER, pageRequest)
+    return PageResultComments(
+      (pageResult.pageable.pageNumber + 1),
+      pageResult.totalElements.toLong(),
+      pageResult.isLast,
+      convertCommentsToCommentResponseDtoList(prisonerId, pageResult.content),
+    )
+  }
+
+  private fun validateRequest(staffId: String, appId: UUID, prisonerId: String) {
+    val staff = getStaff(staffId)
+    val app = getAppById(appId)
+    validateStaffPermission(staff, app)
+    validatePrisonerByRequestedBy(prisonerId, app)
   }
 
   override fun getCommentsByAppIdForPrisoner(
@@ -274,7 +291,7 @@ class CommentServiceImpl(
     val app = getAppById(appId)
     validatePrisonerByRequestedBy(prisonerId, app)
     val pageRequest = PageRequest.of(pageNumber.toInt() - 1, pageSize.toInt()).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))
-    val pageResult = commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateAsc(appId, CommentVisibility.STAFF_AND_PRISONER, pageRequest)
+    val pageResult = commentRepository.getCommentsByAppIdAndVisibility(appId, CommentVisibility.STAFF_AND_PRISONER, pageRequest)
     return PageResultComments(
       (pageResult.pageable.pageNumber + 1),
       pageResult.totalElements.toLong(),

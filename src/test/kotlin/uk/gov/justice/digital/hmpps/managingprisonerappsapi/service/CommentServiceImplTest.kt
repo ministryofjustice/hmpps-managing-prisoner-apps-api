@@ -372,9 +372,9 @@ class CommentServiceImplTest {
         EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
       ),
     )
-    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateAsc(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
+    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_ONLY, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByStaff), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, CommentVisibility.STAFF_AND_PRISONER, 1, 5)
+    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
     assertComment(commentByStaff, result.contents.get(0), true, requestedBy)
@@ -390,7 +390,7 @@ class CommentServiceImplTest {
         EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
       ),
     )
-    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateAsc(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
+    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByPrisoner), PageRequest.of(0, 5), 1))
     val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)
@@ -408,9 +408,9 @@ class CommentServiceImplTest {
         EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
       ),
     )
-    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateAsc(app.id, CommentVisibility.STAFF_ONLY, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
+    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_ONLY, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByStaff), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, CommentVisibility.STAFF_ONLY, 1, 5)
+    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
     assertComment(commentByStaff, result.contents.get(0), true, requestedBy)
@@ -426,7 +426,7 @@ class CommentServiceImplTest {
         EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
       ),
     )
-    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateAsc(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
+    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByPrisoner), PageRequest.of(0, 5), 1))
     val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)

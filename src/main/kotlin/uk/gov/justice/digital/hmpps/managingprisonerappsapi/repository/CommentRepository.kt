@@ -15,5 +15,5 @@ interface CommentRepository : JpaRepository<Comment, UUID> {
 
   fun getCommentsByAppIdAndVisibilityOrderByCreatedDateDesc(appId: UUID, visibility: CommentVisibility): List<Comment>
 
-  fun getCommentsByAppIdAndVisibilityOrderByCreatedDateAsc(appId: UUID, visibility: CommentVisibility, pageable: Pageable): Page<Comment>
+  fun getCommentsByAppIdAndVisibility(appId: UUID, visibility: CommentVisibility, pageable: Pageable): Page<Comment>
 }

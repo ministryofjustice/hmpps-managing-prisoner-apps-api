@@ -224,7 +224,7 @@ class HistoryServiceImplTest {
     val result = historyServiceImpl.getHistoryByAppId(appId, establishmentId)
 
     assertEquals(1, result.size)
-    assertEquals("Prisoner ID merged with $mergedId", result[0].activityMessage.header)
+    assertEquals("Prisoner Id merged with $mergedId", result[0].activityMessage.header)
   }
 
   @Test

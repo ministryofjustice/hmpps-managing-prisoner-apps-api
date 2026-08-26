@@ -71,144 +71,56 @@ class HistoryServiceImpl(
       .orElseThrow { ApiException("App with id $appId does not exist", HttpStatus.NOT_FOUND) }
 
     history.forEach { h ->
-      var createdBy: String
-      if (h.createdBy == StaffType.MANAGE_APPS_ADMIN.name) {
-        createdBy = StaffType.MANAGE_APPS_ADMIN.name
-      } else {
-        if (h.createdBy != app.requestedBy) {
-          // history data added due to staff action
-          val staff = staffService.getStaffById(h.createdBy).orElseThrow {
-            ApiException("Staff with id ${h.createdBy} does not exist", HttpStatus.NOT_FOUND)
-          }
-          createdBy = staff.fullName
-        } else {
-          // history data added due to prisoner action
-          createdBy = "${app.requestedByFirstName} ${app.requestedByLastName} [PRISONER]"
-        }
+      val createdBy: String = when {
+        h.createdBy == StaffType.MANAGE_APPS_ADMIN.name -> StaffType.MANAGE_APPS_ADMIN.name
+        h.createdBy != app.requestedBy -> staffService.getStaffById(h.createdBy)
+          .orElseThrow { ApiException("Staff with id ${h.createdBy} does not exist", HttpStatus.NOT_FOUND) }
+          .fullName
+        else -> "${app.requestedByFirstName} ${app.requestedByLastName} [PRISONER]"
       }
-      var groupName: String = ""
 
-      if (h.activity == Activity.APP_SUBMITTED) {
-        groupName = groupService.getGroupById(h.entityId).name
-        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
-          h.id,
-          h.appId,
-          h.entityId,
-          h.entityType,
-          ActivityMessage("Application logged", createdBy, "Assigned to $groupName"),
-          h.createdDate,
-        )
-      } else if (h.activity == Activity.APP_IN_PROGRESS) {
-        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
-          h.id,
-          h.appId,
-          h.entityId,
-          h.entityType,
-          ActivityMessage("Application set to In Progress", createdBy, null),
-          h.createdDate,
-        )
-      } else if (h.activity == Activity.PRISONER_ID_UPDATE) {
-        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
-          h.id,
-          h.appId,
-          h.entityId,
-          h.entityType,
-          ActivityMessage("Prisoner ID merged with ${h.reference}", createdBy, null),
-          h.createdDate,
-        )
-      } else if (h.activity == Activity.APP_REQUEST_FORM_DATA_UPDATED) {
-        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
-          h.id,
-          h.appId,
-          h.entityId,
-          h.entityType,
-          ActivityMessage("Form data updated", createdBy, null),
-          h.createdDate,
-        )
-      } else if (h.activity == Activity.APP_FORWARDED_TO_A_GROUP) {
-        groupName = groupService.getGroupById(h.entityId).name
-        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
-          h.id,
-          h.appId,
-          h.entityId,
-          h.entityType,
-          ActivityMessage(
-            "Application forwarded",
-            createdBy,
-            "Forwarded to $groupName",
-          ),
-          h.createdDate,
-        )
-      } else if (h.activity == Activity.FORWARDING_COMMENT_ADDED && h.entityType == EntityType.COMMENT) {
-        val comment = commentRepository.findById(h.entityId)
-        if (comment.isPresent) {
-          map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
-            h.id,
-            h.appId,
-            h.entityId,
-            h.entityType,
-            ActivityMessage(
-              "Comment",
-              createdBy,
-              comment.get().message,
-            ),
-            h.createdDate,
-          )
+      val key = "${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"
+
+      fun message(header: String, body: String? = null) = ActivityMessage(header, createdBy, body)
+      fun toResponse(msg: ActivityMessage) = HistoryResponse(h.id, h.appId, h.entityId, h.entityType, msg, h.createdDate)
+
+      val response: HistoryResponse? = when (h.activity) {
+        Activity.APP_SUBMITTED -> {
+          val groupName = groupService.getGroupById(h.entityId).name
+          toResponse(message("Application logged", "Assigned to $groupName"))
         }
-      } else if (h.activity == Activity.COMMENT_ADDED && h.entityType == EntityType.COMMENT) {
-        val comment = commentRepository.findById(h.entityId)
-        if (comment.isPresent) {
-          var messageHeader: String = ""
-          if (comment.get().visibility == CommentVisibility.STAFF_ONLY) {
-            messageHeader = "Comment"
-          } else if (comment.get().visibility == CommentVisibility.STAFF_AND_PRISONER) {
-            if (comment.get().createdByUserType == UserCategory.PRISONER) {
-              messageHeader = "Message from prisoner"
-            } else {
-              messageHeader = "Message to prisoner"
+        Activity.APP_IN_PROGRESS -> toResponse(message("Application set to In Progress"))
+        Activity.PRISONER_ID_UPDATE -> toResponse(message("Prisoner Id merged with ${h.reference}"))
+        Activity.APP_REQUEST_FORM_DATA_UPDATED -> toResponse(message("Form data updated"))
+        Activity.APP_FORWARDED_TO_A_GROUP -> {
+          val groupName = groupService.getGroupById(h.entityId).name
+          toResponse(message("Application forwarded", "Forwarded to $groupName"))
+        }
+        Activity.FORWARDING_COMMENT_ADDED, Activity.COMMENT_ADDED -> {
+          if (h.entityType != EntityType.COMMENT) return@forEach
+          commentRepository.findById(h.entityId).orElse(null)?.let { comment ->
+            val header = when {
+              h.activity == Activity.FORWARDING_COMMENT_ADDED -> "Comment"
+              comment.visibility == CommentVisibility.STAFF_ONLY -> "Comment"
+              comment.createdByUserType == UserCategory.PRISONER -> "Message from prisoner"
+              else -> "Message to prisoner"
             }
+            toResponse(message(header, comment.message))
           }
-          map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
-            h.id,
-            h.appId,
-            h.entityId,
-            h.entityType,
-            ActivityMessage(
-              messageHeader,
-              createdBy,
-              comment.get().message,
-            ),
-            h.createdDate,
-          )
         }
-      } else if (h.entityType == EntityType.RESPONSE) {
-        var response = responseRepository.findById(h.entityId)
-        var messageHeader: String = "Application closed."
-        var messageBody: String = ""
-        if (response.isPresent) {
-          messageBody = response.get().reason
+        Activity.APP_APPROVED, Activity.APP_DECLINED, Activity.APP_REJECTED -> {
+          if (h.entityType != EntityType.RESPONSE) return@forEach
+          val reason = responseRepository.findById(h.entityId).orElse(null)?.reason ?: ""
+          val prefix = when (h.activity) {
+            Activity.APP_APPROVED -> "Application approved."
+            Activity.APP_DECLINED -> "Application declined."
+            else -> "Application rejected."
+          }
+          toResponse(message("Application closed.", "$prefix $reason"))
         }
-        if (h.activity == Activity.APP_APPROVED) {
-          messageBody = "Application approved. $messageBody"
-        } else if (h.activity == Activity.APP_DECLINED) {
-          messageBody = "Application declined. $messageBody"
-        } else if (h.activity == Activity.APP_REJECTED) {
-          messageBody = "Application rejected. $messageBody"
-        }
-
-        map["${h.id}_${h.activity}_${h.createdBy}_${h.createdDate}"] = HistoryResponse(
-          h.id,
-          h.appId,
-          h.entityId,
-          h.entityType,
-          ActivityMessage(
-            messageHeader,
-            createdBy,
-            messageBody,
-          ),
-          h.createdDate,
-        )
+        else -> null
       }
+      response?.let { map[key] = it }
     }
     return map.values.toList()
   }
