@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.CommentService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
@@ -111,7 +112,7 @@ class CommentResource(val commentService: CommentService) {
 
   @Tag(name = "Comments")
   @Operation(
-    summary = "Get all comments for a give app by app id",
+    summary = "Get all internal comments or external messages for a give app by app id",
     description = "This api endpoint is for getting list of comments by app Id. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
@@ -137,13 +138,13 @@ class CommentResource(val commentService: CommentService) {
     @PathVariable appId: UUID,
     @RequestParam(required = true) page: Long,
     @RequestParam(required = true) size: Long,
-    @RequestParam(required = false) createdBy: Boolean,
+    @RequestParam(required = true) visibility: CommentVisibility,
     authentication: Authentication,
   ): ResponseEntity<PageResultComments> {
     logger.info("Request received to  get comments for app: $appId")
     authentication as AuthAwareAuthenticationToken
     val comments =
-      commentService.getCommentsByAppIdForStaff(prisonerId, authentication.principal, appId, createdBy, page, size)
+      commentService.getCommentsByAppIdForStaff(prisonerId, authentication.principal, appId, visibility, page, size)
     return ResponseEntity.status(HttpStatus.OK).body(comments)
   }
 }

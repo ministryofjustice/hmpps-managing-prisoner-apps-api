@@ -4,6 +4,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentR
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import java.util.*
 
 interface CommentService {
@@ -18,7 +19,7 @@ interface CommentService {
 
   fun getCommentByIdForPrisoner(prisonerId: String, appId: UUID, createdBy: Boolean, commentId: UUID): CommentResponseDto<Any>
 
-  fun getCommentsByAppIdForStaff(prisonerId: String, staffId: String, appId: UUID, createdBy: Boolean, pageNumber: Long, pageSize: Long): PageResultComments
+  fun getCommentsByAppIdForStaff(prisonerId: String, staffId: String, appId: UUID, visibility: CommentVisibility, pageNumber: Long, pageSize: Long): PageResultComments
 
-  fun getCommentsByAppIdForPrisoner(prisonerId: String, appId: UUID, createdBy: Boolean, pageNumber: Long, pageSize: Long): PageResultComments
+  fun getCommentsByAppIdForPrisoner(prisonerId: String, appId: UUID, pageNumber: Long, pageSize: Long): PageResultComments
 }

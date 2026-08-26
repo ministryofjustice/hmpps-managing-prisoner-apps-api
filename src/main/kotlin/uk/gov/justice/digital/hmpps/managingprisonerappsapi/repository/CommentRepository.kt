@@ -10,11 +10,10 @@ import java.util.*
 
 @Repository
 interface CommentRepository : JpaRepository<Comment, UUID> {
-  fun getCommentsByAppId(appId: UUID, pageable: Pageable): Page<Comment>
 
   fun countCommentsByAppId(appId: UUID): Long
 
   fun getCommentsByAppIdAndVisibilityOrderByCreatedDateDesc(appId: UUID, visibility: CommentVisibility): List<Comment>
 
-  fun getCommentsByAppIdAndVisibility(appId: UUID, visibility: CommentVisibility, pageable: Pageable): Page<Comment>
+  fun getCommentsByAppIdAndVisibilityOrderByCreatedDateAsc(appId: UUID, visibility: CommentVisibility, pageable: Pageable): Page<Comment>
 }

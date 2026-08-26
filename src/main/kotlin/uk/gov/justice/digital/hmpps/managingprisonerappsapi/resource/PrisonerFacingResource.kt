@@ -304,13 +304,12 @@ class PrisonerFacingResource(
     @PathVariable appId: UUID,
     @RequestParam(required = true) page: Long,
     @RequestParam(required = true) size: Long,
-    @RequestParam(required = false) createdBy: Boolean,
     authentication: Authentication,
   ): ResponseEntity<PageResultComments> {
     logger.info("Request received to  get comments for app: $appId")
     authentication as AuthAwareAuthenticationToken
     val comments =
-      commentService.getCommentsByAppIdForPrisoner(authentication.principal, appId, createdBy, page, size)
+      commentService.getCommentsByAppIdForPrisoner(authentication.principal, appId, page, size)
     return ResponseEntity.status(HttpStatus.OK).body(comments)
   }
 

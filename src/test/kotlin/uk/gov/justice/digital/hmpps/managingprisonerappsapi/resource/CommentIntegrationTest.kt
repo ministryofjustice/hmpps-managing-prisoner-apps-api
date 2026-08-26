@@ -19,10 +19,14 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
@@ -36,6 +40,8 @@ class CommentIntegrationTest(
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val commentRepository: CommentRepository,
+  @Autowired private val applicationTypeRepository: ApplicationTypeRepository,
+  @Autowired private val applicationGroupRepository: ApplicationGroupRepository,
 ) : IntegrationTestBase() {
 
   private lateinit var app: App
@@ -78,6 +84,7 @@ class CommentIntegrationTest(
     commentRepository.deleteAll()
     populateEstablishments()
     populateGroups()
+    populateApplicationGroupsAndTypes()
     populateApps()
 
     prisonerSearchApi.start()
@@ -98,6 +105,8 @@ class CommentIntegrationTest(
     groupRepository.deleteAll()
     establishmentRepository.deleteAll()
     commentRepository.deleteAll()
+    applicationTypeRepository.deleteAll()
+    applicationGroupRepository.deleteAll()
   }
 
   @Test
@@ -208,7 +217,7 @@ class CommentIntegrationTest(
       .responseBody as CommentResponseDto<String>
 
     var res = webTestClient.get()
-      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments?page=1&size=10")
+      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments?page=1&size=10&visibility=STAFF_ONLY")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -223,7 +232,7 @@ class CommentIntegrationTest(
     Assertions.assertEquals(1, res.totalElements)
 
     res = webTestClient.get()
-      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments?page=1&size=10")
+      .uri("/v1/prisoners/${app.requestedBy}/apps/${app.id}/comments?page=1&size=10&visibility=STAFF_ONLY")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -267,6 +276,21 @@ class CommentIntegrationTest(
         assignedGroupSecondName,
         listOf(1L, 2L),
         GroupType.WING,
+      ),
+    )
+  }
+
+  private fun populateApplicationGroupsAndTypes() {
+    val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false, false)
+    val addOfficialContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false, false)
+    val removeContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false, false)
+    val addGenericPinPhoneEnquiry = ApplicationType(applicationTypeFour, applicationTypeFourName, true, false, true)
+    applicationTypeRepository.saveAll(listOf(addSocialContact, addOfficialContact, removeContact, addGenericPinPhoneEnquiry))
+    applicationGroupRepository.save(
+      ApplicationGroup(
+        applicationGroupOne,
+        applicationGroupOneName,
+        listOf(addSocialContact, addOfficialContact, removeContact, addGenericPinPhoneEnquiry),
       ),
     )
   }
