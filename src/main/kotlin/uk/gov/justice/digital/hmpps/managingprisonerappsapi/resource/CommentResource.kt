@@ -111,11 +111,11 @@ class CommentResource(val commentService: CommentService) {
 
   @Tag(name = "Comments")
   @Operation(
-    summary = "Get all comments for a give app by app id",
+    summary = "Get all internal comments for an app by app id",
     description = "This api endpoint is for getting list of comments by app Id. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
-      ApiResponse(responseCode = "200", description = "List fo comments returned successfully."),
+      ApiResponse(responseCode = "200", description = "List of comments returned successfully."),
       ApiResponse(
         responseCode = "401",
         description = "Unauthorized to access this endpoint",
@@ -137,13 +137,49 @@ class CommentResource(val commentService: CommentService) {
     @PathVariable appId: UUID,
     @RequestParam(required = true) page: Long,
     @RequestParam(required = true) size: Long,
-    @RequestParam(required = false) createdBy: Boolean,
     authentication: Authentication,
   ): ResponseEntity<PageResultComments> {
     logger.info("Request received to  get comments for app: $appId")
     authentication as AuthAwareAuthenticationToken
     val comments =
-      commentService.getCommentsByAppIdForStaff(prisonerId, authentication.principal, appId, createdBy, page, size)
+      commentService.getCommentsByAppIdForStaff(prisonerId, authentication.principal, appId, page, size)
+    return ResponseEntity.status(HttpStatus.OK).body(comments)
+  }
+
+  @Tag(name = "Comments")
+  @Operation(
+    summary = "Get all messages send or received from prisoner for an app by app id",
+    description = "This api endpoint is for getting list of messages by app Id. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "List fo comments returned successfully."),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @GetMapping(
+    "/prisoners/{prisonerId}/apps/{appId}/messages",
+  )
+  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
+  fun getMessagesByAppId(
+    @PathVariable prisonerId: String,
+    @PathVariable appId: UUID,
+    @RequestParam(required = true) page: Long,
+    @RequestParam(required = true) size: Long,
+    authentication: Authentication,
+  ): ResponseEntity<PageResultComments> {
+    logger.info("Request received to  get messages for app: $appId")
+    authentication as AuthAwareAuthenticationToken
+    val comments =
+      commentService.getMessagesByAppIdForStaff(prisonerId, authentication.principal, appId, page, size)
     return ResponseEntity.status(HttpStatus.OK).body(comments)
   }
 }

@@ -18,7 +18,9 @@ interface CommentService {
 
   fun getCommentByIdForPrisoner(prisonerId: String, appId: UUID, createdBy: Boolean, commentId: UUID): CommentResponseDto<Any>
 
-  fun getCommentsByAppIdForStaff(prisonerId: String, staffId: String, appId: UUID, createdBy: Boolean, pageNumber: Long, pageSize: Long): PageResultComments
+  fun getCommentsByAppIdForStaff(prisonerId: String, staffId: String, appId: UUID, pageNumber: Long, pageSize: Long): PageResultComments
 
-  fun getCommentsByAppIdForPrisoner(prisonerId: String, appId: UUID, createdBy: Boolean, pageNumber: Long, pageSize: Long): PageResultComments
+  fun getMessagesByAppIdForStaff(prisonerId: String, staffId: String, appId: UUID, pageNumber: Long, pageSize: Long): PageResultComments
+
+  fun getCommentsByAppIdForPrisoner(prisonerId: String, appId: UUID, pageNumber: Long, pageSize: Long): PageResultComments
 }

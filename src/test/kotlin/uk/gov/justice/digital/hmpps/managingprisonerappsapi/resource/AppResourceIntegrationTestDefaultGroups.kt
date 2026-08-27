@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
@@ -454,11 +453,6 @@ class AppResourceIntegrationTestDefaultGroups(
       .returnResult()
       .responseBody as AppResponseDto<AssignedGroupDto, String>
 
-    val pageResult = commentRepository.getCommentsByAppId(appIdFirst, PageRequest.of(0, 1))
-    val comment = pageResult.content.get(0)
-    Assertions.assertEquals(forwardingMessage, comment.message)
-    Assertions.assertEquals(appIdFirst, comment.appId)
-    Assertions.assertEquals(loggedUserId, comment.createdBy)
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)

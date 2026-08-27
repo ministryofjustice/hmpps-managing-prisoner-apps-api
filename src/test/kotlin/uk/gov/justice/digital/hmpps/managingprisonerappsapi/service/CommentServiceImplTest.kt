@@ -367,12 +367,17 @@ class CommentServiceImplTest {
     Mockito.`when`(staffService.getStaffById(createdBy))
       .thenReturn(Optional.of(staff))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
-    Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
+    Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
+      Optional.of(
+        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+      ),
+    )
+    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_ONLY, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByStaff), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, false, 1, 5)
+    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
-    assertComment(commentByStaff, result.contents.get(0), false, requestedBy)
+    assertComment(commentByStaff, result.contents.get(0), true, requestedBy)
   }
 
   @Test
@@ -380,12 +385,17 @@ class CommentServiceImplTest {
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy))
       .thenReturn(Optional.of(prisoner))
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
+    Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
+      Optional.of(
+        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+      ),
+    )
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByPrisoner), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, false, 1, 5)
+    val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
-    assertComment(commentByPrisoner, result.contents.get(0), false, requestedBy)
+    assertComment(commentByPrisoner, result.contents.get(0), true, requestedBy)
   }
 
   @Test
@@ -398,9 +408,9 @@ class CommentServiceImplTest {
         EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
       ),
     )
-    Mockito.`when`(commentRepository.getCommentsByAppId(app.id, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
+    Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_ONLY, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByStaff), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, true, 1, 5)
+    val result = commentServiceImpl.getCommentsByAppIdForStaff(requestedBy, createdBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
     assertComment(commentByStaff, result.contents.get(0), true, requestedBy)
@@ -418,7 +428,7 @@ class CommentServiceImplTest {
     )
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByPrisoner), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, true, 1, 5)
+    val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
     assertComment(commentByPrisoner, result.contents.get(0), true, requestedBy)
