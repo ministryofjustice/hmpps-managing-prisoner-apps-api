@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponsePrisonerDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
@@ -207,8 +206,8 @@ class PrisonerFacingResource(
 
   @Tag(name = "Prisoner Apps")
   @Operation(
-    summary = "Add a comment to an App request of a prisoner.",
-    description = "This api endpoint is for adding comment to an app request of a prisoner. The logged staff and prisoner  for whom app request created should belongs to same establishment for adding comment. Requires role ROLE_MANAGING_PRISONER_APPS",
+    summary = "Add a message by prisoner to an App request.",
+    description = "This api endpoint is for adding message to an app request of a prisoner. The app should belong to logged prisoner. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
     responses = [
       ApiResponse(responseCode = "200", description = "Comment added successfully"),
@@ -225,25 +224,25 @@ class PrisonerFacingResource(
     ],
   )
   @PostMapping(
-    "/prisoners/apps/{appId}/comments",
+    "/prisoners/apps/{appId}/messages",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
-  fun addComment(
+  fun addMessage(
     @PathVariable appId: UUID,
-    @RequestBody commentRequestDto: CommentRequestDto,
+    @RequestBody message: String,
     authentication: Authentication,
   ): ResponseEntity<CommentResponseDto<Any>> {
-    logger.info("Request received for adding comment for app: $appId")
+    logger.info("Request received for adding message for app: $appId")
     authentication as AuthAwareAuthenticationToken
-    val comment = commentService.addCommentByPrisoner(authentication.principal, appId, commentRequestDto)
+    val comment = commentService.addMessageByPrisoner(authentication.principal, appId, message)
     return ResponseEntity.status(HttpStatus.CREATED).body(comment)
   }
 
   @Tag(name = "Prisoner Apps")
   @Operation(
-    summary = "Get a comment by comment id",
+    summary = "Get a message by message id",
     description = "This api endpoint is for getting comment details. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_PRISONER_FACING_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
@@ -261,29 +260,29 @@ class PrisonerFacingResource(
     ],
   )
   @GetMapping(
-    "/prisoners/apps/{appId}/comments/{commentId}",
+    "/prisoners/apps/{appId}/messages/{messageId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   fun getCommentById(
     @PathVariable appId: UUID,
-    @PathVariable commentId: UUID,
+    @PathVariable messageId: UUID,
     @RequestParam(required = false) createdBy: Boolean,
     authentication: Authentication,
   ): ResponseEntity<CommentResponseDto<Any>> {
-    logger.info("Request received to get comment for app: $appId and comment: $commentId")
+    logger.info("Request received to get message for app: $appId and message: $messageId")
     authentication as AuthAwareAuthenticationToken
-    val comment = commentService.getCommentByIdForPrisoner(authentication.principal, appId, createdBy, commentId)
+    val comment = commentService.getCommentByIdForPrisoner(authentication.principal, appId, createdBy, messageId)
     return ResponseEntity.status(HttpStatus.OK).body(comment)
   }
 
   @Tag(name = "Prisoner Apps")
   @Operation(
-    summary = "Get all comments for a give app by app id",
-    description = "This api endpoint is for getting list of comments by app Id. Requires role ROLE_PRISONER_FACING_APPS",
+    summary = "Get all comments for an app",
+    description = "This api endpoint is for getting list of messages by app Id. Requires role ROLE_PRISONER_FACING_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
-      ApiResponse(responseCode = "200", description = "List fo comments returned successfully."),
+      ApiResponse(responseCode = "200", description = "List fo messages returned successfully."),
       ApiResponse(
         responseCode = "401",
         description = "Unauthorized to access this endpoint",
@@ -297,19 +296,19 @@ class PrisonerFacingResource(
     ],
   )
   @GetMapping(
-    "/prisoners/apps/{appId}/comments",
+    "/prisoners/apps/{appId}/messages",
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
-  fun getCommentsByAppId(
+  fun getMessagesByAppId(
     @PathVariable appId: UUID,
     @RequestParam(required = true) page: Long,
     @RequestParam(required = true) size: Long,
     authentication: Authentication,
   ): ResponseEntity<PageResultComments> {
-    logger.info("Request received to  get comments for app: $appId")
+    logger.info("Request received to  get messages for app: $appId")
     authentication as AuthAwareAuthenticationToken
     val comments =
-      commentService.getCommentsByAppIdForPrisoner(authentication.principal, appId, page, size)
+      commentService.getMessagesByAppIdForPrisoner(authentication.principal, appId, page, size)
     return ResponseEntity.status(HttpStatus.OK).body(comments)
   }
 

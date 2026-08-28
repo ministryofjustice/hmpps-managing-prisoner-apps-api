@@ -82,7 +82,7 @@ class AppResource(var appService: AppService) {
 
   @Tag(name = "Apps")
   @Operation(
-    summary = "Update App request form data for a prisoner",
+    summary = "Update App request form data",
     description = "This api endpoint is for updating app request for a prisoner. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
@@ -120,7 +120,7 @@ class AppResource(var appService: AppService) {
   @GetMapping("/prisoners/{prisonerId}/apps/{id}")
   @Tag(name = "Apps")
   @Operation(
-    summary = "Get app by id for a prisoner",
+    summary = "Get app details by Id",
     description = "This api endpoint to get prisoner app. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
