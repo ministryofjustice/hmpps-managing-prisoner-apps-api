@@ -13,7 +13,6 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
@@ -179,10 +178,7 @@ class CommentServiceImplTest {
       requestedBy,
       createdBy,
       app.id,
-      CommentRequestDto(
-        message,
-        CommentVisibility.STAFF_ONLY,
-      ),
+      message,
     )
     assertComment(commentByStaff, result, false, requestedBy)
   }
@@ -204,13 +200,10 @@ class CommentServiceImplTest {
       ),
     )
     Mockito.`when`(commentRepository.save(any())).thenReturn(commentByPrisoner)
-    val result = commentServiceImpl.addCommentByPrisoner(
+    val result = commentServiceImpl.addMessageByPrisoner(
       requestedBy,
       app.id,
-      CommentRequestDto(
-        message,
-        CommentVisibility.STAFF_AND_PRISONER,
-      ),
+      message,
     )
     assertComment(commentByPrisoner, result, false, requestedBy)
   }
@@ -226,7 +219,7 @@ class CommentServiceImplTest {
         requestedBy,
         createdBy,
         app.id,
-        CommentRequestDto(message, CommentVisibility.STAFF_ONLY),
+        message,
       )
     }
     assertEquals(HttpStatus.NOT_FOUND, exception.status)
@@ -255,7 +248,7 @@ class CommentServiceImplTest {
         requestedBy,
         createdBy,
         app.id,
-        CommentRequestDto(message, CommentVisibility.STAFF_ONLY),
+        message,
       )
     }
     assertEquals(HttpStatus.FORBIDDEN, exception.status)
@@ -272,7 +265,7 @@ class CommentServiceImplTest {
         requestedBy,
         createdBy,
         app.id,
-        CommentRequestDto(message, CommentVisibility.STAFF_ONLY),
+        message,
       )
     }
     assertEquals(HttpStatus.FORBIDDEN, exception.status)
@@ -289,7 +282,7 @@ class CommentServiceImplTest {
         "X12345",
         createdBy,
         app.id,
-        CommentRequestDto(message, CommentVisibility.STAFF_ONLY),
+        message,
       )
     }
     assertEquals(HttpStatus.FORBIDDEN, exception.status)
@@ -392,7 +385,7 @@ class CommentServiceImplTest {
     )
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByPrisoner), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, 1, 5)
+    val result = commentServiceImpl.getMessagesByAppIdForPrisoner(requestedBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
     assertComment(commentByPrisoner, result.contents.get(0), true, requestedBy)
@@ -428,7 +421,7 @@ class CommentServiceImplTest {
     )
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
       .thenReturn(PageImpl(listOf(commentByPrisoner), PageRequest.of(0, 5), 1))
-    val result = commentServiceImpl.getCommentsByAppIdForPrisoner(requestedBy, app.id, 1, 5)
+    val result = commentServiceImpl.getMessagesByAppIdForPrisoner(requestedBy, app.id, 1, 5)
     assertEquals(1, result.totalElements)
     assertEquals(true, result.exhausted)
     assertComment(commentByPrisoner, result.contents.get(0), true, requestedBy)

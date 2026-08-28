@@ -270,7 +270,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     val message = "Do you need more information"
     val body = CommentRequestDto(message, CommentVisibility.STAFF_AND_PRISONER)
     val response = webTestClient.post()
-      .uri("/v1/prisoners/apps/${app.id}/comments")
+      .uri("/v1/prisoners/apps/${app.id}/messages")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -292,7 +292,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     val message = "This needs to be checked again"
     val body = CommentRequestDto(message, CommentVisibility.STAFF_AND_PRISONER)
     val response = webTestClient.post()
-      .uri("/v1/prisoners/apps/${app.id}/comments")
+      .uri("/v1/prisoners/apps/${app.id}/messages")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -308,7 +308,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     Assertions.assertEquals(app.requestedBy, response.prisonerNumber)
 
     var res = webTestClient.get()
-      .uri("/v1/prisoners/apps/${app.id}/comments/${response.id}")
+      .uri("/v1/prisoners/apps/${app.id}/messages/${response.id}")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
@@ -323,7 +323,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     Assertions.assertEquals(app.requestedBy, res.prisonerNumber)
 
     val resp = webTestClient.get()
-      .uri("/v1/prisoners/apps/${app.id}/comments/${response.id}?createdBy=true")
+      .uri("/v1/prisoners/apps/${app.id}/messages/${response.id}?createdBy=true")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       // .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -347,7 +347,7 @@ class AppResourcePrisonerFacingIntegrationTest(
       CommentVisibility.STAFF_AND_PRISONER,
     )
     webTestClient.post()
-      .uri("/v1/prisoners/apps/${app.id}/comments")
+      .uri("/v1/prisoners/apps/${app.id}/messages")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -360,7 +360,7 @@ class AppResourcePrisonerFacingIntegrationTest(
       .responseBody as CommentResponseDto<String>
 
     var res = webTestClient.get()
-      .uri("/v1/prisoners/apps/${app.id}/comments?page=1&size=10")
+      .uri("/v1/prisoners/apps/${app.id}/messages?page=1&size=10")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

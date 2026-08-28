@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerDto
@@ -50,12 +49,27 @@ class CommentServiceImpl(
     prisonerId: String,
     staffId: String,
     appId: UUID,
-    commentRequestDto: CommentRequestDto,
+    message: String,
+  ): CommentResponseDto<Any> = addCommentOrMessageByStaff(prisonerId, staffId, appId, message, CommentVisibility.STAFF_ONLY)
+
+  override fun addMessageByStaff(
+    prisonerId: String,
+    staffId: String,
+    appId: UUID,
+    message: String,
+  ): CommentResponseDto<Any> = addCommentOrMessageByStaff(prisonerId, staffId, appId, message, CommentVisibility.STAFF_AND_PRISONER)
+
+  fun addCommentOrMessageByStaff(
+    prisonerId: String,
+    staffId: String,
+    appId: UUID,
+    message: String,
+    visibility: CommentVisibility,
   ): CommentResponseDto<Any> {
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
     val staff = getStaff(staffId)
     val app = getAppById(appId)
-    if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED) {
+    if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED || app.status == AppStatus.REJECTED) {
       throw ApiException("Comment cannot be added as app is already closed", HttpStatus.FORBIDDEN)
     }
     validateStaffPermission(staff, app)
@@ -65,11 +79,11 @@ class CommentServiceImpl(
     val comment = commentRepository.save(
       Comment(
         Generators.timeBasedEpochGenerator().generate(),
-        commentRequestDto.message,
+        message,
         createdDate,
         staffId,
         appId,
-        commentRequestDto.visibility,
+        visibility,
         UserCategory.STAFF,
       ),
     )
@@ -106,18 +120,17 @@ class CommentServiceImpl(
     statsTelemetryService.logMessageAdded(
       appStatsContext,
       UserCategory.STAFF,
-      commentRequestDto.visibility,
+      visibility,
       MessageType.STAFF_NOTE,
       createdDate,
     )
-
     return convertCommentToCommentResponseDto(prisonerId, staff.username, comment)
   }
 
-  override fun addCommentByPrisoner(
+  override fun addMessageByPrisoner(
     prisonerId: String,
     appId: UUID,
-    commentRequestDto: CommentRequestDto,
+    message: String,
   ): CommentResponseDto<Any> {
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
     val prisoner = validatePrisoner(prisonerId)
@@ -127,7 +140,7 @@ class CommentServiceImpl(
     val comment = commentRepository.save(
       Comment(
         Generators.timeBasedEpochGenerator().generate(),
-        commentRequestDto.message,
+        message,
         createdDate,
         prisonerId,
         appId,
@@ -282,7 +295,7 @@ class CommentServiceImpl(
     validatePrisonerByRequestedBy(prisonerId, app)
   }
 
-  override fun getCommentsByAppIdForPrisoner(
+  override fun getMessagesByAppIdForPrisoner(
     prisonerId: String,
     appId: UUID,
     pageNumber: Long,
