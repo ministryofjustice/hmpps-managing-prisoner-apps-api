@@ -1,5 +1,5 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.2"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.6"
   id("org.owasp.dependencycheck") version "13.0.0"
   kotlin("plugin.spring") version "2.4.10"
   kotlin("plugin.jpa") version "2.4.10"
@@ -37,7 +37,7 @@ dependencies {
   testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
   testImplementation("net.javacrumbs.json-unit:json-unit-assertj:5.1.2")
 
-  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.46") {
+  testImplementation("io.swagger.parser.v3:swagger-parser:2.1.47") {
     exclude(group = "io.swagger.core.v3")
   }
   testImplementation("com.h2database:h2:2.4.240")
