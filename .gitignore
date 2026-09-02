@@ -7,6 +7,7 @@
 .gradle/
 .kotlin/
 build/
+dev.env
 
 # CMake
 cmake-build-debug/
@@ -72,3 +73,4 @@ sonar-project.properties
 #Helm
 **/Chart.lock
 .trivyignore
+.snyk
