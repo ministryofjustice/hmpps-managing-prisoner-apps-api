@@ -130,6 +130,8 @@ class ResponseServiceImpl(
     if (response.decision == Decision.REJECTED) {
       app.status = AppStatus.REJECTED
     }
+    app.lastModifiedDate = createdDate
+    app.lastModifiedBy = staffId
     appService.saveApp(app)
 
     val toStatus = app.status
