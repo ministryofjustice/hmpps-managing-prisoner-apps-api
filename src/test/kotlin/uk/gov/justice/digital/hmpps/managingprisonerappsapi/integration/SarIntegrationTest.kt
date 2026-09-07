@@ -107,7 +107,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
     val templateResponse = requestSarTemplate()
 
     val renderResult = getSarHelper().renderServiceReport(
-      data = dataResponse,
+      data = dataResponse.content, // The data response content is passed to the renderServiceReport method
       templateVersion = "1.0",
       template = templateResponse,
     )
@@ -143,7 +143,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
 
     // Render HTML first, then convert to PDF
     val htmlResult = getSarHelper().renderServiceReport(
-      data = dataResponse,
+      data = dataResponse.content, // The data response content is passed to the renderServiceReport method
       templateVersion = "1.0",
       template = templateResponse,
     )
