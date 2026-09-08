@@ -13,7 +13,9 @@ import org.springframework.data.domain.Sort
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestPrisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppRow
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppScope
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
@@ -144,7 +146,6 @@ class AppPrisonerFacingServiceTest {
       applicationGroupRepository,
       groupRepository,
       prisonerService,
-      staffService,
       groupService,
       establishmentService,
       activityService,
@@ -158,26 +159,55 @@ class AppPrisonerFacingServiceTest {
   }
 
   @Test
-  fun getAppsByPrisonerId() {
-    Mockito.`when`(applicationTypeRepository.findById(1L)).thenReturn(Optional.of<ApplicationType>(applicationType))
+  fun `getAppsByPrisonerId with OPEN scope`() {
     Mockito.`when`(
-      appRepository.findAppsByRequestedBy(
+      appRepository.findAppsForPrisoner(
         prisoner.username,
+        setOf(AppStatus.NEW, AppStatus.IN_PROGRESS),
         PageRequest.of(0, 5).withSort(Sort.Direction.DESC, "createdDate"),
       ),
+    ).thenReturn(
+      PageImpl(
+        listOf(PrisonerAppRow(app, applicationType.name, 2L)),
+        PageRequest.of(0, 5).withSort(Sort.Direction.DESC, "createdDate"),
+        1,
+      ),
     )
-      .thenReturn(
-        PageImpl(
-          listOf<App>(app),
-          PageRequest.of(0, 5).withSort(Sort.Direction.DESC, "createdDate"),
-          listOf<App>(app).size.toLong(),
-        ),
-      )
     Mockito.`when`(prisonerService.getPrisonerById(prisoner.username)).thenReturn(Optional.of<Prisoner>(prisoner))
     Mockito.`when`(establishmentService.getEstablishmentById(prisoner.establishmentId!!))
       .thenReturn(Optional.of<EstablishmentDto>(establishment))
-    val pApp = appService.getAppsByPrisonerId(prisoner.username, 1L, 5L)
+    val pApp = appService.getAppsByPrisonerId(prisoner.username, AppScope.OPEN, 1L, 5L)
     assertThat(pApp).isNotNull
+    assertThat(pApp.apps).hasSize(1)
+    assertThat(pApp.apps[0].applicationType).isEqualTo(applicationType.name)
+    assertThat(pApp.apps[0].messageCount).isEqualTo(2L)
+  }
+
+  @Test
+  fun `getAppsByPrisonerId with CLOSED scope`() {
+    val closedApp = app.copy(status = AppStatus.APPROVED)
+    Mockito.`when`(
+      appRepository.findAppsForPrisoner(
+        prisoner.username,
+        setOf(AppStatus.APPROVED, AppStatus.DECLINED, AppStatus.REJECTED),
+        PageRequest.of(0, 5).withSort(Sort.Direction.DESC, "lastModifiedDate"),
+      ),
+    ).thenReturn(
+      PageImpl(
+        listOf(PrisonerAppRow(closedApp, applicationType.name, 1L)),
+        PageRequest.of(0, 5).withSort(Sort.Direction.DESC, "lastModifiedDate"),
+        1,
+      ),
+    )
+    Mockito.`when`(prisonerService.getPrisonerById(prisoner.username)).thenReturn(Optional.of<Prisoner>(prisoner))
+    Mockito.`when`(establishmentService.getEstablishmentById(prisoner.establishmentId!!))
+      .thenReturn(Optional.of<EstablishmentDto>(establishment))
+
+    val pApp = appService.getAppsByPrisonerId(prisoner.username, AppScope.CLOSED, 1L, 5L)
+    assertThat(pApp).isNotNull
+    assertThat(pApp.apps).hasSize(1)
+    assertThat(pApp.apps[0].status).isEqualTo(AppStatus.APPROVED)
+    assertThat(pApp.apps[0].messageCount).isEqualTo(1L)
   }
 
   @Test

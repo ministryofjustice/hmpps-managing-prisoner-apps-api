@@ -165,9 +165,9 @@ class AppResourcePrisonerFacingIntegrationTest(
 
     Assertions.assertNotNull(appResponse)
 
-    // get apps
+    // get OPEN apps
     val appsResponse = webTestClient.get()
-      .uri("/v1/prisoners/apps?pageNum=1")
+      .uri("/v1/prisoners/apps?pageNum=1&scope=OPEN")
       .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
