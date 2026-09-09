@@ -1,8 +1,8 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.8"
   id("org.owasp.dependencycheck") version "13.0.0"
-  kotlin("plugin.spring") version "2.4.10"
-  kotlin("plugin.jpa") version "2.4.10"
+  kotlin("plugin.spring") version "2.4.20"
+  kotlin("plugin.jpa") version "2.4.20"
 }
 
 configurations {
@@ -40,7 +40,7 @@ dependencies {
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.48") {
     exclude(group = "io.swagger.core.v3")
   }
-  testImplementation("com.h2database:h2:2.4.240")
+  testImplementation("com.h2database:h2:2.5.250")
 
   testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.8.1") {
     exclude(group = "org.springframework.boot", module = "spring-boot-webtestclient")
