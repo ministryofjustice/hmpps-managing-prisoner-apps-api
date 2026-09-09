@@ -18,4 +18,5 @@ data class AppListPrisonerFacing(
   val createdDate: LocalDateTime,
   val lastUpdatedDate: LocalDateTime,
   val status: AppStatus,
+  val messageCount: Long?,
 )

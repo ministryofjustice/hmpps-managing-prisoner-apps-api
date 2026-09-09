@@ -26,6 +26,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PageResultComments
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerApplicationTypeCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppScope
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppPrisonerFacingService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.CommentService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppJourneyEventsRequest
@@ -46,7 +47,7 @@ class PrisonerFacingResource(
 
   @Tag(name = "Prisoner Apps")
   @Operation(
-    summary = "Get apps for  a prisoner",
+    summary = "Get Open or Closed apps for  a prisoner",
     description = "This api endpoint to get prisoner apps. Requires role ROLE_PRISONER_FACING_APPS",
     security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
     responses = [
@@ -67,12 +68,13 @@ class PrisonerFacingResource(
   @GetMapping("/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
   fun getPrisonerApps(
     @RequestParam(value = "pageNum", required = true) pageNum: Long,
-    @RequestParam(value = "pageSize", required = false) pageSize: Long? = 20,
+    @RequestParam(value = "pageSize", required = false, defaultValue = "10") pageSize: Long,
+    @RequestParam(value = "scope", required = true) scope: AppScope,
     authentication: Authentication,
   ): ResponseEntity<PrisonerAppsPage> {
     logger.info("Request received for getting apps for prisoner: ${authentication.principal}")
     authentication as AuthAwareAuthenticationToken
-    val apps = appPrisonerFacingService.getAppsByPrisonerId(authentication.principal, pageNum, pageSize!!)
+    val apps = appPrisonerFacingService.getAppsByPrisonerId(authentication.principal, scope, pageNum, pageSize)
     return ResponseEntity.status(HttpStatus.OK).body(apps)
   }
 

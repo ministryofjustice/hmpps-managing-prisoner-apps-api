@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppRow
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAppTypeCounts
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppByAssignedGroupCounts
@@ -110,6 +111,24 @@ interface AppRepository : JpaRepository<App, UUID> {
   fun findAppsByRequestedBy(requestedBy: String): List<App>
 
   fun findAppsByRequestedBy(requestedBy: String, pageable: Pageable): Page<App>
+
+  @Query(
+    value = """
+    select new uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppRow(
+      a, t.name, count(c.id)
+    )
+    from App a
+    inner join ApplicationType t on t.id = a.applicationType
+    left join Comment c on c.appId = a.id and c.visibility = 'STAFF_AND_PRISONER'
+    where a.requestedBy = :requestedBy and a.status in :status
+    group by a, t.name
+    """,
+    countQuery = """
+    select count(a.id) from App a
+    where a.requestedBy = :requestedBy and a.status in :status
+    """,
+  )
+  fun findAppsForPrisoner(requestedBy: String, status: Set<AppStatus>, pageable: Pageable): Page<PrisonerAppRow>
 
   @Query(
     value = "SELECT COUNT(*) as count, a.applicationType as applicationType FROM App a " +

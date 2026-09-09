@@ -12,11 +12,13 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppRow
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerApplicationTypeCount
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppScope
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
@@ -44,7 +46,6 @@ class AppPrisonerFacingService(
   private val applicationGroupRepository: ApplicationGroupRepository,
   private val groupRepository: GroupRepository,
   private val prisonerService: PrisonerService,
-  private val staffService: StaffService,
   private val groupService: GroupService,
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
@@ -54,12 +55,26 @@ class AppPrisonerFacingService(
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  fun getAppsByPrisonerId(prisonerId: String, pageNumber: Long, pageSize: Long): PrisonerAppsPage {
+  fun getAppsByPrisonerId(prisonerId: String, scope: AppScope, pageNumber: Long, pageSize: Long): PrisonerAppsPage {
     val prisoner = validatePrisoner(prisonerId)
     validateEstablishment(prisoner.establishmentId!!)
-    val pageRequest =
-      PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(Sort.Direction.DESC, "createdDate")
-    val pageResult = appRepository.findAppsByRequestedBy(prisonerId, pageRequest)
+
+    var sort: Sort
+    var appStatus: Set<AppStatus>
+
+    when (scope) {
+      AppScope.OPEN -> {
+        sort = Sort.by(Sort.Direction.DESC, "createdDate")
+        appStatus = setOf(AppStatus.NEW, AppStatus.IN_PROGRESS)
+      }
+      AppScope.CLOSED -> {
+        sort = Sort.by(Sort.Direction.DESC, "lastModifiedDate")
+        appStatus = setOf(AppStatus.APPROVED, AppStatus.DECLINED, AppStatus.REJECTED)
+      }
+    }
+    val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(sort)
+    val pageResult = appRepository.findAppsForPrisoner(prisonerId, appStatus, pageRequest)
+
     return PrisonerAppsPage(
       pageResult.pageable.pageNumber + 1,
       pageResult.totalElements,
@@ -321,26 +336,22 @@ class AppPrisonerFacingService(
     return appRequests
   }
 
-  private fun convertAppsToAppResponsePrisonerFacing(apps: List<App>): List<AppListPrisonerFacing> {
+  private fun convertAppsToAppResponsePrisonerFacing(prisonerAppRows: List<PrisonerAppRow>): List<AppListPrisonerFacing> {
     val appList = ArrayList<AppListPrisonerFacing>()
-    apps.forEach { app ->
-      appList.add(convertAppToAppListPrisonerFacing(app))
+    prisonerAppRows.forEach { appRow ->
+      appList.add(
+        AppListPrisonerFacing(
+          appRow.app.id,
+          appRow.app.requestedBy,
+          appRow.appType,
+          appRow.app.createdDate,
+          appRow.app.lastModifiedDate,
+          appRow.app.status,
+          appRow.commentCount,
+        ),
+      )
     }
     return appList
-  }
-
-  private fun convertAppToAppListPrisonerFacing(app: App): AppListPrisonerFacing {
-    val applicationType = applicationTypeRepository.findById(app.applicationType!!).orElseThrow {
-      throw ApiException("Application type with id: ${app.applicationType} not found", HttpStatus.INTERNAL_SERVER_ERROR)
-    }
-    return AppListPrisonerFacing(
-      app.id,
-      app.requestedBy,
-      applicationType.name,
-      app.createdDate,
-      app.lastModifiedDate,
-      app.status,
-    )
   }
 
   private fun validatePrisoner(prisonerId: String): Prisoner {

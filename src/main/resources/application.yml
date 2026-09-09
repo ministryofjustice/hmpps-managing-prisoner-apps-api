@@ -118,7 +118,6 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
-    version: 5.32.11
     operationsSorter: alpha
     tagsSorter: alpha
   nullable-request-parameter-enabled: false
