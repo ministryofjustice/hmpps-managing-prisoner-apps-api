@@ -44,6 +44,11 @@ generic-service:
     groups:
       - internal
 
+# DB restore CronJob — disabled by default, enabled in values-prod.yaml only
+dbRestore:
+  enabled: false
+  schedule: "0 2 * * 0"  # Every Sunday at 02:00 AM UTC (override per env)
+
 generic-prometheus-alerts:
   targetApplication: hmpps-managing-prisoner-apps-api
   sqsAlertsTotalMessagesThreshold: 1

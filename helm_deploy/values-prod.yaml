@@ -1,6 +1,10 @@
 ---
 # Per environment values which override defaults in hmpps-managing-prisoner-apps-api/values.yaml
 
+dbRestore:
+  enabled: true
+  schedule: "0 2 * * 0"  # Every Sunday at 02:00 AM UTC
+
 generic-service:
   ingress:
     host: managing-prisoner-apps-api.hmpps.service.justice.gov.uk

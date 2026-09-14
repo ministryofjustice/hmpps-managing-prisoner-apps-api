@@ -1,0 +1,135 @@
+# Script to restore the prod-replica database to the preprod database on a schedule.
+  {{- if .Values.dbRestore.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-db-restore
+  labels:
+    app: {{ .Release.Name }}-db-restore
+spec:
+  # Every Sunday at 02:00 AM — override in values-prod.yaml
+  schedule: {{ .Values.dbRestore.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      # Automatically clean up the pod after 1 hour
+      ttlSecondsAfterFinished: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: db-restore
+              image: postgres:17
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -euo pipefail
+                  echo "===> Starting DB restore: prod replica -> preprod"
+
+                  # SOURCE/TARGET endpoints from Cloud Platform RDS secrets are always
+                  # in "host:port" format (e.g. xxx.rds.amazonaws.com:5432),
+                  # so we can split on the last colon without a fallback check.
+                  SOURCE_DB_HOST="${SOURCE_DB_ENDPOINT%:*}"
+                  SOURCE_DB_PORT="${SOURCE_DB_ENDPOINT##*:}"
+
+                  TARGET_DB_HOST="${TARGET_DB_ENDPOINT%:*}"
+                  TARGET_DB_PORT="${TARGET_DB_ENDPOINT##*:}"
+
+                  echo "===> Dumping from SOURCE (prod replica)..."
+                  PGPASSWORD="$SOURCE_DB_PASSWORD" pg_dump \
+                    --host="$SOURCE_DB_HOST" \
+                    --port="$SOURCE_DB_PORT" \
+                    --username="$SOURCE_DB_USERNAME" \
+                    --dbname="$SOURCE_DB_NAME" \
+                    --format=custom \
+                    --no-owner \
+                    --no-acl \
+                    --file=/tmp/prod_dump.pgdump
+
+                  echo "===> Dropping existing connections to TARGET (preprod)..."
+                  PGPASSWORD="$TARGET_DB_PASSWORD" psql \
+                    --host="$TARGET_DB_HOST" \
+                    --port="$TARGET_DB_PORT" \
+                    --username="$TARGET_DB_USERNAME" \
+                    --dbname=postgres \
+                    -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$TARGET_DB_NAME' AND pid <> pg_backend_pid();"
+
+                  echo "===> Dropping and recreating TARGET database..."
+                  PGPASSWORD="$TARGET_DB_PASSWORD" psql \
+                    --host="$TARGET_DB_HOST" \
+                    --port="$TARGET_DB_PORT" \
+                    --username="$TARGET_DB_USERNAME" \
+                    --dbname=postgres \
+                    -c "DROP DATABASE IF EXISTS \"$TARGET_DB_NAME\";" \
+                    -c "CREATE DATABASE \"$TARGET_DB_NAME\";"
+
+                  echo "===> Restoring dump to TARGET (preprod)..."
+                  PGPASSWORD="$TARGET_DB_PASSWORD" pg_restore \
+                    --host="$TARGET_DB_HOST" \
+                    --port="$TARGET_DB_PORT" \
+                    --username="$TARGET_DB_USERNAME" \
+                    --dbname="$TARGET_DB_NAME" \
+                    --no-owner \
+                    --no-acl \
+                    --exit-on-error \
+                    /tmp/prod_dump.pgdump
+
+                  echo "===> DB restore complete."
+              env:
+                # --- SOURCE (prod-replica) DB credentials ---
+                # Shares same credentials as the prod database, but with a different endpoint.
+                # Endpoint is picked from rds-postgresql-read-replica-output
+                - name: SOURCE_DB_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: rds-postgresql-instance-output
+                      key: database_name
+                - name: SOURCE_DB_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: rds-postgresql-instance-output
+                      key: database_username
+                - name: SOURCE_DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: rds-postgresql-instance-output
+                      key: database_password
+                - name: SOURCE_DB_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: rds-postgresql-read-replica-output
+                      key: rds_instance_endpoint
+
+                # --- TARGET (preprod) DB credentials --- from the standard namespace secret
+                - name: TARGET_DB_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: preprod-rds-credentials
+                      key: database_name
+                - name: TARGET_DB_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: preprod-rds-credentials
+                      key: database_username
+                - name: TARGET_DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: preprod-rds-credentials
+                      key: database_password
+                - name: TARGET_DB_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: preprod-rds-credentials
+                      key: rds_instance_endpoint
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+  {{- end }}
+
