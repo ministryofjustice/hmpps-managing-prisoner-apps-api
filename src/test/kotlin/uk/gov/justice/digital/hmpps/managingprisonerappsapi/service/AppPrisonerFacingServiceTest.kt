@@ -180,7 +180,7 @@ class AppPrisonerFacingServiceTest {
     assertThat(pApp).isNotNull
     assertThat(pApp.apps).hasSize(1)
     assertThat(pApp.apps[0].applicationType).isEqualTo(applicationType.name)
-    assertThat(pApp.apps[0].messageCount).isEqualTo(2L)
+    assertThat(pApp.apps[0].unreadMessageCount).isEqualTo(2L)
   }
 
   @Test
@@ -207,7 +207,7 @@ class AppPrisonerFacingServiceTest {
     assertThat(pApp).isNotNull
     assertThat(pApp.apps).hasSize(1)
     assertThat(pApp.apps[0].status).isEqualTo(AppStatus.APPROVED)
-    assertThat(pApp.apps[0].messageCount).isEqualTo(1L)
+    assertThat(pApp.apps[0].unreadMessageCount).isEqualTo(1L)
   }
 
   @Test

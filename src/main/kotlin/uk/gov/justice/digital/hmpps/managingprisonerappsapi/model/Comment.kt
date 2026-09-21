@@ -26,6 +26,8 @@ data class Comment(
   val visibility: CommentVisibility,
   @Enumerated(EnumType.STRING)
   val createdByUserType: UserCategory,
+  @Column(name = "read_by_prisoner")
+  val readByPrisoner: Boolean = false,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

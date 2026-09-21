@@ -347,7 +347,7 @@ class AppPrisonerFacingService(
           appRow.app.createdDate,
           appRow.app.lastModifiedDate,
           appRow.app.status,
-          appRow.commentCount,
+          appRow.unreadMessageCount,
         ),
       )
     }

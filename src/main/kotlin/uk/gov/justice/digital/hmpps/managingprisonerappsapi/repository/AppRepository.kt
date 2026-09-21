@@ -120,6 +120,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     from App a
     inner join ApplicationType t on t.id = a.applicationType
     left join Comment c on c.appId = a.id and c.visibility = 'STAFF_AND_PRISONER'
+    and c.readByPrisoner=false and c.createdByUserType = 'STAFF'
     where a.requestedBy = :requestedBy and a.status in :status
     group by a, t.name
     """,
