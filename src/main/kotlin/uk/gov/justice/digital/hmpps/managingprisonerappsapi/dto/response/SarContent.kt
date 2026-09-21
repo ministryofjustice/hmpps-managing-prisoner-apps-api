@@ -67,6 +67,10 @@ data class PrnAppAttachment(
   @JsonIgnore val documentId: String = "",
 )
 
+/**
+ *  inlineAttachmentContent expects an object that maps strictly to
+ *  SAR lib InlineAttachment (contentType, url, filesize, headers)
+ */
 data class PrnInlineAttachment(
   val contentType: String, // For helper function
   val url: String,
