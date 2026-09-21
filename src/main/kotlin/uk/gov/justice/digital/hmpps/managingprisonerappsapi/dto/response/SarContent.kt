@@ -59,6 +59,7 @@ data class PrnAppResponse(
 )
 
 data class PrnAppAttachment(
+  val fileName: String,
   val contentType: String,
   val url: String,
   val headers: List<AttachmentHeader>,

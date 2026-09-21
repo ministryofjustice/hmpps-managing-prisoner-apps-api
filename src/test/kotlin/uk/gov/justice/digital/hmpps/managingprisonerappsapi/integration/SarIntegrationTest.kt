@@ -174,6 +174,8 @@ class SarIntegrationTest : SarIntegrationTestBase() {
         .isEqualTo(getSarHelper().getExpectedSarJson())
       assertThat(response.attachments?.isNotEmpty() == true).`as`("Response has attachments")
         .isEqualTo(getSarHelper().attachmentsExpected)
+      assertThat(hasResponseIdInSarFormData(response)).`as`("SAR formDataItems excludes responseId")
+        .isFalse()
     }
   }
 
@@ -283,6 +285,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           "telephone1" to "441234567899",
           "telephone2" to "",
           "relationship" to "Brother",
+          "responseId" to "60d08fcf-998b-49e1-97fa-cd10a54808d6",
         ),
       ),
       requestedBy = PRISONER_NUMBER,
@@ -490,5 +493,13 @@ class SarIntegrationTest : SarIntegrationTestBase() {
     return root.path("apps").flatMap { app ->
       app.path("appAttachments").map { attachment -> attachment.path("url").asText() }
     }.filter { it.isNotBlank() }
+  }
+
+  private fun hasResponseIdInSarFormData(response: SubjectAccessRequestResponse<Any>): Boolean {
+    val json = getSarHelper().toJson(response)
+    val root = com.fasterxml.jackson.databind.ObjectMapper().readTree(json)
+    return root.path("apps").any { app ->
+      app.path("formDataItems").any { item -> item.path("key").asText() == "responseId" }
+    }
   }
 }

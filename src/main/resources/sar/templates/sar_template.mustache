@@ -6,7 +6,7 @@
     <table class="data-table">
         <tr>
             <td class="data-column-30">Status</td>
-            <td class="data-column-60">Type</td>
+            <td class="data-column-60">Application Type</td>
         </tr>
         <tr>
             <td>{{ optionalValue status }}</td>
@@ -45,7 +45,7 @@
             </tr>
             <tr>
                 <td>{{ optionalValue decision }}</td>
-                <td>{{ optionalValue createdBy }}</td>
+                <td>{{ optionalValue ( getUserLastName createdBy) }}</td>
                 <td>{{ optionalValue (formatDate createdDateTime) }}</td>
                 <td>{{ optionalValue reason }}</td>
             </tr>
@@ -114,7 +114,13 @@
         <table class="data-table">
             <tr><td>Attachment</td></tr>
             <tr>
-                <td><img src="{{{ inlineAttachmentContent this }}}" alt="Inline attachment" style="max-width:100%;"/></td>
+                <td>File Name: {{ optionalValue fileName }}</td>
+            </tr>
+            <tr>
+                <td>File Type: {{ optionalValue contentType }}</td>
+            </tr>
+            <tr>
+                <td><img src="{{{ inlineAttachmentContent inlineAttachment }}}" alt="Inline attachment" style="max-width:100%;"/></td>
             </tr>
         </table>
     {{/appAttachments}}

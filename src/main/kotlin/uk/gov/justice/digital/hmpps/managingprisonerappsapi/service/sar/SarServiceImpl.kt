@@ -127,6 +127,7 @@ class SarServiceImpl(
         attachments.forEach { attachment ->
           appAttachments.add(
             PrnAppAttachment(
+              attachment.fileName,
               attachment.fileType,
               "$selfUrl/sar/attachments/${attachment.documentId}/file",
               attachmentHeaderList,
@@ -143,6 +144,7 @@ class SarServiceImpl(
       val formDataItems = app.requests.flatMap { requestMap ->
         requestMap.entries
           .filter { entry -> entry.key != "id" }
+          .filter { entry -> entry.key != "responseId" }
           .map { entry ->
             FormDataItem(
               key = entry.key,
