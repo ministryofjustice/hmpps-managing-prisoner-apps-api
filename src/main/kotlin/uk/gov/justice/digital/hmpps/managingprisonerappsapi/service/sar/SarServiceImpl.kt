@@ -12,6 +12,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnAppA
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnAppComment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnAppHistory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnAppResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrnInlineAttachment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarContent
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
@@ -125,10 +126,17 @@ class SarServiceImpl(
         val attachmentHeaderList: List<AttachmentHeader> = listOf(AttachmentHeader("Service-Name", serviceName))
 
         attachments.forEach { attachment ->
+          val attachmentUrl = "$selfUrl/sar/attachments/${attachment.documentId}/file"
           appAttachments.add(
             PrnAppAttachment(
+              attachment.fileName,
               attachment.fileType,
-              "$selfUrl/sar/attachments/${attachment.documentId}/file",
+              attachmentUrl,
+              PrnInlineAttachment(
+                contentType = attachment.fileType,
+                url = attachmentUrl,
+                headers = attachmentHeaderList,
+              ),
               attachmentHeaderList,
               attachment.documentId,
             ),
@@ -143,6 +151,7 @@ class SarServiceImpl(
       val formDataItems = app.requests.flatMap { requestMap ->
         requestMap.entries
           .filter { entry -> entry.key != "id" }
+          .filter { entry -> entry.key != "responseId" }
           .map { entry ->
             FormDataItem(
               key = entry.key,
