@@ -103,6 +103,12 @@ class SarServiceTest {
       false,
     ).apply {
       lastModifiedDate = this@SarServiceTest.lastModifiedDate
+      requests = listOf(
+        mutableMapOf(
+          "name" to "Jane Jones",
+          "responseId" to "response-123",
+        ),
+      )
     }
 
     val excludedApp = DataGenerator.generateApp(
@@ -158,7 +164,7 @@ class SarServiceTest {
         reference = null,
       ),
     )
-    val appFile = AppFile(fileId, "document-1", "proof-of-id.pdf", LocalDateTime.of(2026, 1, 11, 9, 0), "staff-1", "application/pdf")
+    val appFile = AppFile(fileId, "60d08fcf-998b-49e1-97fa-cd10a54808d3", "application-photo[photo1].jpg", LocalDateTime.of(2026, 1, 11, 9, 0), "staff-1", "image/jpeg")
     val group = DataGenerator.generateGroups(assignedGroup, establishmentId, "Test Group", emptyList(), GroupType.DEPARTMENT)
 
     Mockito.`when`(appRepository.findAppsByRequestedBy(prisonerNumber)).thenReturn(listOf(includedApp, excludedApp))
@@ -188,13 +194,17 @@ class SarServiceTest {
     assertEquals("Add social contact", prnApp.type)
     assertEquals(establishmentId, prnApp.establishment)
     val expectedFormDataItems = includedApp.requests.flatMap { requestMap ->
-      requestMap.entries.map { (key, value) -> FormDataItem(key, value.toString()) }
+      requestMap.entries
+        .filter { entry -> entry.key != "id" }
+        .filter { entry -> entry.key != "responseId" }
+        .map { (key, value) -> FormDataItem(key, value.toString()) }
     }
     assertEquals(expectedFormDataItems, prnApp.formDataItems)
+    assertEquals(false, prnApp.formDataItems.any { it.key == "responseId" })
     assertEquals(
       listOf(
         "App request submitted.",
-        "File proof-of-id.pdf added to app request",
+        "File application-photo[photo1].jpg added to app request",
         "App request approved.",
       ),
       prnApp.history.map { it.activity },
