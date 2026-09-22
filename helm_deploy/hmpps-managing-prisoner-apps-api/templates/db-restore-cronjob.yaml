@@ -19,9 +19,25 @@ spec:
       template:
         spec:
           restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+            runAsGroup: 999
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: db-restore
               image: postgres:17
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                runAsNonRoot: true
+                runAsUser: 999
+                runAsGroup: 999
+                seccompProfile:
+                  type: RuntimeDefault
               command:
                 - /bin/bash
                 - -c
