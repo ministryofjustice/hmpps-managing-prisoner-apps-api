@@ -46,8 +46,6 @@ data class EstablishmentApplicationType(
     foreignKey = ForeignKey(name = "fk_est_app_type_app_type"),
   )
   val applicationType: ApplicationType,
-
-  val displayOrder: Int = 0,
   val active: Boolean = true,
   val createdDate: LocalDateTime? = null,
   val lastModifiedDate: LocalDateTime? = null,

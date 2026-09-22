@@ -185,6 +185,12 @@ class AppPrisonerFacingService(
     return establishmentService.getAppGroupsAndTypesForPrisonerEstablishment(prisoner.establishmentId)
   }
 
+  fun getActiveAppGroupsAndTypesByLoggedPrisonerEstablishment(prisonerId: String): List<ApplicationGroupResponse> {
+    val prisoner = validatePrisoner(prisonerId)
+    validateEstablishment(prisoner.establishmentId!!)
+    return establishmentService.getActiveAppGroupsAndTypesForLoggedPrisonerEstablishment(prisoner.establishmentId)
+  }
+
   fun getPrisonerAppsCountInPending(prisonerId: String, appType: Long): PrisonerApplicationTypeCount {
     val prisoner = validatePrisoner(prisonerId)
     val applicationType = applicationTypeRepository.findById(appType).orElseThrow {

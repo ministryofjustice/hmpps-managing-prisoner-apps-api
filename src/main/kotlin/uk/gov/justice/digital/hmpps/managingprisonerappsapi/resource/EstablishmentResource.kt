@@ -19,13 +19,17 @@ import org.springframework.web.bind.annotation.RestController
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.EstablishmentApplicationTypeService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.EstablishmentService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 
 @RestController
 @RequestMapping("")
-class EstablishmentResource(private val establishmentService: EstablishmentService) {
+class EstablishmentResource(
+  private val establishmentService: EstablishmentService,
+  private val establishmentApplicationTypeService: EstablishmentApplicationTypeService,
+) {
   companion object {
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
@@ -226,7 +230,7 @@ class EstablishmentResource(private val establishmentService: EstablishmentServi
   fun getAppGroupsForEstablishment(authentication: Authentication): ResponseEntity<List<ApplicationGroupResponse>> {
     authentication as AuthAwareAuthenticationToken
     logger.info("Request received for get app types & Groups for ${authentication.principal}")
-    val appTypes = establishmentService.getAppGroupsAndTypesForLoggedUserEstablishment(authentication.principal)
+    val appTypes = establishmentApplicationTypeService.getActiveApplicationTypesByStaffId(authentication.principal)
     return ResponseEntity.status(HttpStatus.OK).body(appTypes)
   }
 }

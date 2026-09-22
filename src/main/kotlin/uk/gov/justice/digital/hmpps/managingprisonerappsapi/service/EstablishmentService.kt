@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppTypeResponse
@@ -11,7 +12,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import java.util.*
@@ -20,7 +20,6 @@ import java.util.*
 class EstablishmentService(
   private val establishmentRepository: EstablishmentRepository,
   private val applicationGroupRepository: ApplicationGroupRepository,
-  private val applicationTypeRepository: ApplicationTypeRepository,
   private val establishmentApplicationTypeRepository: EstablishmentApplicationTypeRepository,
   private val staffService: StaffService,
 ) {
@@ -68,21 +67,27 @@ class EstablishmentService(
     return convertApplicationGroupsToAppGroupsResponse(applicationGroupRepository.findAll(), establishment.blackListedAppGroups, establishment.blackListedAppTypes)
   }
 
-  fun getAppGroupsAndTypesForLoggedUserEstablishment(staffId: String): List<ApplicationGroupResponse> {
+  fun getActiveAppGroupsAndTypesForLoggedUserEstablishment(staffId: String): List<ApplicationGroupResponse> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
     }
-    val establishment = establishmentRepository.findById(staff.establishmentId).orElseThrow {
+    establishmentRepository.findById(staff.establishmentId).orElseThrow {
       ApiException("Establishment: ${staff.establishmentId} not enabled", HttpStatus.FORBIDDEN)
     }
-    return getApplicationGroupsForEstablishment(staff.establishmentId)
+    return getActiveApplicationGroupsForEstablishment(staff.establishmentId)
+  }
+
+  fun getActiveAppGroupsAndTypesForLoggedPrisonerEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
+    establishmentRepository.findById(establishmentId).orElseThrow {
+      ApiException("Establishment: $establishmentId not enabled", HttpStatus.FORBIDDEN)
+    }
+    return getActiveApplicationGroupsForEstablishment(establishmentId)
   }
 
   fun getAppGroupsAndTypesForPrisonerEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
     val establishment = establishmentRepository.findById(establishmentId).orElseThrow {
       ApiException("Establishment: $establishmentId not enabled", HttpStatus.FORBIDDEN)
     }
-    // TODO- Remove this line & use getApplicationGroupsForEstablishment()
     return convertApplicationGroupsToAppGroupsResponse(applicationGroupRepository.findAll(), establishment.blackListedAppGroups, establishment.blackListedAppTypes)
   }
 
@@ -102,9 +107,13 @@ class EstablishmentService(
     setOf(),
   )
 
-  private fun getApplicationGroupsForEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
+  private fun getActiveApplicationGroupsForEstablishment(establishmentId: String): List<ApplicationGroupResponse> {
     val configuredTypes = establishmentApplicationTypeRepository
-      .findByEstablishmentIdAndActiveOrderByDisplayOrder(establishmentId, true)
+      .findByEstablishmentIdAndActive(
+        establishmentId,
+        true,
+        Sort.by(Sort.Order.asc("applicationType.applicationGroup.id"), Sort.Order.asc("applicationType.name")),
+      )
 
     val typesByGroup = configuredTypes
       .mapNotNull { configuredType -> configuredType.applicationType.applicationGroup?.let { it to configuredType.applicationType } }

@@ -35,6 +35,7 @@ ALTER TABLE if exists establishment_application_type
         FOREIGN KEY (application_type_id) REFERENCES application_type (id);
 
 ALTER TABLE if exists establishment_application_type DROP COLUMN IF EXISTS application_group_id;
+ALTER TABLE if exists establishment_application_type DROP COLUMN IF EXISTS display_order;
 
 -- establishment_application_group is no longer used
 DROP TABLE IF EXISTS establishment_application_group;
