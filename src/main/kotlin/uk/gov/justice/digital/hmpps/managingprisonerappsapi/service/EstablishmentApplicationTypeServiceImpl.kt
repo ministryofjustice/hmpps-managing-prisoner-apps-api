@@ -3,11 +3,14 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.EstablishmentApplicationTypeRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentApplicationTypeResponse
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentApplicationTypeResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
@@ -37,7 +40,7 @@ class EstablishmentApplicationTypeServiceImpl(
     return getActiveApplicationTypesByEstablishmentId(prisoner.establishmentId)
   }
 
-  override fun getAllApplicationTypesByEstablishment(staffId: String): List<EstablishmentApplicationTypeResponse> {
+  override fun getAllApplicationTypesByEstablishment(staffId: String): List<EstablishmentApplicationTypeResponseDto> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("No staff with id $staffId", HttpStatus.FORBIDDEN)
     }
@@ -53,29 +56,62 @@ class EstablishmentApplicationTypeServiceImpl(
           Sort.Order.asc("applicationType.name"),
         ),
       )
-      .mapNotNull { configured ->
-        val type = configured.applicationType
-        val group = type.applicationGroup ?: return@mapNotNull null
-        EstablishmentApplicationTypeResponse(
-          id = configured.id,
-          establishmentId = staff.establishmentId,
-          active = configured.active,
-          applicationGroupResponse = ApplicationGroupResponse(
-            id = group.id,
-            name = group.name,
-            appTypes = listOf(
-              ApplicationTypeResponse(
-                id = type.id,
-                name = type.name,
-                genericType = type.genericType,
-                genericForm = type.genericForm,
-                logDetailRequired = type.logDetailRequired,
-                count = null,
-              ),
-            ),
+      .mapNotNull { it.toResponseDtoOrNull() }
+  }
+
+  override fun saveEstablishmentApplicationTypes(staffId: String, establishmentApplicationTypeRequestDtoList: List<EstablishmentApplicationTypeRequestDto>): List<EstablishmentApplicationTypeResponseDto> {
+    val staff = staffService.getStaffById(staffId).orElseThrow {
+      ApiException("No staff with id", HttpStatus.FORBIDDEN)
+    }
+    val establishment = establishmentRepository.findById(staff.establishmentId).orElseThrow {
+      ApiException("Establishment not enabled", HttpStatus.FORBIDDEN)
+    }
+    validateEstablishment(establishmentApplicationTypeRequestDtoList.first().establishmentId)
+
+    if (establishment.id != establishmentApplicationTypeRequestDtoList.first().establishmentId) {
+      throw ApiException("Staff does not belong to establishment", HttpStatus.FORBIDDEN)
+    }
+
+    var savedList: MutableList<EstablishmentApplicationTypeResponseDto> = mutableListOf()
+    for (establishmentApplicationTypeRequestDto in establishmentApplicationTypeRequestDtoList) {
+      val existing = establishmentApplicationTypeRepository.findById(establishmentApplicationTypeRequestDto.id)
+        .orElseThrow {
+          ApiException("Application type with id ${establishmentApplicationTypeRequestDto.id} not found", HttpStatus.NOT_FOUND)
+        }
+
+      val saved = establishmentApplicationTypeRepository.save(
+        existing.copy(
+          active = establishmentApplicationTypeRequestDto.active,
+          departmentId = establishmentApplicationTypeRequestDto.departmentId,
+          lastModifiedBy = staffId,
+          lastModifiedDate = java.time.LocalDateTime.now(),
+        ),
+      )
+      savedList.add(saved.toResponseDto())
+    }
+    return savedList
+  }
+
+  private fun EstablishmentApplicationType.toResponseDto(): EstablishmentApplicationTypeResponseDto = toResponseDtoOrNull()
+    ?: error("ApplicationType ${applicationType.id} has no applicationGroup")
+
+  private fun EstablishmentApplicationType.toResponseDtoOrNull(): EstablishmentApplicationTypeResponseDto? {
+    val group = applicationType.applicationGroup ?: return null
+    return EstablishmentApplicationTypeResponseDto(
+      id = id!!,
+      establishmentId = establishment.id,
+      departmentId = departmentId,
+      active = active,
+      applicationGroupResponse = ApplicationGroupResponse(
+        id = group.id,
+        name = group.name,
+        appTypes = listOf(
+          applicationType.toResponseDto(
+            count = null,
           ),
-        )
-      }
+        ),
+      ),
+    )
   }
 
   private fun getActiveApplicationTypesByEstablishmentId(establishmentId: String): List<ApplicationGroupResponse> {
@@ -95,18 +131,22 @@ class EstablishmentApplicationTypeServiceImpl(
         id = appGroup.id,
         name = appGroup.name,
         appTypes = appTypes.map { type ->
-          ApplicationTypeResponse(
-            id = type.id,
-            name = type.name,
-            genericType = type.genericType,
-            genericForm = type.genericForm,
-            logDetailRequired = type.logDetailRequired,
+          type.toResponseDto(
             count = null,
           )
         },
       )
     }
   }
+
+  private fun ApplicationType.toResponseDto(count: Long? = null) = ApplicationTypeResponse(
+    id = id,
+    name = name,
+    genericType = genericType,
+    genericForm = genericForm,
+    logDetailRequired = logDetailRequired,
+    count = count,
+  )
 
   private fun validateEstablishment(establishmentId: String): EstablishmentDto = establishmentService.getEstablishmentById(establishmentId).orElseThrow {
     ApiException("Establishment with id $establishmentId not onboarded", HttpStatus.FORBIDDEN)
