@@ -29,15 +29,17 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.Prisone
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppScope
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppPrisonerFacingService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.CommentService
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.EstablishmentApplicationTypeService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppJourneyEventsRequest
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
 import java.util.*
 
 @RestController
-@RequestMapping("v1")
+@RequestMapping("")
 class PrisonerFacingResource(
   private val appPrisonerFacingService: AppPrisonerFacingService,
+  private val establishmentApplicationTypeService: EstablishmentApplicationTypeService,
   private val commentService: CommentService,
 ) {
 
@@ -65,7 +67,7 @@ class PrisonerFacingResource(
     ],
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
-  @GetMapping("/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @GetMapping("v1/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
   fun getPrisonerApps(
     @RequestParam(value = "pageNum", required = true) pageNum: Long,
     @RequestParam(value = "pageSize", required = false, defaultValue = "10") pageSize: Long,
@@ -98,7 +100,7 @@ class PrisonerFacingResource(
     ],
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
-  @GetMapping("/prisoners/apps/{id}")
+  @GetMapping("v1/prisoners/apps/{id}")
   fun getPrisonerAppByAppId(
     @PathVariable("id") id: UUID,
     authentication: Authentication,
@@ -129,13 +131,43 @@ class PrisonerFacingResource(
     ],
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
-  @GetMapping("/prisoners/apps/groups")
+  @GetMapping("v1/prisoners/apps/groups")
   fun getPrisonerAppTypes(
     authentication: Authentication,
   ): ResponseEntity<List<ApplicationGroupResponse>> {
     authentication as AuthAwareAuthenticationToken
     val appResponseDto =
       appPrisonerFacingService.getAppGroupsAndTypesByLoggedUserEstablishment(authentication.principal)
+    return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
+  }
+
+  @Tag(name = "Prisoner Apps")
+  @Operation(
+    summary = "Get app groups and app types.",
+    description = "This api endpoint to app groups and app types for a logged prisoner. Requires role ROLE_PRISONER_FACING_APPS",
+    security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
+    responses = [
+      ApiResponse(responseCode = "200", description = "App request created."),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
+  @GetMapping("v2/prisoners/apps/groups")
+  fun getPrisonerAppGroupsAndTypes(
+    authentication: Authentication,
+  ): ResponseEntity<List<ApplicationGroupResponse>> {
+    authentication as AuthAwareAuthenticationToken
+    val appResponseDto =
+      establishmentApplicationTypeService.getActiveApplicationTypesByPrisonerId(authentication.principal)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 
@@ -159,7 +191,7 @@ class PrisonerFacingResource(
     ],
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
-  @GetMapping("/prisoners/apps/{applicationType}/pending")
+  @GetMapping("v1/prisoners/apps/{applicationType}/pending")
   fun getPrisonerPendingAppCountByAppType(
     @PathVariable("applicationType") applicationType: Long,
     authentication: Authentication,
@@ -191,7 +223,7 @@ class PrisonerFacingResource(
     ],
   )
   @PostMapping(
-    "prisoners/apps",
+    "v1/prisoners/apps",
     produces = [MediaType.APPLICATION_JSON_VALUE],
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
@@ -226,7 +258,7 @@ class PrisonerFacingResource(
     ],
   )
   @PostMapping(
-    "/prisoners/apps/{appId}/messages",
+    "v1/prisoners/apps/{appId}/messages",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
@@ -262,7 +294,7 @@ class PrisonerFacingResource(
     ],
   )
   @GetMapping(
-    "/prisoners/apps/{appId}/messages/{messageId}",
+    "v1/prisoners/apps/{appId}/messages/{messageId}",
     produces = [MediaType.APPLICATION_JSON_VALUE],
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
@@ -298,7 +330,7 @@ class PrisonerFacingResource(
     ],
   )
   @GetMapping(
-    "/prisoners/apps/{appId}/messages",
+    "v1/prisoners/apps/{appId}/messages",
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   fun getMessagesByAppId(
@@ -347,7 +379,7 @@ class PrisonerFacingResource(
     ],
   )
   @PostMapping(
-    "/prisoners/apps/journey-events",
+    "v1/prisoners/apps/journey-events",
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")

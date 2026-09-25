@@ -14,8 +14,10 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import java.time.Duration
 
@@ -23,6 +25,7 @@ class EstablishmentIntegrationTest(
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val applicationGroupRepository: ApplicationGroupRepository,
   @Autowired private val applicationTypeRepository: ApplicationTypeRepository,
+  @Autowired private val establishmentApplicationTypeRepository: EstablishmentApplicationTypeRepository,
 ) : IntegrationTestBase() {
 
   private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
@@ -31,8 +34,10 @@ class EstablishmentIntegrationTest(
 
   @BeforeEach
   fun setup() {
+    establishmentApplicationTypeRepository.deleteAll()
     populateEstablishments()
     populateApplicationGroupsAndTypes()
+    populateEstablishmentApplicationTypes()
 
     manageUsersApi.start()
     manageUsersApi.stubStaffDetailsFound(loggedUserId)
@@ -45,6 +50,7 @@ class EstablishmentIntegrationTest(
 
   @AfterEach()
   fun teardown() {
+    establishmentApplicationTypeRepository.deleteAll()
     establishmentRepository.deleteAll()
   }
 
@@ -80,6 +86,41 @@ class EstablishmentIntegrationTest(
       .returnResult()
       .responseBody as List<ApplicationGroupResponse>
     assertEquals(2, response.size)
+  }
+
+  @Test
+  fun `get active app groups and types for logged establishment`() {
+    val response = webTestClient.get()
+      .uri("/v1/establishments/apps/groups")
+      .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
+      .header("Content-Type", "application/json")
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+      .expectBody(object : ParameterizedTypeReference<List<ApplicationGroupResponse>>() {})
+      .returnResult()
+      .responseBody as List<ApplicationGroupResponse>
+
+    assertEquals(1, response.size)
+    assertEquals(1L, response[0].id)
+    assertEquals(2, response[0].appTypes?.size)
+    assertEquals(listOf(2L, 1L), response[0].appTypes?.map { it.id })
+  }
+
+  private fun populateEstablishmentApplicationTypes() {
+    val establishment = establishmentRepository.findById(establishmentIdFirst).get()
+    val typeOne = applicationTypeRepository.findById(1L).get()
+    val typeTwo = applicationTypeRepository.findById(2L).get()
+    val typeThree = applicationTypeRepository.findById(3L).get()
+
+    establishmentApplicationTypeRepository.saveAll(
+      listOf(
+        EstablishmentApplicationType(establishment = establishment, applicationType = typeOne, active = true),
+        EstablishmentApplicationType(establishment = establishment, applicationType = typeTwo, active = true),
+        EstablishmentApplicationType(establishment = establishment, applicationType = typeThree, active = false),
+      ),
+    )
   }
 
   private fun populateApplicationGroupsAndTypes() {

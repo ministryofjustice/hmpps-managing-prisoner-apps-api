@@ -1,20 +1,15 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository
 
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationTypeId
+import java.util.UUID
 
 @Repository
-interface EstablishmentApplicationTypeRepository : JpaRepository<EstablishmentApplicationType, EstablishmentApplicationTypeId> {
+interface EstablishmentApplicationTypeRepository : JpaRepository<EstablishmentApplicationType, UUID> {
 
-  fun findByIdEstablishmentIdOrderByDisplayOrder(establishmentId: String): List<EstablishmentApplicationType>
+  fun findByEstablishmentId(establishmentId: String, sort: Sort): List<EstablishmentApplicationType>
 
-  fun findByIdEstablishmentIdAndActiveOrderByDisplayOrder(establishmentId: String, active: Boolean): List<EstablishmentApplicationType>
-
-  fun findByIdEstablishmentIdAndIdApplicationGroupIdAndActiveOrderByDisplayOrder(
-    establishmentId: String,
-    applicationGroupId: Long,
-    active: Boolean,
-  ): List<EstablishmentApplicationType>
+  fun findByEstablishmentIdAndActive(establishmentId: String, active: Boolean, sort: Sort): List<EstablishmentApplicationType>
 }
