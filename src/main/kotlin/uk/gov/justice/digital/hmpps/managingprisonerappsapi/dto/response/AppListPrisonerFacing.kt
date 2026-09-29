@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response
 
+import io.swagger.v3.oas.annotations.media.Schema
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import java.time.LocalDateTime
 import java.util.UUID
@@ -19,4 +20,6 @@ data class AppListPrisonerFacing(
   val lastUpdatedDate: LocalDateTime,
   val status: AppStatus,
   val messageCount: Long?,
+  @field:Schema(description = "True when the app has a staff message the prisoner has not yet read")
+  val hasUnreadMessages: Boolean = false,
 )

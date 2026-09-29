@@ -24,11 +24,13 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
@@ -42,6 +44,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.UUID
 
 class AppResourcePrisonerFacingIntegrationTest(
   @Autowired private val appRepository: AppRepository,
@@ -415,6 +418,134 @@ class AppResourcePrisonerFacingIntegrationTest(
 
     Assertions.assertEquals(1, res.page)
     Assertions.assertEquals(1, res.totalElements)
+  }
+
+  private fun saveStaffMessage(
+    appId: UUID,
+    visibility: CommentVisibility = CommentVisibility.STAFF_AND_PRISONER,
+    createdByUserType: UserCategory = UserCategory.STAFF,
+    createdDate: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC),
+  ): Comment = commentRepository.save(
+    Comment(
+      Generators.timeBasedEpochGenerator().generate(),
+      "A message from staff",
+      createdDate,
+      "STAFF_USER",
+      appId,
+      visibility,
+      createdByUserType,
+    ),
+  )
+
+  private fun getOpenApps(): PrisonerAppsPage = webTestClient.get()
+    .uri("/v1/prisoners/apps?pageNum=1&scope=OPEN")
+    .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+    .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+    .exchange()
+    .expectStatus().isOk
+    .expectBody(object : ParameterizedTypeReference<PrisonerAppsPage>() {})
+    .returnResult()
+    .responseBody as PrisonerAppsPage
+
+  private fun hasUnread(page: PrisonerAppsPage, appId: UUID): Boolean = page.apps.first { it.id == appId }.hasUnreadMessages
+
+  @Test
+  fun `unread indicator is true when an unread staff message exists`() {
+    saveStaffMessage(app.id)
+
+    Assertions.assertTrue(hasUnread(getOpenApps(), app.id))
+  }
+
+  @Test
+  fun `staff-only notes and prisoner messages do not flag unread`() {
+    saveStaffMessage(app.id, visibility = CommentVisibility.STAFF_ONLY)
+    saveStaffMessage(app.id, createdByUserType = UserCategory.PRISONER)
+
+    Assertions.assertFalse(hasUnread(getOpenApps(), app.id))
+  }
+
+  @Test
+  fun `mark as read clears the unread indicator and re-flags on a later staff message`() {
+    saveStaffMessage(app.id)
+    Assertions.assertTrue(hasUnread(getOpenApps(), app.id))
+
+    webTestClient.put()
+      .uri("/v1/prisoners/apps/${app.id}/messages/read")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .exchange()
+      .expectStatus().isNoContent
+
+    Assertions.assertFalse(hasUnread(getOpenApps(), app.id))
+
+    // a later staff message re-flags the app as unread
+    saveStaffMessage(app.id, createdDate = LocalDateTime.now(ZoneOffset.UTC).plusMinutes(1))
+
+    Assertions.assertTrue(hasUnread(getOpenApps(), app.id))
+  }
+
+  @Test
+  fun `getting messages does not change read-state`() {
+    saveStaffMessage(app.id)
+
+    webTestClient.get()
+      .uri("/v1/prisoners/apps/${app.id}/messages?page=1&size=10")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+      .exchange()
+      .expectStatus().isOk
+
+    Assertions.assertTrue(hasUnread(getOpenApps(), app.id))
+  }
+
+  @Test
+  fun `mark as read is forbidden for another prisoner's app`() {
+    val othersApp = appRepository.save(
+      DataGenerator.generateApp(
+        establishmentIdFirst,
+        null,
+        applicationTypeOne,
+        applicationGroupOne,
+        "B99999",
+        LocalDateTime.now(ZoneOffset.UTC).minusDays(1),
+        "Other",
+        "Prisoner",
+        AppStatus.NEW,
+        assignedGroupFirst,
+        false,
+      ),
+    )
+
+    webTestClient.put()
+      .uri("/v1/prisoners/apps/${othersApp.id}/messages/read")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .exchange()
+      .expectStatus().isForbidden
+  }
+
+  @Test
+  fun `mark as read returns not found for an unknown app`() {
+    webTestClient.put()
+      .uri("/v1/prisoners/apps/${UUID.randomUUID()}/messages/read")
+      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
+      .exchange()
+      .expectStatus().isNotFound
+  }
+
+  @Test
+  fun `mark as read is forbidden without the required role`() {
+    webTestClient.put()
+      .uri("/v1/prisoners/apps/${app.id}/messages/read")
+      .headers(setAuthorisation(roles = listOf()))
+      .exchange()
+      .expectStatus().isForbidden
+  }
+
+  @Test
+  fun `mark as read is unauthorized without a token`() {
+    webTestClient.put()
+      .uri("/v1/prisoners/apps/${app.id}/messages/read")
+      .exchange()
+      .expectStatus().isUnauthorized
   }
 
   protected fun populateEstablishments() {

@@ -115,7 +115,14 @@ interface AppRepository : JpaRepository<App, UUID> {
   @Query(
     value = """
     select new uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppRow(
-      a, t.name, count(c.id)
+      a, t.name, count(c.id),
+      case when exists (
+        select 1 from Comment m
+        where m.appId = a.id
+          and m.createdByUserType = 'STAFF'
+          and m.visibility = 'STAFF_AND_PRISONER'
+          and (a.prisonerMessagesReadAt is null or m.createdDate > a.prisonerMessagesReadAt)
+      ) then true else false end
     )
     from App a
     inner join ApplicationType t on t.id = a.applicationType
