@@ -43,6 +43,7 @@ data class App(
   var firstNightCenter: Boolean,
   @OneToMany(mappedBy = "app", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
   var appFiles: MutableList<AppFile> = mutableListOf<AppFile>(),
+  var prisonerMessagesReadAt: LocalDateTime? = null,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

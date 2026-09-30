@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -344,6 +345,44 @@ class PrisonerFacingResource(
     val comments =
       commentService.getMessagesByAppIdForPrisoner(authentication.principal, appId, page, size)
     return ResponseEntity.status(HttpStatus.OK).body(comments)
+  }
+
+  @Tag(name = "Prisoner Apps")
+  @Operation(
+    summary = "Mark staff messages on an app as read",
+    description = "This api endpoint marks the staff messages on an app as read for the logged prisoner by advancing the read watermark to the server time. The app should belong to the logged prisoner. Requires role ROLE_PRISONER_FACING_APPS",
+    security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
+    responses = [
+      ApiResponse(responseCode = "204", description = "Read watermark updated successfully."),
+      ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "403",
+        description = "Forbidden to access this endpoint",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+      ApiResponse(
+        responseCode = "404",
+        description = "App not found",
+        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
+      ),
+    ],
+  )
+  @PutMapping(
+    "v1/prisoners/apps/{appId}/messages/read",
+  )
+  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
+  fun markMessagesAsRead(
+    @PathVariable appId: UUID,
+    authentication: Authentication,
+  ): ResponseEntity<Void> {
+    logger.info("Request received to mark messages as read for app: $appId")
+    authentication as AuthAwareAuthenticationToken
+    appPrisonerFacingService.markMessagesAsRead(authentication.principal, appId)
+    return ResponseEntity.noContent().build()
   }
 
   @Tag(name = "Stats")

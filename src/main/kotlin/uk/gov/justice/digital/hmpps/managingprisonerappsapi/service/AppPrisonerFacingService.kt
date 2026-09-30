@@ -119,6 +119,17 @@ class AppPrisonerFacingService(
     }
   }
 
+  fun markMessagesAsRead(prisonerId: String, appId: UUID) {
+    val prisoner = validatePrisoner(prisonerId)
+    validateEstablishment(prisoner.establishmentId!!)
+    val app = appRepository.findById(appId).orElseThrow {
+      ApiException("App with id $appId not found", HttpStatus.NOT_FOUND)
+    }
+    validatePrisonerByRequestedBy(prisonerId, app)
+    app.prisonerMessagesReadAt = LocalDateTime.now(ZoneOffset.UTC)
+    appRepository.save(app)
+  }
+
   fun submitApp(appRequest: AppRequestPrisoner, prisonerId: String): AppResponsePrisonerDto<Any, Any> {
     // validate prisoner exist
     val prisoner = validatePrisoner(prisonerId)
@@ -354,6 +365,7 @@ class AppPrisonerFacingService(
           appRow.app.lastModifiedDate,
           appRow.app.status,
           appRow.commentCount,
+          appRow.hasUnreadMessages,
         ),
       )
     }

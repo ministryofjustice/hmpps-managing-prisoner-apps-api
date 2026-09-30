@@ -6,4 +6,5 @@ data class PrisonerAppRow(
   val app: App,
   val appType: String,
   val commentCount: Long,
+  val hasUnreadMessages: Boolean = false,
 )
