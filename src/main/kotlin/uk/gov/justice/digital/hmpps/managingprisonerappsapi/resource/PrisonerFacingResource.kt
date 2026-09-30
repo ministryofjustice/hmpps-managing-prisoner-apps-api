@@ -372,7 +372,7 @@ class PrisonerFacingResource(
     ],
   )
   @PutMapping(
-    "/prisoners/apps/{appId}/messages/read",
+    "v1/prisoners/apps/{appId}/messages/read",
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
   fun markMessagesAsRead(
