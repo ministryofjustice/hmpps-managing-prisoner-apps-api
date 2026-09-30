@@ -19,6 +19,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.Prisone
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerAppsPage
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.PrisonerSearchApiExtension.Companion.prisonerSearchApi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
@@ -67,6 +68,7 @@ class AppResourcePrisonerFacingIntegrationTest(
   private val requestedByFirst = "A12345"
   private val requestedByFirstMainName = "John"
   private val requestedByFirstSurname = "Smith"
+  private val staffUserId = "STAFF_USER"
 
   private val applicationGroupOne = 1L
   private val applicationTypeOne = 1L
@@ -103,6 +105,8 @@ class AppResourcePrisonerFacingIntegrationTest(
 
     prisonerSearchApi.start()
     prisonerSearchApi.stubPrisonerSearchFound(loggedUserId)
+    manageUsersApi.start()
+    manageUsersApi.stubStaffDetailsFound(staffUserId)
 
     webTestClient = webTestClient
       .mutate()
@@ -430,7 +434,7 @@ class AppResourcePrisonerFacingIntegrationTest(
       Generators.timeBasedEpochGenerator().generate(),
       "A message from staff",
       createdDate,
-      "STAFF_USER",
+      staffUserId,
       appId,
       visibility,
       createdByUserType,
