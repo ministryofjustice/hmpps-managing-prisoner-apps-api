@@ -42,7 +42,7 @@ dependencies {
   }
   testImplementation("com.h2database:h2:2.5.252")
 
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.8.3") {
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.8.4") {
     exclude(group = "org.springframework.boot", module = "spring-boot-webtestclient")
   }
 
