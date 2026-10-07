@@ -89,6 +89,7 @@ class HistoryServiceImpl(
         }
         Activity.APP_IN_PROGRESS -> toResponse(message("Application set to In Progress"))
         Activity.PRISONER_ID_UPDATE -> toResponse(message("Prisoner Id merged with ${h.reference}"))
+        Activity.PRISONER_RELEASED -> toResponse(message("Prisoner has left the establishment"))
         Activity.APP_REQUEST_FORM_DATA_UPDATED -> toResponse(message("Form data updated"))
         Activity.APP_FORWARDED_TO_A_GROUP -> {
           val groupName = groupService.getGroupById(h.entityId).name
