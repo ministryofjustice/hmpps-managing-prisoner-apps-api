@@ -204,6 +204,8 @@ class SarServiceImpl(
       return "App request form data updated"
     } else if (activity == Activity.PRISONER_ID_UPDATE) {
       return "Prisoner Id updated"
+    } else if (activity == Activity.PRISONER_RELEASED) {
+      return "Prisoner has left the establishment"
     } else if (activity == Activity.FILE_ADDED) {
       val file = appFileRepository.findById(entityId)
       var fileName = ""

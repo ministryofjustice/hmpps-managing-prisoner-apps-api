@@ -89,7 +89,6 @@ class HistoryServiceImpl(
         }
         Activity.APP_IN_PROGRESS -> toResponse(message("Application set to In Progress"))
         Activity.PRISONER_ID_UPDATE -> toResponse(message("Prisoner Id merged with ${h.reference}"))
-        Activity.PRISONER_RELEASED -> toResponse(message("Prisoner has left the establishment"))
         Activity.APP_REQUEST_FORM_DATA_UPDATED -> toResponse(message("Form data updated"))
         Activity.APP_FORWARDED_TO_A_GROUP -> {
           val groupName = groupService.getGroupById(h.entityId).name
@@ -107,7 +106,7 @@ class HistoryServiceImpl(
             toResponse(message(header, comment.message))
           }
         }
-        Activity.APP_APPROVED, Activity.APP_DECLINED, Activity.APP_REJECTED -> {
+        Activity.APP_APPROVED, Activity.APP_DECLINED, Activity.APP_REJECTED, Activity.PRISONER_RELEASED -> {
           if (h.entityType != EntityType.RESPONSE) return@forEach
           val reason = responseRepository.findById(h.entityId).orElse(null)?.reason ?: ""
           val prefix = when (h.activity) {
@@ -115,7 +114,7 @@ class HistoryServiceImpl(
             Activity.APP_DECLINED -> "Application declined."
             else -> "Application rejected."
           }
-          toResponse(message("Application closed.", "$prefix $reason"))
+          toResponse(message("Application closed", "$prefix $reason"))
         }
         else -> null
       }

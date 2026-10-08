@@ -5,6 +5,7 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
@@ -16,8 +17,8 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.AdditionalInformation
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.HMPPSDomainEvent
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.AdditionalInformationMerge
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.HMPPSMergeDomainEvent
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.PrisonerEventSubscriberService.Companion.PRISONER_MERGE_EVENT_TYPE
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.assignedGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.generateAppForMerge
@@ -64,7 +65,7 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     purgeQueueSafely()
   }
 
-  // @Test
+  @Test
   fun `should merge prisoner app records when merge event received`() {
     // ARRANGE - Verify initial state
     assertThat(appRepository.findAppsByRequestedBy(OLD_NOMS_NUMBER)).hasSize(3)
@@ -73,11 +74,9 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     // ACT - Publish merge event to SNS topic
     publishDomainEventMessage(
       PRISONER_MERGE_EVENT_TYPE,
-      AdditionalInformation(
+      AdditionalInformationMerge(
         removedNomsNumber = OLD_NOMS_NUMBER,
         nomsNumber = NEW_NOMS_NUMBER,
-        reason = "MERGED",
-        prisonId = "123456",
       ),
       "A prisoner has been merged from $OLD_NOMS_NUMBER to $NEW_NOMS_NUMBER",
     )
@@ -124,11 +123,9 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
     // Publish merge event
     publishDomainEventMessage(
       PRISONER_MERGE_EVENT_TYPE,
-      AdditionalInformation(
+      AdditionalInformationMerge(
         removedNomsNumber = nonExistentNomsNumber,
         nomsNumber = NEW_NOMS_NUMBER,
-        reason = "MERGED",
-        prisonId = "123456",
       ),
       "A prisoner has been merged from $nonExistentNomsNumber to $NEW_NOMS_NUMBER",
     )
@@ -147,10 +144,10 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
 
   private fun publishDomainEventMessage(
     eventType: String,
-    additionalInformation: AdditionalInformation,
+    additionalInformation: AdditionalInformationMerge,
     description: String,
   ) {
-    val domainEvent = HMPPSDomainEvent(
+    val domainEvent = HMPPSMergeDomainEvent(
       eventType = eventType,
       additionalInformation = additionalInformation,
       occurredAt = Instant.now().toString(),

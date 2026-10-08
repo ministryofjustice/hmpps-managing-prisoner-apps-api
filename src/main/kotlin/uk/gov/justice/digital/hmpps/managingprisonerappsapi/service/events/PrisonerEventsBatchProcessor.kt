@@ -83,10 +83,6 @@ class PrisonerEventsBatchProcessor(
       var updatedCount = 0
 
       appsPage.content.forEach { app ->
-        // Update app's status to REJECTED
-        app.status = AppStatus.REJECTED
-        appRepository.save(app)
-
         // Create a new Response
         val responseEntity = responseRepository.save(
           Response(
@@ -113,6 +109,17 @@ class PrisonerEventsBatchProcessor(
             releaseReason,
           ),
         )
+
+        // Update app's status to REJECTED
+        // val req = app.requests
+        app.requests.forEach { request ->
+          if (request["responseId"] == null) {
+            request["responseId"] = responseEntity.id.toString()
+          }
+        }
+        // app.requests=req
+        app.status = AppStatus.REJECTED
+        appRepository.save(app)
         updatedCount++
       }
 

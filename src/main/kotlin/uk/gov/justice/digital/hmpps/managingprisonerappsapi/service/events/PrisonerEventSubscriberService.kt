@@ -34,7 +34,7 @@ class PrisonerEventSubscriberService(
 
       when (eventType) {
         PRISONER_MERGE_EVENT_TYPE -> {
-          val mergeEvent = mapper.readValue(hmppsMessage.Message, HMPPSDomainEvent::class.java)
+          val mergeEvent = mapper.readValue(hmppsMessage.Message, HMPPSMergeDomainEvent::class.java)
           log.info("Processing prisoner merge: ${mergeEvent.additionalInformation.removedNomsNumber} -> ${mergeEvent.additionalInformation.nomsNumber}")
           prisonerEventService.mergePrisonerNomsNumbers(
             mergeEvent.additionalInformation.nomsNumber,
@@ -43,7 +43,7 @@ class PrisonerEventSubscriberService(
           )
         }
         PRISONER_RELEASE_EVENT_TYPE -> {
-          val releaseEvent = mapper.readValue(hmppsMessage.Message, HMPPSDomainEvent::class.java)
+          val releaseEvent = mapper.readValue(hmppsMessage.Message, HMPPSReleaseDomainEvent::class.java)
           log.info("Processing prisoner release: ${releaseEvent.additionalInformation.nomsNumber}, Reason: ${releaseEvent.additionalInformation.reason}")
 
           if (releaseEvent.additionalInformation.reason == RELEASE_REASON_RELEASED ||
@@ -58,12 +58,12 @@ class PrisonerEventSubscriberService(
           }
         }
         PRISONER_RECEIVED_EVENT_TYPE -> {
-          val receivedEvent = mapper.readValue(hmppsMessage.Message, HMPPSDomainEvent::class.java)
+          val receivedEvent = mapper.readValue(hmppsMessage.Message, HMPPSReleaseDomainEvent::class.java)
           log.info("Processing prisoner received: ${receivedEvent.additionalInformation.nomsNumber}")
           prisonerEventService.handlePrisonerReceived(
             receivedEvent.additionalInformation.nomsNumber,
-            receivedEvent.additionalInformation.reason,
-            receivedEvent.additionalInformation.prisonId,
+            receivedEvent.additionalInformation.reason!!,
+            receivedEvent.additionalInformation.prisonId!!,
             receivedEvent.occurredAt,
           )
         }
@@ -80,18 +80,29 @@ class PrisonerEventSubscriberService(
   }
 }
 
-data class HMPPSDomainEvent(
-  val eventType: String? = null,
+data class HMPPSMergeDomainEvent(
+  val eventType: String,
+  val additionalInformation: AdditionalInformationMerge,
+  val version: String,
+  val occurredAt: String,
+  val description: String,
+)
+
+data class AdditionalInformationMerge(
+  val nomsNumber: String,
+  val removedNomsNumber: String,
+)
+
+data class HMPPSReleaseDomainEvent(
+  val eventType: String,
   val additionalInformation: AdditionalInformation,
   val version: String,
   val occurredAt: String,
   val description: String,
-
 )
 
 data class AdditionalInformation(
   val nomsNumber: String,
-  val removedNomsNumber: String,
   val reason: String,
   val prisonId: String,
 )
