@@ -138,6 +138,13 @@ interface AppRepository : JpaRepository<App, UUID> {
   fun findAppsForPrisoner(requestedBy: String, status: Set<AppStatus>, pageable: Pageable): Page<PrisonerAppRow>
 
   @Query(
+    value = """
+    select a FROM App a where a.requestedBy = :requestedBy and a.status in ('NEW', 'IN_PROGRESS')
+    """,
+  )
+  fun findOpenAppsForPrisoner(requestedBy: String, pageable: Pageable): Page<App>
+
+  @Query(
     value = "SELECT COUNT(*) as count, a.applicationType as applicationType FROM App a " +
       " WHERE (a.establishmentId = :establishmentId)" +
       " AND (a.status in :status)" +

@@ -49,12 +49,12 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
     }
   }
 
-  fun addTelemetryDataForPrisonerMerge(
+  fun addTelemetryDataForPrisonerEvent(
     activity: Activity,
     createdBy: String,
     createdDate: LocalDateTime,
     newPrisonerId: String,
-    removedPrisonerId: String,
+    additionalData: String,
     status: String,
   ) {
     try {
@@ -62,9 +62,19 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
 
       map["dateTime"] = createdDate.format(FORMATTER)
       map["createdBy"] = createdBy
-      map["newPrisoneId"] = newPrisonerId
-      map["removedPrisoneId"] = removedPrisonerId
+      map["newPrisonerId"] = newPrisonerId
       map["status"] = status
+
+      when (activity) {
+        Activity.PRISONER_ID_UPDATE ->
+          map["removedPrisonerId"] = additionalData
+        Activity.PRISONER_RELEASED ->
+          map["releaseReason"] = additionalData
+        else -> {
+          logger.error("Invalid activity type for prisoner event telemetry: $activity")
+          return
+        }
+      }
 
       telemetryClient.trackEvent(activity.toString(), map, null)
     } catch (e: Exception) {

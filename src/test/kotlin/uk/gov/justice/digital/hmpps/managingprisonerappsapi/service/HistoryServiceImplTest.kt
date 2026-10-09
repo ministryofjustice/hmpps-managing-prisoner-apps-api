@@ -351,7 +351,7 @@ class HistoryServiceImplTest {
     val result = historyServiceImpl.getHistoryByAppId(appId, establishmentId)
 
     assertEquals(1, result.size)
-    assertEquals("Application closed.", result[0].activityMessage.header)
+    assertEquals("Application closed", result[0].activityMessage.header)
     assertEquals("Application approved. ${response.reason}", result[0].activityMessage.body)
   }
 
@@ -367,7 +367,7 @@ class HistoryServiceImplTest {
     val result = historyServiceImpl.getHistoryByAppId(appId, establishmentId)
 
     assertEquals(1, result.size)
-    assertEquals("Application closed.", result[0].activityMessage.header)
+    assertEquals("Application closed", result[0].activityMessage.header)
     assertEquals("Application declined. ${response.reason}", result[0].activityMessage.body)
   }
 
@@ -383,7 +383,7 @@ class HistoryServiceImplTest {
     val result = historyServiceImpl.getHistoryByAppId(appId, establishmentId)
 
     assertEquals(1, result.size)
-    assertEquals("Application closed.", result[0].activityMessage.header)
+    assertEquals("Application closed", result[0].activityMessage.header)
     assertEquals("Application rejected. ${response.reason}", result[0].activityMessage.body)
   }
 
@@ -398,7 +398,7 @@ class HistoryServiceImplTest {
     val result = historyServiceImpl.getHistoryByAppId(appId, establishmentId)
 
     assertEquals(1, result.size)
-    assertEquals("Application closed.", result[0].activityMessage.header)
+    assertEquals("Application closed", result[0].activityMessage.header)
     assertEquals("Application approved. ", result[0].activityMessage.body)
   }
 

@@ -1,8 +1,8 @@
 plugins {
-  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.11"
+  id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.12"
   id("org.owasp.dependencycheck") version "13.0.0"
-  kotlin("plugin.spring") version "2.4.20"
-  kotlin("plugin.jpa") version "2.4.20"
+  kotlin("plugin.spring") version "2.4.21"
+  kotlin("plugin.jpa") version "2.4.21"
 }
 
 configurations {
@@ -19,7 +19,7 @@ dependencies {
   implementation("com.fasterxml.uuid:java-uuid-generator:5.2.0")
   implementation("org.flywaydb:flyway-core")
   implementation("org.springframework.boot:spring-boot-starter-flyway")
-  implementation("org.postgresql:postgresql:42.7.13")
+  implementation("org.postgresql:postgresql:42.7.14")
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.11.0")

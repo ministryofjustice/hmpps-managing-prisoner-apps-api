@@ -106,7 +106,7 @@ class HistoryServiceImpl(
             toResponse(message(header, comment.message))
           }
         }
-        Activity.APP_APPROVED, Activity.APP_DECLINED, Activity.APP_REJECTED -> {
+        Activity.APP_APPROVED, Activity.APP_DECLINED, Activity.APP_REJECTED, Activity.PRISONER_RELEASED -> {
           if (h.entityType != EntityType.RESPONSE) return@forEach
           val reason = responseRepository.findById(h.entityId).orElse(null)?.reason ?: ""
           val prefix = when (h.activity) {
@@ -114,7 +114,7 @@ class HistoryServiceImpl(
             Activity.APP_DECLINED -> "Application declined."
             else -> "Application rejected."
           }
-          toResponse(message("Application closed.", "$prefix $reason"))
+          toResponse(message("Application closed", "$prefix $reason"))
         }
         else -> null
       }
