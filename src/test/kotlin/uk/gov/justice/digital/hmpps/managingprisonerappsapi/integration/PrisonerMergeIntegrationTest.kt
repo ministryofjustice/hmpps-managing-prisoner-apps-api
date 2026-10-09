@@ -83,37 +83,35 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
 
     // WAIT - Wait for async processing to complete
     awaitAtMost30Secs untilAsserted {
-      verify(eventProcessingComplete).complete()
+      assertThat(appRepository.findAppsByRequestedBy(OLD_NOMS_NUMBER)).hasSize(0)
+      assertThat(appRepository.findAppsByRequestedBy(NEW_NOMS_NUMBER)).hasSize(4)
     }
-
-    // ASSERT - Verify merge happened correctly
-    // Old NOMS should have 0 apps
-    assertThat(appRepository.findAppsByRequestedBy(OLD_NOMS_NUMBER)).hasSize(0)
-    // New NOMS should have 4 apps (3 merged + 1 existing)
-    assertThat(appRepository.findAppsByRequestedBy(NEW_NOMS_NUMBER)).hasSize(4)
 
     // Verify history entries were created (3 for merged apps)
     val historyEntries = historyRepository.findAll()
     assertThat(historyEntries).hasSizeGreaterThanOrEqualTo(3)
 
     // Verify telemetry event was tracked by TelemetryService
-    // The service calls addTelemetryDataForPrisonerMerge which adds dateTime dynamically
-    verify(telemetryClient).trackEvent(
-      eq("PRISONER_ID_UPDATE"),
-      argThat { map ->
-        map["newPrisoneId"] == NEW_NOMS_NUMBER &&
-          map["removedPrisoneId"] == OLD_NOMS_NUMBER &&
-          map["createdBy"] == "MANAGE_APPS_ADMIN" &&
-          map.containsKey("dateTime") // dateTime is added by TelemetryService
-      },
-      isNull(),
-    )
+    awaitAtMost30Secs untilAsserted {
+      verify(telemetryClient).trackEvent(
+        eq("PRISONER_ID_UPDATE"),
+        argThat { map ->
+          map["newPrisonerId"] == NEW_NOMS_NUMBER &&
+            map["removedPrisonerId"] == OLD_NOMS_NUMBER &&
+            map["createdBy"] == "MANAGE_APPS_ADMIN" &&
+            map.containsKey("dateTime")
+        },
+        isNull(),
+      )
+    }
 
     // Verify queue is empty (all messages processed)
-    assertThat(getNumberOfMessagesCurrentlyOnQueue()).isEqualTo(0)
+    awaitAtMost30Secs untilAsserted {
+      assertThat(getNumberOfMessagesCurrentlyOnQueue()).isEqualTo(0)
+    }
   }
 
-  // @Test
+  @Test
   fun `should not track telemetry event when no apps to merge`() {
     val nonExistentNomsNumber = "ZZ9999ZZ"
 
@@ -130,16 +128,14 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
       "A prisoner has been merged from $nonExistentNomsNumber to $NEW_NOMS_NUMBER",
     )
 
-    // Wait for processing to complete
+    // Wait for processing to complete (no records to merge)
     awaitAtMost30Secs untilAsserted {
-      verify(eventProcessingComplete).complete()
+      assertThat(appRepository.findAppsByRequestedBy(nonExistentNomsNumber)).hasSize(0)
+      assertThat(getNumberOfMessagesCurrentlyOnQueue()).isEqualTo(0)
     }
 
     // Verify no telemetry event was tracked (because no apps were merged)
     verifyNoInteractions(telemetryClient)
-
-    // Verify queue is empty
-    assertThat(getNumberOfMessagesCurrentlyOnQueue()).isEqualTo(0)
   }
 
   private fun publishDomainEventMessage(

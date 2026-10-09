@@ -22,6 +22,7 @@ class PrisonerEventSubscriberService(
     const val PRISONER_RECEIVED_EVENT_TYPE = "prison-offender-events.prisoner.received"
     const val RELEASE_REASON_RELEASED = "RELEASED"
     const val RELEASE_REASON_TRANSFERRED = "TRANSFERRED"
+    const val RELEASE_REASON_UNKNOWN = "UNKNOWN"
   }
 
   @SqsListener("domaineventsqueue", factory = "hmppsQueueContainerFactoryProxy")
@@ -47,7 +48,8 @@ class PrisonerEventSubscriberService(
           log.info("Processing prisoner release: ${releaseEvent.additionalInformation.nomsNumber}, Reason: ${releaseEvent.additionalInformation.reason}")
 
           if (releaseEvent.additionalInformation.reason == RELEASE_REASON_RELEASED ||
-            releaseEvent.additionalInformation.reason == RELEASE_REASON_TRANSFERRED
+            releaseEvent.additionalInformation.reason == RELEASE_REASON_TRANSFERRED ||
+            releaseEvent.additionalInformation.reason == RELEASE_REASON_UNKNOWN
           ) {
             prisonerEventService.handlePrisonerReleased(
               releaseEvent.additionalInformation.nomsNumber,

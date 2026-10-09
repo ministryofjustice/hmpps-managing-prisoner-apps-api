@@ -62,12 +62,12 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
 
       map["dateTime"] = createdDate.format(FORMATTER)
       map["createdBy"] = createdBy
-      map["newPrisoneId"] = newPrisonerId
+      map["newPrisonerId"] = newPrisonerId
       map["status"] = status
 
       when (activity) {
         Activity.PRISONER_ID_UPDATE ->
-          map["removedPrisoneId"] = additionalData
+          map["removedPrisonerId"] = additionalData
         Activity.PRISONER_RELEASED ->
           map["releaseReason"] = additionalData
         else -> {
