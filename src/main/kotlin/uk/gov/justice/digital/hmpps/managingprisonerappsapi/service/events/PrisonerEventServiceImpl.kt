@@ -28,7 +28,6 @@ class PrisonerEventServiceImpl(
 
   companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
-    private val OPEN_APP_STATUSES = setOf(AppStatus.NEW, AppStatus.IN_PROGRESS)
   }
 
   override fun mergePrisonerNomsNumbers(mergedNomsNumber: String, removedNomsNumber: String, description: String) {
@@ -48,7 +47,7 @@ class PrisonerEventServiceImpl(
       activity = Activity.PRISONER_RELEASED,
       primaryId = nomsNumber,
       additionalData = releaseReason,
-      fetchPage = { pageable -> appRepository.findOpenAppsForPrisoner(nomsNumber, OPEN_APP_STATUSES, pageable) },
+      fetchPage = { pageable -> appRepository.findOpenAppsForPrisoner(nomsNumber, pageable) },
       processBatch = { page, createdOn -> batchProcessor.updateBatchForPrisonerRelease(page, nomsNumber, releaseReason, createdOn) },
     )
   }
