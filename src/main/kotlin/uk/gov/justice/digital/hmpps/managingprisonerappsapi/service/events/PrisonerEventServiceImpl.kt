@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.analytics.TelemetryService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.StaffType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import java.time.Clock
