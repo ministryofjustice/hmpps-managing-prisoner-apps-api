@@ -65,16 +65,15 @@ class PrisonerFacingResource(
     ],
   )
   @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
-  @GetMapping("/prisoners/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
+  @GetMapping("/prisoners/{prisonerId}/apps", produces = [MediaType.APPLICATION_JSON_VALUE])
   fun getPrisonerApps(
+    @PathVariable prisonerId: String,
     @RequestParam(value = "pageNum", required = true) pageNum: Long,
     @RequestParam(value = "pageSize", required = false, defaultValue = "10") pageSize: Long,
     @RequestParam(value = "scope", required = true) scope: AppScope,
-    authentication: Authentication,
   ): ResponseEntity<PrisonerAppsPage> {
-    logger.info("Request received for getting apps for prisoner: ${authentication.principal}")
-    authentication as AuthAwareAuthenticationToken
-    val apps = appPrisonerFacingService.getAppsByPrisonerId(authentication.principal, scope, pageNum, pageSize)
+    logger.info("Request received for getting apps for prisoner: $prisonerId")
+    val apps = appPrisonerFacingService.getAppsByPrisonerId(prisonerId, scope, pageNum, pageSize)
     return ResponseEntity.status(HttpStatus.OK).body(apps)
   }
 
