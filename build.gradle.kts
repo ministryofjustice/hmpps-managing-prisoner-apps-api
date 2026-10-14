@@ -1,6 +1,5 @@
 plugins {
   id("uk.gov.justice.hmpps.gradle-spring-boot") version "11.0.12"
-  id("org.owasp.dependencycheck") version "13.0.0"
   kotlin("plugin.spring") version "2.4.21"
   kotlin("plugin.jpa") version "2.4.21"
 }
@@ -35,14 +34,14 @@ dependencies {
 
   testImplementation("org.wiremock:wiremock-standalone:3.13.2")
   testImplementation("org.mockito.kotlin:mockito-kotlin:6.4.0")
-  testImplementation("net.javacrumbs.json-unit:json-unit-assertj:6.2.0")
+  testImplementation("net.javacrumbs.json-unit:json-unit-assertj:6.3.0")
 
   testImplementation("io.swagger.parser.v3:swagger-parser:2.1.48") {
     exclude(group = "io.swagger.core.v3")
   }
   testImplementation("com.h2database:h2:2.5.252")
 
-  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.8.3") {
+  testImplementation("uk.gov.justice.service.hmpps:hmpps-subject-access-request-test-support:2.8.4") {
     exclude(group = "org.springframework.boot", module = "spring-boot-webtestclient")
   }
 
