@@ -34,7 +34,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.RequestedByNam
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.AppService
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
-import java.util.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("v1")
@@ -157,7 +157,10 @@ class AppResource(var appService: AppService) {
     description = "This api endpoint to get all activities associated with an app by app id. The logged staff and prisoner should belongs to same establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
     security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
     responses = [
-      ApiResponse(responseCode = "200", description = "All activity associated with processing app request provided in response."),
+      ApiResponse(
+        responseCode = "200",
+        description = "All activity associated with processing app request provided in response.",
+      ),
       ApiResponse(
         responseCode = "401",
         description = "Unauthorized to access this endpoint",

@@ -131,7 +131,7 @@ class ResponseServiceImplTest {
       AssignedGroupDto(
         assignedGroup,
         "Business Hub",
-        EstablishmentDto(establishmentId, "Test Establishment", false, emptySet(), emptySet()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
         1,
         GroupType.WING,
       ),
@@ -184,7 +184,7 @@ class ResponseServiceImplTest {
       AssignedGroupDto(
         assignedGroup,
         "Business Hub",
-        EstablishmentDto(establishmentId, "Test Establishment", false, emptySet(), emptySet()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
         1,
         GroupType.WING,
       ),

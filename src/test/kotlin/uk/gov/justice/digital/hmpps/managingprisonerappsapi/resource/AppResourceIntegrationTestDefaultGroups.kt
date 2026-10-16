@@ -24,12 +24,14 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGro
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
@@ -48,6 +50,7 @@ class AppResourceIntegrationTestDefaultGroups(
   @Autowired private val commentRepository: CommentRepository,
   @Autowired private val applicationGroupRepository: ApplicationGroupRepository,
   @Autowired private val applicationTypeRepository: ApplicationTypeRepository,
+  @Autowired private val establishmentApplicationTypeRepository: EstablishmentApplicationTypeRepository,
 ) : IntegrationTestBase() {
 
   private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
@@ -86,12 +89,14 @@ class AppResourceIntegrationTestDefaultGroups(
   fun setUp() {
     appRepository.deleteAll()
     groupRepository.deleteAll()
+    establishmentApplicationTypeRepository.deleteAll()
     establishmentRepository.deleteAll()
 
     populateEstablishments()
     populateGroups()
     populateApps()
     populateApplicationGroupsAndTypes()
+    populateEstablishmentApplicationTypes()
 
     prisonerSearchApi.start()
     prisonerSearchApi.stubPrisonerSearchFound(requestedByFirst)
@@ -109,6 +114,7 @@ class AppResourceIntegrationTestDefaultGroups(
   fun tearOff() {
     appRepository.deleteAll()
     groupRepository.deleteAll()
+    establishmentApplicationTypeRepository.deleteAll()
     establishmentRepository.deleteAll()
     commentRepository.deleteAll()
   }
@@ -664,8 +670,6 @@ class AppResourceIntegrationTestDefaultGroups(
         establishmentIdFirst,
         "ESTABLISHMENT_NAME_1",
         true,
-        setOf(),
-        setOf(),
       ),
     )
     establishmentRepository.save(
@@ -673,8 +677,6 @@ class AppResourceIntegrationTestDefaultGroups(
         establishmentIdSecond,
         "ESTABLISHMENT_NAME_2",
         true,
-        setOf(),
-        setOf(),
       ),
     )
     establishmentRepository.save(
@@ -682,8 +684,6 @@ class AppResourceIntegrationTestDefaultGroups(
         establishmentIdThird,
         "ESTABLISHMENT_NAME_3",
         true,
-        setOf(),
-        setOf(),
       ),
     )
   }
@@ -698,15 +698,6 @@ class AppResourceIntegrationTestDefaultGroups(
         GroupType.WING,
       ),
     )
-    /*groupRepository.save(
-        DataGenerator.generateGroups(
-            assignedGroupFirst,
-            establishmentIdFirst,
-            assignedGroupFirstName,
-            listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
-            GroupType.WING
-        )
-    )*/
     groupRepository.save(
       DataGenerator.generateGroups(
         assignedGroupSecond,
@@ -719,13 +710,29 @@ class AppResourceIntegrationTestDefaultGroups(
   }
 
   private fun populateApplicationGroupsAndTypes() {
-    val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false, false)
-    val removeContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false, false)
-    val addOfficialContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false, false)
-    val addGenericPinPhoneEnquiry = ApplicationType(applicationTypeFour, applicationTypeFourName, true, false, true)
+    val group = applicationGroupRepository.save<ApplicationGroup>(ApplicationGroup(applicationGroupOne, applicationGroupOneName))
+    val addSocialContact = ApplicationType(applicationTypeOne, applicationTypeOneName, false, false, false, group)
+    val removeContact = ApplicationType(applicationTypeTwo, applicationTypeTwoName, false, false, false, group)
+    val addOfficialContact = ApplicationType(applicationTypeThree, applicationTypeThreeName, false, false, false, group)
+    val addGenericPinPhoneEnquiry = ApplicationType(applicationTypeFour, applicationTypeFourName, true, false, true, group)
     applicationTypeRepository.saveAll<ApplicationType>(listOf<ApplicationType>(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
-    val applicationGroupOne = ApplicationGroup(applicationGroupOne, applicationGroupOneName, listOf(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
-    applicationGroupRepository.save<ApplicationGroup>(applicationGroupOne)
+  }
+
+  private fun populateEstablishmentApplicationTypes() {
+    val applicationTypes = applicationTypeRepository.findAll()
+    establishmentRepository.findAll()
+      .filter { it.id in listOf(establishmentIdFirst, establishmentIdSecond, establishmentIdThird) }
+      .forEach { establishment ->
+        applicationTypes.forEach { applicationType ->
+          establishmentApplicationTypeRepository.save(
+            EstablishmentApplicationType(
+              establishment = establishment,
+              applicationType = applicationType,
+              active = true,
+            ),
+          )
+        }
+      }
   }
 
   private fun populateApps() {

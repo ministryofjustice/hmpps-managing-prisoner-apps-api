@@ -125,8 +125,6 @@ class DataGenerator {
       "HST",
       "Test Establishment",
       false,
-      setOf(),
-      setOf(),
     )
 
     fun generateGroups(

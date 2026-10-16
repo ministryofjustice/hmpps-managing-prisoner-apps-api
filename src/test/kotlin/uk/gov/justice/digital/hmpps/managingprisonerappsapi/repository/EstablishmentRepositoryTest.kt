@@ -37,8 +37,6 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
       ESTABLISHMENT_ID_1,
       ESTABLISHMENT_NAME_1,
       false,
-      setOf(),
-      setOf(),
     )
     val entity = establishmentRepository.save(establishment)
     assertEstablishment(establishment, entity)
@@ -46,16 +44,16 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
 
   @Test
   fun `update establishment`() {
-    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, false, setOf(), setOf())
+    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, false)
     val entity = establishmentRepository.save(establishment)
-    val updatedEstablishment = Establishment(entity.id, ESTABLISHMENT_NAME_2, false, setOf(), setOf())
+    val updatedEstablishment = Establishment(entity.id, ESTABLISHMENT_NAME_2, false)
     val updatedEntity = establishmentRepository.save(updatedEstablishment)
     assertEstablishment(updatedEstablishment, updatedEntity)
   }
 
   @Test
   fun `get establishment by id`() {
-    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, false, setOf(), setOf())
+    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, false)
     establishmentRepository.save(establishment)
     val entity = establishmentRepository.findById(establishment.id)
     assertEstablishment(establishment, entity.get())
@@ -63,7 +61,7 @@ class EstablishmentRepositoryTest(@Autowired private val establishmentRepository
 
   @Test
   fun `delete establishment by id`() {
-    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, false, setOf(), setOf())
+    val establishment = Establishment(ESTABLISHMENT_ID_1, ESTABLISHMENT_NAME_1, false)
     establishmentRepository.save(establishment)
     establishmentRepository.deleteById(establishment.id)
     val entity = establishmentRepository.findById(establishment.id)

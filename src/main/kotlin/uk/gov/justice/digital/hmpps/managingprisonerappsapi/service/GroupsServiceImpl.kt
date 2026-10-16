@@ -126,11 +126,6 @@ class GroupsServiceImpl(
 
   override fun getGroupByInitialAppType(establishmentId: String, appType: Long): List<Groups> {
     val groupList = groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(establishmentId, appType)
-    /*if (groupList.isEmpty()) {
-      throw ApiException("Groups list is empty", HttpStatus.BAD_REQUEST)
-    } else {
-      return groupList
-    }*/
     return groupList
   }
 

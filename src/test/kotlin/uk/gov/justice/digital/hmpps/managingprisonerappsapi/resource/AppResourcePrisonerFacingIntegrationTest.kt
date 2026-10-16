@@ -233,23 +233,6 @@ class AppResourcePrisonerFacingIntegrationTest(
   }
 
   @Test
-  fun `get app groups and types for logged prisoner`() {
-    val appsResponse = webTestClient.get()
-      .uri("/v1/prisoners/apps/groups")
-      .headers(setAuthorisation(roles = listOf("ROLE_PRISONER_FACING_APPS")))
-      .header("Content-Type", "application/json")
-      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-      .exchange()
-      .expectStatus().isOk
-      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<List<ApplicationGroupResponse>>() {})
-      .consumeWith(System.out::println)
-      .returnResult()
-      .responseBody as List<ApplicationGroupResponse>
-    Assertions.assertNotNull(appsResponse.get(0))
-  }
-
-  @Test
   fun `get logged prisoner apps count by application type`() {
     appRepository.deleteAll()
     var response = webTestClient.get()
@@ -558,8 +541,6 @@ class AppResourcePrisonerFacingIntegrationTest(
         establishmentIdFirst,
         "ESTABLISHMENT_NAME_1",
         false,
-        setOf(),
-        setOf(),
       ),
     )
     establishmentRepository.save(
@@ -567,8 +548,6 @@ class AppResourcePrisonerFacingIntegrationTest(
         establishmentIdSecond,
         "ESTABLISHMENT_NAME_2",
         false,
-        setOf(),
-        setOf(),
       ),
     )
     establishmentRepository.save(
@@ -576,8 +555,6 @@ class AppResourcePrisonerFacingIntegrationTest(
         establishmentIdThird,
         "ESTABLISHMENT_NAME_3",
         false,
-        setOf(),
-        setOf(),
       ),
     )
   }
@@ -592,15 +569,6 @@ class AppResourcePrisonerFacingIntegrationTest(
         GroupType.WING,
       ),
     )
-    /*groupRepository.save(
-        DataGenerator.generateGroups(
-            assignedGroupFirst,
-            establishmentIdFirst,
-            assignedGroupFirstName,
-            listOf(AppType.PIN_PHONE_ADD_NEW_CONTACT, AppType.PIN_PHONE_REMOVE_CONTACT),
-            GroupType.WING
-        )
-    )*/
     groupRepository.save(
       DataGenerator.generateGroups(
         assignedGroupSecond,
@@ -632,13 +600,6 @@ class AppResourcePrisonerFacingIntegrationTest(
         addGenericPinPhoneEnquiry,
       ),
     )
-    /*// val applicationGroupOne = ApplicationGroup(applicationGroupOne, applicationGroupOneName, listOf(addSocialContact, removeContact, addOfficialContact, addGenericPinPhoneEnquiry))
-
-    // applicationGroupRepository.save<ApplicationGroup>(applicationGroupOne)
-    // addOfficialContact.applicationGroup = applicationGroupOne
-    // applicationTypeRepository.save(addOfficialContact)
-    val appgrp = applicationTypeRepository.findById(applicationTypeOne)
-    // println(appgrp)*/
   }
 
   protected fun populateApps() {

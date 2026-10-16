@@ -43,7 +43,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppReposi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppStatsContext
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.MessageType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetryService
@@ -64,7 +63,7 @@ class AppServiceImpl(
   private val applicationGroupRepository: ApplicationGroupRepository,
   private val applicationTypeRepository: ApplicationTypeRepository,
   private val statsTelemetryService: StatsTelemetryService,
-  private val groupRepository: GroupRepository,
+  private val establishmentApplicationTypeService: EstablishmentApplicationTypeService,
 ) : AppService {
 
   companion object {
@@ -162,16 +161,19 @@ class AppServiceImpl(
     if (prisoner.establishmentId != staff.establishmentId) {
       throw ApiException("Staff and prisoner is from two different establishment", HttpStatus.FORBIDDEN)
     }
-    validateApplicationGroupAndType(appRequestDto.applicationGroup!!, appRequestDto.applicationType!!)
+    validateActiveApplicationGroupAndType(
+      prisoner.establishmentId,
+      appRequestDto.applicationGroup!!,
+      appRequestDto.applicationType!!,
+    )
+
     if (appRequestDto.requests.size != 1) {
       throw ApiException("Only one requests in app is supported", HttpStatus.BAD_REQUEST)
     }
     val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
       ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
     }
-    if (establishment.blacklistedAppTypes.contains(appRequestDto.applicationType!!)) {
-      throw ApiException("The type: ${appRequestDto.applicationType} is not enabled for ${establishment.name}", HttpStatus.FORBIDDEN)
-    }
+
     val establishmentId = if (establishment.defaultDepartments) "DEFAULT" else staff.establishmentId
     var department: UUID? = null
     if (appRequestDto.department != null) {
@@ -281,7 +283,12 @@ class AppServiceImpl(
     return historyService.getHistoryByAppId(appId, staff.establishmentId)
   }
 
-  override fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID, commentRequestDto: CommentRequestDto?): AppResponseDto<Any, Any> {
+  override fun forwardAppToGroup(
+    staffId: String,
+    groupId: UUID,
+    appId: UUID,
+    commentRequestDto: CommentRequestDto?,
+  ): AppResponseDto<Any, Any> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("Staff with id $staffId not found", HttpStatus.FORBIDDEN)
     }
@@ -399,13 +406,11 @@ class AppServiceImpl(
     var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> = listOf()
     var appByFirstNightCount: Int = 0
     var pageResult: Page<App> = Page.empty()
-    var establishmentAppTypes = emptySet<Long>()
     runBlocking {
       launch {
         establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
           ApiException("Establishment with id: ${staff.establishmentId} is not enabled.", HttpStatus.FORBIDDEN)
         }
-        establishmentAppTypes = establishment.blacklistedAppTypes
       }
       launch {
         appTypeDto = appRepository.countBySearchFilterGroupByAppType(
@@ -444,7 +449,8 @@ class AppServiceImpl(
         } else {
           sortDirection = Sort.Direction.DESC
         }
-        val pageRequest = PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(sortDirection, "requestedDate")
+        val pageRequest =
+          PageRequest.of((pageNumber - 1).toInt(), pageSize.toInt()).withSort(sortDirection, "requestedDate")
         pageResult = appRepository.appsBySearchFilter(
           staff.establishmentId,
           status,
@@ -462,7 +468,7 @@ class AppServiceImpl(
       pageResult.pageable.pageNumber + 1,
       pageResult.totalElements,
       pageResult.isLast,
-      convertAppTypeCountsToMap(appTypeDto, establishmentAppTypes),
+      convertAppTypeCountsToMap(appTypeDto),
       convertAssignedGroupCountsToGroupAppListViewDto(
         groups,
         assignedGroupTypesCounts,
@@ -680,9 +686,8 @@ class AppServiceImpl(
     return list
   }
 
-  private fun convertAppTypeCountsToMap(appByAppTypeCounts: List<AppByAppTypeCounts>, types: Set<Long>): Map<Long, ApplicationTypeResponse> {
+  private fun convertAppTypeCountsToMap(appByAppTypeCounts: List<AppByAppTypeCounts>): Map<Long, ApplicationTypeResponse> {
     val map = TreeMap<Long, ApplicationTypeResponse>()
-    var appTypes = types
     appByAppTypeCounts.forEach { appTypeCount ->
       val applicationType = applicationTypeRepository.findById(appTypeCount.getApplicationType()).orElseThrow {
         ApiException("No app type with id $appTypeCount", HttpStatus.NOT_FOUND)
@@ -695,18 +700,14 @@ class AppServiceImpl(
         null,
         appTypeCount.getCount().toLong(),
       )
-      appTypes = appTypes.minus(appTypeCount.getApplicationType())
-    }
-    appTypes.forEach { appType ->
-      val applicationType = applicationTypeRepository.findById(appType).orElseThrow {
-        ApiException("No app type with id $appType", HttpStatus.NOT_FOUND)
-      }
-      map[appType] = ApplicationTypeResponse(applicationType.id, applicationType.name, null, null, null, null)
     }
     return map
   }
 
-  private fun convertAppFilestoAppFileEnityList(appFileRequestDtos: List<FileRequestDto>, createdBy: String): List<AppFile> {
+  private fun convertAppFilestoAppFileEnityList(
+    appFileRequestDtos: List<FileRequestDto>,
+    createdBy: String,
+  ): List<AppFile> {
     val files = ArrayList<AppFile>()
     appFileRequestDtos.forEach { file ->
       files.add(
@@ -761,16 +762,25 @@ class AppServiceImpl(
 
   private fun validateStaffPermission(staff: Staff, app: App) {
     if (staff.establishmentId != app.establishmentId) {
-      throw ApiException("Staff with id ${staff.username} do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
+      throw ApiException(
+        "Staff with id ${staff.username} do not have permission to view other establishment App",
+        HttpStatus.FORBIDDEN,
+      )
     }
   }
 
-  private fun validateApplicationGroupAndType(appGroupId: Long, appTypeId: Long) {
-    applicationGroupRepository.findById(appGroupId).orElseThrow {
-      ApiException("Application group with id $appGroupId does not exist", HttpStatus.FORBIDDEN)
-    }
-    applicationTypeRepository.findById(appTypeId).orElseThrow {
-      ApiException("Application type with id $appTypeId does not exist", HttpStatus.FORBIDDEN)
+  private fun validateActiveApplicationGroupAndType(establishmentId: String, appGroupId: Long, appTypeId: Long) {
+    val appTypeView = establishmentApplicationTypeService.findApplicationTypeForEstablishment(establishmentId, appTypeId)
+    if (!appTypeView.active) {
+      throw ApiException(
+        "Application type ${appTypeView?.applicationTypeId} is not enabled for establishment}",
+        HttpStatus.FORBIDDEN,
+      )
+    } else if (appTypeView.applicationGroupId != appGroupId) {
+      throw ApiException(
+        "Application group ${appTypeView?.applicationGroupId} does not belong to group $appGroupId",
+        HttpStatus.FORBIDDEN,
+      )
     }
   }
 }

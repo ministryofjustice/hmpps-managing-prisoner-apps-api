@@ -34,7 +34,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.Establishmen
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.AppJourneyEventsRequest
 import uk.gov.justice.hmpps.kotlin.auth.AuthAwareAuthenticationToken
 import uk.gov.justice.hmpps.kotlin.common.ErrorResponse
-import java.util.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("")
@@ -109,36 +109,6 @@ class PrisonerFacingResource(
     logger.info("Request received for getting app by id for prisoner: ${authentication.principal}")
     authentication as AuthAwareAuthenticationToken
     val appResponseDto = appPrisonerFacingService.getPrisonerAppById(authentication.principal, id)
-    return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
-  }
-
-  @Tag(name = "Prisoner Apps")
-  @Operation(
-    summary = "Get app groups and app types.",
-    description = "This api endpoint to app groups and app types for a logged prisoner. Requires role ROLE_PRISONER_FACING_APPS",
-    security = [SecurityRequirement(name = "PRISONER_FACING_APPS")],
-    responses = [
-      ApiResponse(responseCode = "200", description = "App request created."),
-      ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-      ApiResponse(
-        responseCode = "403",
-        description = "Forbidden to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-    ],
-  )
-  @PreAuthorize("hasAnyRole('PRISONER_FACING_APPS')")
-  @GetMapping("v1/prisoners/apps/groups")
-  fun getPrisonerAppTypes(
-    authentication: Authentication,
-  ): ResponseEntity<List<ApplicationGroupResponse>> {
-    authentication as AuthAwareAuthenticationToken
-    val appResponseDto =
-      appPrisonerFacingService.getAppGroupsAndTypesByLoggedUserEstablishment(authentication.principal)
     return ResponseEntity.status(HttpStatus.OK).body(appResponseDto)
   }
 

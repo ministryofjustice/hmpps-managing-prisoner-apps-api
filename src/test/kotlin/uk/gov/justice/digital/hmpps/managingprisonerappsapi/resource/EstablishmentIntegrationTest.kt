@@ -72,23 +72,6 @@ class EstablishmentIntegrationTest(
   }
 
   @Test
-  fun `get app groups and types by establishments`() {
-    var response = webTestClient.get()
-      .uri("/v2/establishments/apps/groups")
-      .headers(setAuthorisation(roles = listOf("ROLE_PRISON")))
-      .header("Content-Type", "application/json")
-      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-      .exchange()
-      .expectStatus().isOk
-      .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<List<ApplicationGroupResponse>>() {})
-      .consumeWith(System.out::println)
-      .returnResult()
-      .responseBody as List<ApplicationGroupResponse>
-    assertEquals(2, response.size)
-  }
-
-  @Test
   fun `get active app groups and types for logged establishment`() {
     val response = webTestClient.get()
       .uri("/v1/establishments/apps/groups")
@@ -153,8 +136,6 @@ class EstablishmentIntegrationTest(
         establishmentIdFirst,
         "ESTABLISHMENT_NAME_1",
         false,
-        setOf(),
-        setOf(),
       ),
     )
     establishmentRepository.save(
@@ -162,8 +143,6 @@ class EstablishmentIntegrationTest(
         establishmentIdSecond,
         "ESTABLISHMENT_NAME_2",
         false,
-        setOf(),
-        setOf(),
       ),
     )
     establishmentRepository.save(
@@ -171,8 +150,6 @@ class EstablishmentIntegrationTest(
         establishmentIdThird,
         "ESTABLISHMENT_NAME_3",
         false,
-        setOf(),
-        setOf(),
       ),
     )
   }

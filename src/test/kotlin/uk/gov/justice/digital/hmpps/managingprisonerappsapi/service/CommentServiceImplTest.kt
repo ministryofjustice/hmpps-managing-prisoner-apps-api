@@ -168,7 +168,7 @@ class CommentServiceImplTest {
       AssignedGroupDto(
         groupId,
         "Test Group",
-        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
         1L,
         GroupType.WING,
       ),
@@ -194,7 +194,7 @@ class CommentServiceImplTest {
       AssignedGroupDto(
         groupId,
         "Test Group",
-        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
         1L,
         GroupType.WING,
       ),
@@ -318,7 +318,7 @@ class CommentServiceImplTest {
     Mockito.`when`(commentRepository.findById(commentByStaff.id)).thenReturn(Optional.of(commentByStaff))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
       ),
     )
     val result = commentServiceImpl.getCommentByIdForStaff(requestedBy, createdBy, app.id, true, commentByStaff.id)
@@ -334,7 +334,7 @@ class CommentServiceImplTest {
     Mockito.`when`(commentRepository.findById(commentByPrisoner.id)).thenReturn(Optional.of(commentByPrisoner))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
       ),
     )
     val result = commentServiceImpl.getCommentByIdForPrisoner(requestedBy, app.id, true, commentByPrisoner.id)
@@ -362,7 +362,7 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
       ),
     )
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_ONLY, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
@@ -380,7 +380,7 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
       ),
     )
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
@@ -398,7 +398,7 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
       ),
     )
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_ONLY, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))
@@ -416,7 +416,7 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
       Optional.of(
-        EstablishmentDto(establishmentId, "Test Establishment", false, setOf(), setOf()),
+        EstablishmentDto(establishmentId, "Test Establishment", false),
       ),
     )
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibility(app.id, CommentVisibility.STAFF_AND_PRISONER, PageRequest.of(0, 5).withSort(Sort.by(Sort.Direction.ASC, "createdDate"))))

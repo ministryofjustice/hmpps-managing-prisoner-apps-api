@@ -24,7 +24,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGro
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
@@ -50,6 +49,7 @@ class AppPrisonerFacingService(
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
   private val statsTelemetryService: StatsTelemetryService,
+  private val establishmentApplicationTypeService: EstablishmentApplicationTypeService,
 ) {
   companion object {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -149,12 +149,19 @@ class AppPrisonerFacingService(
         HttpStatus.BAD_REQUEST,
       )
     }
+
+    validateActiveApplicationGroupAndType(
+      prisoner.establishmentId,
+      appRequest.applicationType!!,
+    )
+
     val groups = groupService.getGroupByInitialAppType(prisoner.establishmentId!!, appRequest.applicationType!!)
     if (groups.isEmpty()) {
       throw ApiException("No department found to assigned app request", HttpStatus.BAD_REQUEST)
     }
     val applicationType = applicationTypeRepository.findById(appRequest.applicationType!!)
       .orElseThrow { ApiException("No application type found for $appRequest", HttpStatus.BAD_REQUEST) }
+
     val app = convertAppRequestToAppRequestEntity(
       appRequest,
       prisonerId,
@@ -188,18 +195,6 @@ class AppPrisonerFacingService(
       applicationType,
       null,
     )
-  }
-
-  fun getAppGroupsAndTypesByLoggedUserEstablishment(prisonerId: String): List<ApplicationGroupResponse> {
-    val prisoner = validatePrisoner(prisonerId)
-    validateEstablishment(prisoner.establishmentId!!)
-    return establishmentService.getAppGroupsAndTypesForPrisonerEstablishment(prisoner.establishmentId)
-  }
-
-  fun getActiveAppGroupsAndTypesByLoggedPrisonerEstablishment(prisonerId: String): List<ApplicationGroupResponse> {
-    val prisoner = validatePrisoner(prisonerId)
-    validateEstablishment(prisoner.establishmentId!!)
-    return establishmentService.getActiveAppGroupsAndTypesForLoggedPrisonerEstablishment(prisoner.establishmentId)
   }
 
   fun getPrisonerAppsCountInPending(prisonerId: String, appType: Long): PrisonerApplicationTypeCount {
@@ -272,9 +267,13 @@ class AppPrisonerFacingService(
     )
   }
 
-  private fun validateStaffPermission(staff: Staff, app: App) {
-    if (staff.establishmentId != app.establishmentId) {
-      throw ApiException("Staff with id ${staff.username} do not have permission to view other establishment App", HttpStatus.FORBIDDEN)
+  private fun validateActiveApplicationGroupAndType(establishmentId: String, appTypeId: Long) {
+    val appTypeView = establishmentApplicationTypeService.findApplicationTypeForEstablishment(establishmentId, appTypeId)
+    if (!appTypeView.active) {
+      throw ApiException(
+        "Application type ${appTypeView?.applicationTypeId} is not enabled for establishment}",
+        HttpStatus.FORBIDDEN,
+      )
     }
   }
 
