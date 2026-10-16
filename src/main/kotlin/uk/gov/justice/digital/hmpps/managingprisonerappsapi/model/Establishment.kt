@@ -3,8 +3,6 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.model
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import org.hibernate.annotations.JdbcTypeCode
-import org.hibernate.type.SqlTypes
 
 @Entity
 @Table(name = "establishment")
@@ -12,13 +10,7 @@ data class Establishment(
   @Id
   val id: String,
   val name: String,
-  // Establishment with defaultDepartments = true, shares sames list of departments.
-  // Establishment with defaultDepartments = false has own list of departments not shared with other establishments.
   val defaultDepartments: Boolean,
-  @JdbcTypeCode(SqlTypes.JSON)
-  val blackListedAppGroups: Set<Long>,
-  @JdbcTypeCode(SqlTypes.JSON)
-  val blackListedAppTypes: Set<Long>,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

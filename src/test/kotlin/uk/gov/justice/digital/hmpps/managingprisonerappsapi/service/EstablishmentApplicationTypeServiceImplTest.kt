@@ -56,7 +56,7 @@ class EstablishmentApplicationTypeServiceImplTest {
   @Test
   fun `getActiveApplicationTypesByStaffId returns grouped active application types`() {
     val staff = Staff(staffId, "user-id", "Test Staff", UserCategory.STAFF, establishmentId, "Officer", UUID.randomUUID())
-    val establishment = Establishment(establishmentId, "Test", false, emptySet(), emptySet())
+    val establishment = Establishment(establishmentId, "Test", false)
     val appGroup = ApplicationGroup(10L, "PIN")
     val appTypeOne = ApplicationType(1L, "Supply list of contacts", false, false, false, appGroup)
     val appTypeTwo = ApplicationType(2L, "Remove a PIN phone contact", true, false, true, appGroup)
@@ -83,7 +83,7 @@ class EstablishmentApplicationTypeServiceImplTest {
   @Test
   fun `getAllApplicationTypesByEstablishment returns mapped rows and skips types without group`() {
     val staff = Staff(staffId, "user-id", "Test Staff", UserCategory.STAFF, establishmentId, "Officer", UUID.randomUUID())
-    val establishment = Establishment(establishmentId, "Test", false, emptySet(), emptySet())
+    val establishment = Establishment(establishmentId, "Test", false)
     val appGroup = ApplicationGroup(30L, "Gym")
     val groupedType = ApplicationType(11L, "Gym booking", false, false, false, appGroup)
     val noGroupType = ApplicationType(12L, "Gym new starter", false, false, false, null)
@@ -110,7 +110,7 @@ class EstablishmentApplicationTypeServiceImplTest {
     val mappingId = UUID.randomUUID()
     val departmentId = UUID.randomUUID()
     val staff = Staff(staffId, "user-id", "Test Staff", UserCategory.STAFF, establishmentId, "Officer", UUID.randomUUID())
-    val establishment = Establishment(establishmentId, "Test", false, emptySet(), emptySet())
+    val establishment = Establishment(establishmentId, "Test", false)
     val appGroup = ApplicationGroup(99L, "Group")
     val appType = ApplicationType(9L, "Type", false, false, false, appGroup)
     val existing = EstablishmentApplicationType(
@@ -124,7 +124,7 @@ class EstablishmentApplicationTypeServiceImplTest {
     Mockito.`when`(staffService.getStaffById(staffId)).thenReturn(Optional.of(staff))
     Mockito.`when`(establishmentRepository.findById(establishmentId)).thenReturn(Optional.of(establishment))
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId))
-      .thenReturn(Optional.of(EstablishmentDto(establishmentId, "Test", false, emptySet(), emptySet())))
+      .thenReturn(Optional.of(EstablishmentDto(establishmentId, "Test", false)))
     Mockito.`when`(establishmentApplicationTypeRepository.findById(mappingId)).thenReturn(Optional.of(existing))
     Mockito.`when`(establishmentApplicationTypeRepository.save(any())).thenAnswer { it.arguments[0] as EstablishmentApplicationType }
 
@@ -153,12 +153,12 @@ class EstablishmentApplicationTypeServiceImplTest {
     val mappingId = UUID.randomUUID()
     val staff = Staff(staffId, "user-id", "Test Staff", UserCategory.STAFF, establishmentId, "Officer", UUID.randomUUID())
     val otherEstablishmentId = "WLI"
-    val establishment = Establishment(establishmentId, "Test", false, emptySet(), emptySet())
+    val establishment = Establishment(establishmentId, "Test", false)
 
     Mockito.`when`(staffService.getStaffById(staffId)).thenReturn(Optional.of(staff))
     Mockito.`when`(establishmentRepository.findById(establishmentId)).thenReturn(Optional.of(establishment))
     Mockito.`when`(establishmentService.getEstablishmentById(otherEstablishmentId))
-      .thenReturn(Optional.of(EstablishmentDto(otherEstablishmentId, "Other", false, emptySet(), emptySet())))
+      .thenReturn(Optional.of(EstablishmentDto(otherEstablishmentId, "Other", false)))
 
     val exception = assertThrows(ApiException::class.java) {
       service.saveEstablishmentApplicationTypes(

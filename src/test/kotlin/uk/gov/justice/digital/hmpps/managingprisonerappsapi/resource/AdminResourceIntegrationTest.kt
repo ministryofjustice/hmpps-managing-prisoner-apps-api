@@ -132,8 +132,6 @@ class AdminResourceIntegrationTest(
         establishmentId,
         "Test Establishment",
         false,
-        emptySet(),
-        emptySet(),
       ),
     )
     val appGroup = applicationGroupRepository.save(

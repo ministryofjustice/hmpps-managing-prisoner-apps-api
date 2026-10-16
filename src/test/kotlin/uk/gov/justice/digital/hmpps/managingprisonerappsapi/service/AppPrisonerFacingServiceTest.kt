@@ -58,6 +58,7 @@ class AppPrisonerFacingServiceTest {
   private lateinit var applicationTypeRepository: ApplicationTypeRepository
   private lateinit var responseRepository: ResponseRepository
   private lateinit var groupRepository: GroupRepository
+  private lateinit var establishmentApplicationTypeService: EstablishmentApplicationTypeService
 
   private lateinit var appService: AppPrisonerFacingService
   private lateinit var app: App
@@ -79,10 +80,16 @@ class AppPrisonerFacingServiceTest {
     responseRepository = Mockito.mock(ResponseRepository::class.java)
     groupRepository = Mockito.mock(GroupRepository::class.java)
     staffService = Mockito.mock(StaffService::class.java)
+    establishmentApplicationTypeService = Mockito.mock(EstablishmentApplicationTypeService::class.java)
+    val activeAppTypeView = Mockito.mock(uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationTypeView::class.java)
+    Mockito.`when`(activeAppTypeView.active).thenReturn(true)
+    Mockito.`when`(activeAppTypeView.applicationGroupId).thenReturn(1L)
+    Mockito.`when`(activeAppTypeView.applicationTypeId).thenReturn(1L)
+    Mockito.`when`(establishmentApplicationTypeService.findApplicationTypeForEstablishment(any(), any())).thenReturn(activeAppTypeView)
     // app.submittedByType = SubmittedByType.PRISONER
 
     establishment =
-      EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", false, setOf(), setOf())
+      EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", false)
     prisoner = Prisoner(
       requestedBy,
       UUID.randomUUID().toString(),
@@ -132,8 +139,6 @@ class AppPrisonerFacingServiceTest {
           establishmentId,
           "Test Establishment",
           false,
-          setOf(),
-          setOf(),
         ),
         1L,
         GroupType.WING,
@@ -150,6 +155,7 @@ class AppPrisonerFacingServiceTest {
       establishmentService,
       activityService,
       statsTelemetryService,
+      establishmentApplicationTypeService,
     )
   }
 

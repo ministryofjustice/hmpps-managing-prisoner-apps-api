@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.StaffType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
@@ -191,6 +192,7 @@ class ResponseServiceImpl(
     createdBy: Boolean,
     responseId: UUID,
   ): AppDecisionResponseDto<Any> {
+    var responseCreatedByAdmin = false
     val staff = getStaff(staffId)
     val staffDto: Any
     val app = appService.getAppById(appId).orElseThrow {
@@ -210,25 +212,33 @@ class ResponseServiceImpl(
     val response = responseRepository.findById(responseId).orElseThrow {
       ApiException("No response found for id $responseId", HttpStatus.NOT_FOUND)
     }
-    val recordCreatedBy = staffService.getStaffById(response.createdBy).orElseThrow {
-      ApiException("Record of staff: ${response.createdBy} not found", HttpStatus.BAD_REQUEST)
+    if (response.createdBy == StaffType.MANAGE_APPS_ADMIN.name) {
+      responseCreatedByAdmin = true
     }
-    if (createdBy) {
-      val establishment = establishmentService.getEstablishmentById(recordCreatedBy.establishmentId).orElseThrow {
-        ApiException(
-          "Staff establishment ${staff.establishmentId} not added in establishment record",
-          HttpStatus.BAD_REQUEST,
-        )
-      }
-      staffDto = StaffDto(
-        recordCreatedBy.username,
-        recordCreatedBy.userId,
-        "${recordCreatedBy.fullName}",
-        UserCategory.STAFF,
-        establishment,
-      )
+
+    if (responseCreatedByAdmin) {
+      staffDto = StaffType.MANAGE_APPS_ADMIN.name
     } else {
-      staffDto = recordCreatedBy.username
+      val recordCreatedBy = staffService.getStaffById(response.createdBy).orElseThrow {
+        ApiException("Record of staff: ${response.createdBy} not found", HttpStatus.BAD_REQUEST)
+      }
+      if (createdBy) {
+        val establishment = establishmentService.getEstablishmentById(recordCreatedBy.establishmentId).orElseThrow {
+          ApiException(
+            "Staff establishment ${staff.establishmentId} not added in establishment record",
+            HttpStatus.BAD_REQUEST,
+          )
+        }
+        staffDto = StaffDto(
+          recordCreatedBy.username,
+          recordCreatedBy.userId,
+          "${recordCreatedBy.fullName}",
+          UserCategory.STAFF,
+          establishment,
+        )
+      } else {
+        staffDto = recordCreatedBy.username
+      }
     }
     return convertResponseToAppDecisionResponse(prisonerId, staffDto, appliesTo, appId, response)
   }

@@ -30,32 +30,6 @@ class GroupResource(private val groupService: GroupService) {
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  /* @Tag(name = "Groups")
-  @Operation(
-    summary = "Add a group",
-    description = "This api endpoint is for adding a group. Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
-    responses = [
-      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
-      ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-      ApiResponse(
-        responseCode = "403",
-        description = "Forbidden to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-    ],
-  )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
-  @PostMapping("/groups", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
-  fun createGroup(@RequestBody groupsRequestDto: GroupsRequestDto): ResponseEntity<AssignedGroupDto> {
-    val createdGroup = groupService.createGroup(groupsRequestDto)
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdGroup)
-  }*/
-
   @Tag(name = "Groups")
   @Operation(
     summary = "Get a group by id.",
@@ -81,50 +55,6 @@ class GroupResource(private val groupService: GroupService) {
     val group = groupService.getGroupById(id, null)
     return ResponseEntity.status(HttpStatus.OK).body(group)
   }
-
-  /*@Tag(name = "Groups")
-  @Operation(
-    summary = "Update a group by id",
-    description = "This api endpoint is for updating a group. Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
-    responses = [
-      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
-      ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-      ApiResponse(
-        responseCode = "403",
-        description = "Forbidden to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-    ],
-  )
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
-  @PutMapping(
-    "/groups/{id}",
-    produces = [MediaType.APPLICATION_JSON_VALUE],
-    consumes = [MediaType.APPLICATION_JSON_VALUE],
-  )
-  fun updateGroup(
-    @PathVariable id: UUID,
-    @RequestBody groupsRequestDto: GroupsRequestDto,
-  ): ResponseEntity<AssignedGroupDto> {
-    val updatedGroup = groupService.updateGroup(groupsRequestDto)
-    return ResponseEntity.status(HttpStatus.OK).body(updatedGroup)
-  }*/
-
-  /*@PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
-  @DeleteMapping(
-    "/groups/{id}",
-    produces = [MediaType.APPLICATION_JSON_VALUE],
-    consumes = [MediaType.APPLICATION_JSON_VALUE],
-  )
-  fun deleteGroup(@PathVariable id: UUID): ResponseEntity<Void> {
-    groupService.deleteGroupById(id)
-    return ResponseEntity.status(HttpStatus.OK).build()
-  }*/
 
   @Tag(name = "Departments")
   @Operation(

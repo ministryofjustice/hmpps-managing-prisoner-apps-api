@@ -11,6 +11,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.Establi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationTypeView
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
@@ -58,6 +59,8 @@ class EstablishmentApplicationTypeServiceImpl(
       )
       .mapNotNull { it.toResponseDtoOrNull() }
   }
+
+  override fun findApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationTypeView = establishmentApplicationTypeRepository.findApplicationTypeForEstablishment(establishmentId, applicationTypeId)
 
   override fun saveEstablishmentApplicationTypes(staffId: String, establishmentApplicationTypeRequestDtoList: List<EstablishmentApplicationTypeRequestDto>): List<EstablishmentApplicationTypeResponseDto> {
     val staff = staffService.getStaffById(staffId).orElseThrow {

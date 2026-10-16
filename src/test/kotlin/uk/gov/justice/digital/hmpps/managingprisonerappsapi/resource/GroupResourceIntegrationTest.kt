@@ -133,8 +133,6 @@ class GroupResourceIntegrationTest(
         establishmentIdFirst,
         establishmentIdFirst,
         false,
-        setOf(),
-        setOf(),
       ),
     )
   }

@@ -34,64 +34,6 @@ class EstablishmentResource(
     private val logger = LoggerFactory.getLogger(this::class.java)
   }
 
-  /*@Tag(name = "Establishments")
-  @Operation(
-    summary = "Add an establishment",
-    description = "This api endpoint is for adding an establishment with agency id and name. Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
-    responses = [
-      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
-      ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-      ApiResponse(
-        responseCode = "403",
-        description = "Forbidden to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-    ],
-  )
-  @PostMapping("establishments")
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
-  fun addEstablishment(@RequestBody establishmentDto: EstablishmentDto): ResponseEntity<EstablishmentDto> {
-    establishmentService.saveEstablishment(establishmentDto)
-    return ResponseEntity.ok(establishmentDto)
-  }
-
-  @Tag(name = "Establishments")
-  @Operation(
-    summary = "Update a establishment",
-    description = "This api endpoint is for updating an establishment. Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
-    responses = [
-      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
-      ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-      ApiResponse(
-        responseCode = "403",
-        description = "Forbidden to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-    ],
-  )
-  @PutMapping("establishments/{id}")
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS')")
-  fun updateEstablishment(
-    @PathVariable id: String,
-    @RequestBody establishmentDto: EstablishmentDto,
-  ): ResponseEntity<EstablishmentDto> {
-    if (id != establishmentDto.id) {
-      throw ApiException("Invalid id ${establishmentDto.id}", HttpStatus.BAD_REQUEST)
-    }
-    val establishment = establishmentService.updateEstablishment(establishmentDto)
-    return ResponseEntity.status(HttpStatus.OK).body(establishment)
-  }*/
-
   @Tag(name = "Establishments")
   @Operation(
     summary = "Get an establishment by agency id",
@@ -145,62 +87,6 @@ class EstablishmentResource(
   fun getEstablishments(): ResponseEntity<Set<String>> {
     val establishments = establishmentService.getEstablishments()
     return ResponseEntity.status(HttpStatus.OK).body(establishments)
-  }
-
-/*  @Tag(name = "Establishments")
-  @Operation(
-    summary = "Get app types of establishment.",
-    description = "This api endpoint is for getting app types by logged user active case load. Requires role ROLE_MANAGING_PRISONER_APPS, ROLE_PRISON",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS, ROLE_PRISON")],
-    responses = [
-      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
-      ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-      ApiResponse(
-        responseCode = "403",
-        description = "Forbidden to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-    ],
-  )
-  @GetMapping("/v1/establishments/apps/types", produces = [MediaType.APPLICATION_JSON_VALUE])
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
-  fun getAppTypesByEstablishment(authentication: Authentication): ResponseEntity<List<AppTypeResponse>> {
-    authentication as AuthAwareAuthenticationToken
-    logger.info("Request received for get app types by ${authentication.principal}")
-    val appTypes = establishmentService.getAppTypesByLoggedUserEstablishment(authentication.principal)
-    return ResponseEntity.status(HttpStatus.OK).body(appTypes)
-  }*/
-
-  @Tag(name = "Establishments")
-  @Operation(
-    summary = "Get application groups by establishment id",
-    description = "This api endpoint is for getting an application groups by establishment id. Requires role ROLE_MANAGING_PRISONER_APPS",
-    security = [SecurityRequirement(name = "MANAGING_PRISONER_APPS")],
-    responses = [
-      ApiResponse(responseCode = "200", description = "Establishment add successfully"),
-      ApiResponse(
-        responseCode = "401",
-        description = "Unauthorized to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-      ApiResponse(
-        responseCode = "403",
-        description = "Forbidden to access this endpoint",
-        content = [Content(mediaType = "application/json", schema = Schema(implementation = ErrorResponse::class))],
-      ),
-    ],
-  )
-  @GetMapping("/v2/establishments/apps/groups", produces = [MediaType.APPLICATION_JSON_VALUE])
-  @PreAuthorize("hasAnyRole('MANAGING_PRISONER_APPS', 'PRISON')")
-  fun getAppGroupsByEstablishment(authentication: Authentication): ResponseEntity<List<ApplicationGroupResponse>> {
-    authentication as AuthAwareAuthenticationToken
-    logger.info("Request received for get app types by ${authentication.principal}")
-    val appTypes = establishmentService.getAppGroupsAndTypesByLoggedUserEstablishment(authentication.principal)
-    return ResponseEntity.status(HttpStatus.OK).body(appTypes)
   }
 
   /**

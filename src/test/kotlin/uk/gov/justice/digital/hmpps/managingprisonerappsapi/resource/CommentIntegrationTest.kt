@@ -253,8 +253,6 @@ class CommentIntegrationTest(
         establishmentIdFirst,
         "ESTABLISHMENT_NAME_1",
         false,
-        setOf(),
-        setOf(),
       ),
     )
   }

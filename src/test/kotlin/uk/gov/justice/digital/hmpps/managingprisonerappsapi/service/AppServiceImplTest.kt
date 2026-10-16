@@ -66,6 +66,7 @@ class AppServiceImplTest {
   private lateinit var applicationTypeRepository: ApplicationTypeRepository
   private lateinit var statsTelemetryService: StatsTelemetryService
   private lateinit var groupRepository: GroupRepository
+  private lateinit var establishmentApplicationTypeService: EstablishmentApplicationTypeService
 
   private lateinit var appService: AppService
   private lateinit var app: App
@@ -87,6 +88,12 @@ class AppServiceImplTest {
     applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
     statsTelemetryService = Mockito.mock(StatsTelemetryService::class.java)
     groupRepository = Mockito.mock(GroupRepository::class.java)
+    establishmentApplicationTypeService = Mockito.mock(EstablishmentApplicationTypeService::class.java)
+    val activeAppTypeView = Mockito.mock(uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationTypeView::class.java)
+    Mockito.`when`(activeAppTypeView.active).thenReturn(true)
+    Mockito.`when`(activeAppTypeView.applicationGroupId).thenReturn(1L)
+    Mockito.`when`(activeAppTypeView.applicationTypeId).thenReturn(1L)
+    Mockito.`when`(establishmentApplicationTypeService.findApplicationTypeForEstablishment(any(), any())).thenReturn(activeAppTypeView)
 
     app = DataGenerator.generateApp(
       establishmentId,
@@ -122,7 +129,7 @@ class AppServiceImplTest {
       UUID.randomUUID(),
     )
     establishment =
-      EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", false, setOf(), setOf())
+      EstablishmentDto(ESTABLISHMENT_ID_1, "Test Establishment", false)
     prisoner = Prisoner(
       requestedBy,
       UUID.randomUUID().toString(),
@@ -152,7 +159,7 @@ class AppServiceImplTest {
       applicationGroupRepository,
       applicationTypeRepository,
       statsTelemetryService,
-      groupRepository,
+      establishmentApplicationTypeService,
     )
   }
 
@@ -282,8 +289,6 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           false,
-          setOf(),
-          setOf(),
         ),
         1L,
         GroupType.WING,
@@ -337,8 +342,6 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           false,
-          setOf(),
-          setOf(),
         ),
         1L,
         GroupType.WING,
@@ -418,8 +421,6 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           false,
-          setOf(),
-          setOf(),
         ),
         1L,
         GroupType.WING,
@@ -498,8 +499,6 @@ class AppServiceImplTest {
           establishmentId,
           "Test Establishment",
           false,
-          setOf(),
-          setOf(),
         ),
         1L,
         GroupType.WING,
@@ -534,8 +533,6 @@ class AppServiceImplTest {
         establishmentId,
         "Test Establishment",
         false,
-        setOf(),
-        setOf(),
       ),
       1L,
       GroupType.WING,
