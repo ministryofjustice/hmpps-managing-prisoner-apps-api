@@ -20,6 +20,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.StaffType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
@@ -367,10 +368,18 @@ class SarIntegrationTest : SarIntegrationTestBase() {
         ),
         Response(
           id = RESPONSE_ID_2,
-          reason = "test reason",
+          reason = "this is declined reason",
           decision = Decision.DECLINED,
           createdDate = LocalDateTime.of(2025, 12, 8, 12, 36, 34),
           createdBy = "JADAMS_GEN",
+          app1.id,
+        ),
+        Response(
+          id = RESPONSE_ID_3,
+          reason = "Prisoner has left the establishment",
+          decision = Decision.REJECTED,
+          createdDate = LocalDateTime.of(2026, 7, 8, 12, 36, 34),
+          createdBy = StaffType.MANAGE_APPS_ADMIN.name,
           app1.id,
         ),
       ),
@@ -467,6 +476,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
     private val COMMENT_ID_2: UUID = UUID.fromString("50000000-0000-0000-0000-000000000002")
     private val RESPONSE_ID_1: UUID = UUID.fromString("60000000-0000-0000-0000-000000000001")
     private val RESPONSE_ID_2: UUID = UUID.fromString("60000000-0000-0000-0000-000000000002")
+    private val RESPONSE_ID_3: UUID = UUID.fromString("60000000-0000-0000-0000-000000000003")
 
     // URLs match what SarServiceImpl builds per AppFile. Currently using a dummy URL for all attachments.
     // When real document API is used, update to: "\${documentApiUrl}/documents/{documentId}/file"

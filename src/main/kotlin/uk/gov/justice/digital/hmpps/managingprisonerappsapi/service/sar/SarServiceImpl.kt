@@ -18,6 +18,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiExcept
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.StaffType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
@@ -115,6 +116,7 @@ class SarServiceImpl(
               response.createdBy,
               response.reason,
               response.createdDate,
+              systemCreated = response.createdBy == StaffType.MANAGE_APPS_ADMIN.name,
             ),
           )
         }
