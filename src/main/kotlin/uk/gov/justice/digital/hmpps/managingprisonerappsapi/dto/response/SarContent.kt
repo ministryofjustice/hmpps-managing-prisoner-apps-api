@@ -56,6 +56,7 @@ data class PrnAppResponse(
   val createdBy: String,
   val reason: String,
   val createdDateTime: LocalDateTime,
+  val systemCreated: Boolean = false, // true if created by system for Prisoner Release domain event
 )
 
 data class PrnAppAttachment(
