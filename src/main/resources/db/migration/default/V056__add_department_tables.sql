@@ -2,12 +2,9 @@ CREATE TABLE if not EXISTS department (
     id uuid NOT NULL,
     "name" varchar(255) NOT NULL,
     slug varchar(255) NOT NULL,
-    CONSTRAINT department_id_not_null NOT NULL id,
     CONSTRAINT department_name_key UNIQUE (name),
-    CONSTRAINT department_name_not_null NOT NULL name,
     CONSTRAINT department_pkey PRIMARY KEY (id),
-    CONSTRAINT department_slug_key UNIQUE (slug),
-    CONSTRAINT department_slug_not_null NOT NULL slug
+    CONSTRAINT department_slug_key UNIQUE (slug)
 );
 
 CREATE TABLE if not exists establishment_departments (
@@ -15,9 +12,6 @@ CREATE TABLE if not exists establishment_departments (
     department_id uuid NULL,
     establishment_id varchar(255) NOT NULL,
     active bool DEFAULT false NOT NULL,
-    CONSTRAINT establishment_departments_active_not_null NOT NULL active,
-    CONSTRAINT establishment_departments_establishment_id_not_null NOT NULL establishment_id,
-    CONSTRAINT establishment_departments_id_not_null NOT NULL id,
     CONSTRAINT establishment_departments_pkey PRIMARY KEY (id)
 );
 
