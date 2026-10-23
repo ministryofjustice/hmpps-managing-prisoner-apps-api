@@ -1,5 +1,5 @@
-# TODO: migrate to ghcr.io/ministryofjustice/hmpps-eclipse-temurin:25-jre-jammy
-FROM --platform=$BUILDPLATFORM eclipse-temurin:25-jdk-jammy AS builder
+ARG BASE_IMAGE=ghcr.io/ministryofjustice/hmpps-eclipse-temurin:25-jre-jammy
+FROM --platform=$BUILDPLATFORM ${BASE_IMAGE} AS builder
 
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER=${BUILD_NUMBER:-1_0_0}
@@ -8,7 +8,7 @@ WORKDIR /app
 ADD . .
 RUN ./gradlew --no-daemon assemble
 
-FROM eclipse-temurin:25-jre-jammy
+FROM ${BASE_IMAGE}
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
 ARG BUILD_NUMBER
