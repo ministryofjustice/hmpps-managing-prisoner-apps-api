@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS app ADD COLUMN if not exists department_id uuid NULL;
