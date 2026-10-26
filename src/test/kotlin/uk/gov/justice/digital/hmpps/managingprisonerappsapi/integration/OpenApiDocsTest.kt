@@ -52,7 +52,10 @@ class OpenApiDocsTest : IntegrationTestBase() {
       .accept(MediaType.APPLICATION_JSON)
       .exchange()
       .expectStatus().isOk
-      .expectBody().jsonPath("info.version").isEqualTo(DateTimeFormatter.ISO_DATE.format(LocalDate.now()))
+      .expectBody().jsonPath("info.version").value<String> {
+        // CI sets BUILD_NUMBER to "<date>.<run>.<sha>", so only the date prefix is checked
+        assertThat(it).startsWith(DateTimeFormatter.ISO_DATE.format(LocalDate.now()))
+      }
   }
 
   @Test
