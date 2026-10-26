@@ -45,12 +45,7 @@
             </tr>
             <tr>
                 <td>{{ optionalValue decision }}</td>
-                {{#systemCreated}}
-                    <td>SYSTEM_USER</td>
-                {{/systemCreated}}
-                {{^systemCreated}}
-                    <td>{{ optionalValue ( getUserLastName createdBy) }}</td>
-                {{/systemCreated}}
+                <td>{{ optionalValue ( getUserLastName createdBy) }}</td>
                 <td>{{ optionalValue (formatDate createdDateTime) }}</td>
                 <td>{{ optionalValue reason }}</td>
             </tr>
