@@ -109,7 +109,7 @@ class GroupsServiceImpl(
     groups: Groups,
     establishmentDto: EstablishmentDto,
   ): AssignedGroupDto = AssignedGroupDto(
-    groups.id,
+    groups.id.toString(),
     groups.name,
     establishmentDto,
     if (groups.initialsApplicationTypes.isNotEmpty()) groups.initialsApplicationTypes.first() else null,

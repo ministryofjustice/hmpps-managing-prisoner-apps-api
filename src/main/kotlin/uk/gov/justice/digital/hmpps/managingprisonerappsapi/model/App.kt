@@ -19,7 +19,9 @@ data class App(
   @Id
   val id: UUID,
   val reference: String?,
-  var assignedGroup: UUID,
+  var assignedGroup: UUID?,
+  var departmentId: UUID?,
+  var departmentSlug: String,
   @Enumerated(EnumType.STRING)
   val appType: AppType?,
   val applicationGroup: Long?,

@@ -26,7 +26,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " AND a.status IN (:status)" +
       " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
-      " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
+      " AND (:assignedGroups IS NULL OR a.departmentSlug IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
       " GROUP BY a.applicationType ORDER BY a.applicationType ASC",
     nativeQuery = false,
@@ -36,19 +36,19 @@ interface AppRepository : JpaRepository<App, UUID> {
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
     requestedBy: String?,
-    assignedGroups: Set<UUID>?,
+    assignedGroups: Set<String>?,
     firstNightCenter: Boolean?,
   ): List<AppByAppTypeCounts>
 
   @Query(
-    value = "SELECT COUNT(*) as count, a.assignedGroup as assignedGroup FROM App a " +
+    value = "SELECT COUNT(*) as count, a.departmentSlug as assignedGroup FROM App a " +
       " WHERE a.establishmentId = :establishmentId " +
       " AND a.status IN (:status)" +
       " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
-      " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
+      " AND (:assignedGroups IS NULL OR a.departmentSlug IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
-      " GROUP BY a.assignedGroup",
+      " GROUP BY a.departmentSlug",
     nativeQuery = false,
   )
   fun countBySearchFilterGroupByAssignedGroup(
@@ -56,7 +56,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
     requestedBy: String?,
-    assignedGroups: Set<UUID>?,
+    assignedGroups: Set<String>?,
     firstNightCenter: Boolean?,
   ): List<AppByAssignedGroupCounts>
 
@@ -66,7 +66,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " AND a.status IN (:status)" +
       " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
-      " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
+      " AND (:assignedGroups IS NULL OR a.departmentSlug IN (:assignedGroups))" +
       " AND (a.firstNightCenter =:firstNightCenter)",
     nativeQuery = false,
   )
@@ -75,7 +75,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
     requestedBy: String?,
-    assignedGroups: Set<UUID>?,
+    assignedGroups: Set<String>?,
     firstNightCenter: Boolean,
   ): AppByFirstNightCount
 
@@ -85,7 +85,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " AND a.status IN (:status)" +
       " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
       " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
-      " AND (:assignedGroups IS NULL OR a.assignedGroup IN (:assignedGroups))" +
+      " AND (:assignedGroups IS NULL OR a.departmentSlug IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)", // +
     nativeQuery = false,
   )
@@ -94,7 +94,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
     requestedBy: String?,
-    assignedGroups: Set<UUID>?,
+    assignedGroups: Set<String>?,
     firstNightCenter: Boolean?,
     pageable: Pageable,
   ): Page<App>

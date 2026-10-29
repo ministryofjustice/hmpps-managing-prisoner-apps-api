@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.EstablishmentApplicationTypeRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentApplicationTypeResponseDto
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationTypeView
 
 interface EstablishmentApplicationTypeService {
@@ -16,4 +17,8 @@ interface EstablishmentApplicationTypeService {
   fun saveEstablishmentApplicationTypes(staffId: String, establishmentApplicationTypeRequestDtoList: List<EstablishmentApplicationTypeRequestDto>): List<EstablishmentApplicationTypeResponseDto>
 
   fun findApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationTypeView
+
+  fun findDefaultApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationType?
+
+  fun findByDepartmentSlugAndEstablishmentId(departmentSlug: String, establishmentId: String): EstablishmentApplicationType
 }

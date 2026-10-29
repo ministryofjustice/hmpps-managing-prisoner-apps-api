@@ -22,6 +22,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppScope
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
@@ -49,6 +50,7 @@ class AppPrisonerFacingService(
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
   private val statsTelemetryService: StatsTelemetryService,
+  private val establishmentDepartmentService: EstablishmentDepartmentService,
   private val establishmentApplicationTypeService: EstablishmentApplicationTypeService,
 ) {
   companion object {
@@ -91,9 +93,22 @@ class AppPrisonerFacingService(
     }
     validatePrisonerByRequestedBy(prisonerId, app)
 
-    val group = groupService.getGroupById(app.assignedGroup)
-    val applicationType = applicationTypeRepository.findById(app.applicationType!!)
-      .orElseThrow { ApiException("No application type found for id: ${app.applicationType}", HttpStatus.BAD_REQUEST) }
+    //
+    // val group = groupService.getGroupById(app.assignedGroup)
+
+    val departmentSlug = app.departmentSlug
+    val estApplicationType = establishmentApplicationTypeService.findByDepartmentSlugAndEstablishmentId(departmentSlug!!, prisoner.establishmentId!!)
+
+    if (departmentSlug == null) {
+      throw ApiException("Department departmentSlug not found for establishment ${prisoner.establishmentId}", HttpStatus.NOT_FOUND)
+    }
+    if (estApplicationType == null) {
+      throw ApiException("No application type found for id: $estApplicationType", HttpStatus.FORBIDDEN)
+    }
+
+    // val applicationType = applicationTypeRepository.findById(app.applicationType!!)
+    //  .orElseThrow { ApiException("No application type found for id: ${app.applicationType}", HttpStatus.BAD_REQUEST) }
+
     var reason: String? = null
     if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED || app.status == AppStatus.REJECTED) {
       val responseId = UUID.fromString(app.requests[0].get("responseId") as String)
@@ -106,9 +121,9 @@ class AppPrisonerFacingService(
     return convertAppEntityToAppResponse(
       app,
       prisoner,
-      group,
-      applicationType.applicationGroup!!,
-      applicationType,
+      app.departmentId!!,
+      estApplicationType.applicationType.applicationGroup!!,
+      estApplicationType.applicationType,
       reason,
     )
   }
@@ -155,25 +170,34 @@ class AppPrisonerFacingService(
       appRequest.applicationType!!,
     )
 
-    val groups = groupService.getGroupByInitialAppType(prisoner.establishmentId!!, appRequest.applicationType!!)
+    val estApplicationType = establishmentApplicationTypeService.findDefaultApplicationTypeForEstablishment(prisoner.establishmentId!!, appRequest.applicationType!!)
+    if (estApplicationType == null || !estApplicationType.active) {
+      throw ApiException("No application type found for ${appRequest.applicationType} in establishment ${prisoner.establishmentId}", HttpStatus.BAD_REQUEST)
+    }
+
+    val department = establishmentDepartmentService.findBySlugIgnoreCase(estApplicationType.departmentSlug)
+
+/*    val groups = groupService.getGroupByInitialAppType(prisoner.establishmentId!!, appRequest.applicationType!!)
     if (groups.isEmpty()) {
       throw ApiException("No department found to assigned app request", HttpStatus.BAD_REQUEST)
     }
     val applicationType = applicationTypeRepository.findById(appRequest.applicationType!!)
-      .orElseThrow { ApiException("No application type found for $appRequest", HttpStatus.BAD_REQUEST) }
+      .orElseThrow { ApiException("No application type found for $appRequest", HttpStatus.BAD_REQUEST) }*/
 
     val app = convertAppRequestToAppRequestEntity(
       appRequest,
       prisonerId,
       prisoner,
-      groups[0].id,
-      applicationType.id,
-      applicationType.applicationGroup!!.id,
+      // groups[0].id,
+      // applicationType.id,
+      estApplicationType.applicationType.id,
+      estApplicationType.applicationType.applicationGroup!!.id,
+      department,
     )
     val appEntity = appRepository.save(app)
     val createdDate = LocalDateTime.now(ZoneOffset.UTC)
     activityService.addActivity(
-      app.assignedGroup,
+      app.id,
       EntityType.ASSIGNED_GROUP,
       app.id,
       Activity.APP_SUBMITTED,
@@ -183,16 +207,17 @@ class AppPrisonerFacingService(
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
-      groups[0].name,
+      // groups[0].name,
+      department.name,
       "",
     )
 
     return convertAppEntityToAppResponse(
       appEntity,
       prisoner,
-      groups[0].id,
-      applicationType.applicationGroup!!,
-      applicationType,
+      department.id,
+      estApplicationType.applicationType.applicationGroup!!,
+      estApplicationType.applicationType,
       null,
     )
   }
@@ -250,7 +275,8 @@ class AppPrisonerFacingService(
       }
     val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
     val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
-    val department = groupRepository.findById(app.assignedGroup).map { it.name }.orElse(null)
+    // val department = groupRepository.findById(app.assignedGroup).map { it.name }.orElse(null)
+    val department = establishmentDepartmentService.findBySlugIgnoreCase(app.departmentSlug!!)
 
     val appStatsContext = AppStatsContext(
       appId = appId,
@@ -259,7 +285,7 @@ class AppPrisonerFacingService(
       appTypeName = appTypeName,
       appGroupId = appGroupId,
       appGroupName = appGroupName,
-      department = department,
+      department = department.name,
     )
     statsTelemetryService.logJourneyEvents(
       appStatsContext = appStatsContext,
@@ -281,16 +307,19 @@ class AppPrisonerFacingService(
     appRequest: AppRequestPrisoner,
     prisonerId: String,
     prisoner: Prisoner,
-    groupId: UUID,
+    // groupId: UUID,
     applicationType: Long,
     applicationGroup: Long,
+    department: Department,
   ): App {
     val localDateTime = LocalDateTime.now(ZoneOffset.UTC)
     var firstNightCenter = false
     return App(
       Generators.timeBasedEpochGenerator().generate(), // id
       appRequest.reference, // reference
-      groupId, // group id or department
+      null, // group id
+      department.id, // department id
+      department.slug, // department slug
       null,
       applicationGroup,
       applicationType,

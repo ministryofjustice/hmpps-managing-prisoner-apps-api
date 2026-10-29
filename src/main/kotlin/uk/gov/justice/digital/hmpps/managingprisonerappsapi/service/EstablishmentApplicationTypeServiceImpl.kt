@@ -62,6 +62,10 @@ class EstablishmentApplicationTypeServiceImpl(
 
   override fun findApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationTypeView = establishmentApplicationTypeRepository.findApplicationTypeForEstablishment(establishmentId, applicationTypeId)
 
+  override fun findDefaultApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationType = establishmentApplicationTypeRepository.findByEstablishmentIdAndApplicationTypeId(establishmentId, applicationTypeId)
+
+  override fun findByDepartmentSlugAndEstablishmentId(departmentSlug: String, establishmentId: String): EstablishmentApplicationType = establishmentApplicationTypeRepository.findByDepartmentSlugAndEstablishmentId(departmentSlug, establishmentId)
+
   override fun saveEstablishmentApplicationTypes(staffId: String, establishmentApplicationTypeRequestDtoList: List<EstablishmentApplicationTypeRequestDto>): List<EstablishmentApplicationTypeResponseDto> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("No staff with id", HttpStatus.FORBIDDEN)
@@ -85,7 +89,7 @@ class EstablishmentApplicationTypeServiceImpl(
       val saved = establishmentApplicationTypeRepository.save(
         existing.copy(
           active = establishmentApplicationTypeRequestDto.active,
-          departmentId = establishmentApplicationTypeRequestDto.departmentId,
+          departmentSlug = establishmentApplicationTypeRequestDto.departmentSlug,
           lastModifiedBy = staffId,
           lastModifiedDate = java.time.LocalDateTime.now(),
         ),
@@ -103,7 +107,7 @@ class EstablishmentApplicationTypeServiceImpl(
     return EstablishmentApplicationTypeResponseDto(
       id = id!!,
       establishmentId = establishment.id,
-      departmentId = departmentId,
+      departmentSlug = departmentSlug,
       active = active,
       applicationGroupResponse = ApplicationGroupResponse(
         id = group.id,

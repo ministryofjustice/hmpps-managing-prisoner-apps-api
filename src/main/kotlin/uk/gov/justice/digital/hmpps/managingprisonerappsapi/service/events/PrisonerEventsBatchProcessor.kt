@@ -11,11 +11,13 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.StaffType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
 import java.time.LocalDateTime
@@ -26,6 +28,7 @@ class PrisonerEventsBatchProcessor(
   private val historyRepository: HistoryRepository,
   private val entityManager: EntityManager,
   private val responseRepository: ResponseRepository,
+  private val departmentRepository: DepartmentRepository,
 ) {
 
   companion object {
@@ -37,11 +40,14 @@ class PrisonerEventsBatchProcessor(
   fun updateBatchForMerge(appsPage: Page<App>, mergedNomsNumber: String, removedNomsNumber: String, createdOn: LocalDateTime): Int {
     try {
       var updatedCount = 0
+      lateinit var department: Department
 
       appsPage.content.forEach { app ->
         // Update app's requestedBy to mergedNomsNumber
         app.requestedBy = mergedNomsNumber
         appRepository.save(app)
+
+        department = departmentRepository.findBySlugIgnoreCase(app.departmentSlug)
 
         // Create new history entry for this app
         val history = History(
@@ -54,6 +60,7 @@ class PrisonerEventsBatchProcessor(
           StaffType.MANAGE_APPS_ADMIN.toString(),
           createdOn,
           removedNomsNumber,
+          department.name,
         )
         historyRepository.save(history)
         updatedCount++
@@ -81,8 +88,11 @@ class PrisonerEventsBatchProcessor(
   fun updateBatchForPrisonerRelease(appsPage: Page<App>, nomsNumber: String, releaseReason: String, createdOn: LocalDateTime): Int {
     try {
       var updatedCount = 0
+      lateinit var department: Department
 
       appsPage.content.forEach { app ->
+
+        department = departmentRepository.findBySlugIgnoreCase(app.departmentSlug)
         // Create a new Response
         val responseEntity = responseRepository.save(
           Response(
@@ -107,6 +117,7 @@ class PrisonerEventsBatchProcessor(
             StaffType.MANAGE_APPS_ADMIN.toString(),
             createdOn,
             releaseReason,
+            department.name,
           ),
         )
 

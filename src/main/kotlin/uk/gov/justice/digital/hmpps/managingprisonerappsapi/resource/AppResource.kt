@@ -212,7 +212,7 @@ class AppResource(var appService: AppService) {
     consumes = [MediaType.APPLICATION_JSON_VALUE],
   )
   fun forwardAppToGroup(
-    @PathVariable groupId: UUID,
+    @PathVariable groupId: String,
     @PathVariable appId: UUID,
     authentication: Authentication,
     @RequestBody commentRequestDto: CommentRequestDto?,

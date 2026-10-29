@@ -10,7 +10,6 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.LinkedHashMap
-import kotlin.toString
 
 /**
  * Sends statistics as custom events to Application Insights.
@@ -368,7 +367,7 @@ class StatsTelemetryService(private val telemetryClient: TelemetryClient) {
       extraDimensions(dimensions)
 
       telemetryClient.trackEvent(activity.name, dimensions, null)
-      log.debug("telemetry for [${activity.name}] - {}", dimensions)
+      log.info("telemetry for [${activity.name}] - {}", dimensions)
     } catch (e: Exception) {
       log.error("Failed to send stats telemetry event [${activity.name}] for appId=${appStatsContext.appId}: ${e.message}", e)
     }

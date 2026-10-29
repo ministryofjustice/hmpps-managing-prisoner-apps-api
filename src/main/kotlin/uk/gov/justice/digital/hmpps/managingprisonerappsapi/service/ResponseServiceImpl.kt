@@ -38,6 +38,7 @@ class ResponseServiceImpl(
   private val activityService: ActivityService,
   private val groupService: GroupService,
   private val statsTelemetryService: StatsTelemetryService,
+  private val establishmentDepartmentService: EstablishmentDepartmentService,
 ) : ResponseService {
 
   companion object {
@@ -67,6 +68,10 @@ class ResponseServiceImpl(
     val fromStatus = app.status
     val reqs = ArrayList<MutableMap<String, Any>>()
     var responseEntity: Response? = null
+
+    val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId)
+    val department = establishmentDepartmentService.findBySlugIgnoreCase(app.departmentSlug)
+
     app.requests.forEach { request ->
       val req = request.toMutableMap()
       if (response.appliesTo.contains(UUID.fromString(request.get("id") as String)) && req["responseId"] == null) {
@@ -83,7 +88,7 @@ class ResponseServiceImpl(
             app.id,
           ),
         )
-        val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
+        // val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
         var rejectionReason: String? =
           if (responseEntity.decision == Decision.REJECTED) {
             response.reason
@@ -113,7 +118,7 @@ class ResponseServiceImpl(
           prisonerId,
           app.applicationType!!,
           app.applicationGroup!!,
-          group.name,
+          department.name,
           rejectionReason,
         )
         req["responseId"] = responseEntity!!.id.toString()
@@ -136,21 +141,19 @@ class ResponseServiceImpl(
     appService.saveApp(app)
 
     val toStatus = app.status
-    val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
+
+    // val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
     val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
     val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
 
-    var establishmentName = group.establishment.name
-    val department = group.name
-
     val appStatsContext = AppStatsContext(
       app.id,
-      establishmentName,
+      establishmentDto.get().name,
       app.applicationType!!,
       appTypeName,
       app.applicationGroup!!,
       appGroupName,
-      department,
+      department.name,
     )
 
     if (app.status == AppStatus.APPROVED || app.status == AppStatus.DECLINED || app.status == AppStatus.REJECTED) {

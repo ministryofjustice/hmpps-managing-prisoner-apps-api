@@ -24,6 +24,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRe
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
@@ -40,6 +41,7 @@ class SarServiceImpl(
   private val groupRepository: GroupRepository,
   private val commentRepository: CommentRepository,
   private val responseRepository: ResponseRepository,
+  private val departmentRepository: DepartmentRepository,
   @Value("\${hmpps.document.api.url}") private val documentApiurl: String,
   @Value("\${hmpps.service.name}") private val serviceName: String,
   @Value("\${hmpps.self.url}") private val selfUrl: String,
@@ -146,7 +148,8 @@ class SarServiceImpl(
         }
       }
 
-      val assignedGroup = groupRepository.findById(app.assignedGroup)
+      // val assignedGroup = groupRepository.findById(app.assignedGroup)
+      val department = departmentRepository.findBySlugIgnoreCase(app.departmentSlug)
       val appType = applicationTypeRepository.findById(app.applicationType!!)
 
       // Convert formData maps to FormDataItem list
@@ -169,7 +172,7 @@ class SarServiceImpl(
         app.requestedDate,
         app.lastModifiedDate,
         app.establishmentId,
-        assignedGroup.get().name,
+        department.name,
         prnApphistory,
         formDataItems,
         prnAppComments,
@@ -185,7 +188,7 @@ class SarServiceImpl(
     return sarContent
   }
 
-  override fun convertActivityToStatement(activity: Activity, entityId: UUID): String {
+  private fun convertActivityToStatement(activity: Activity, entityId: UUID): String {
     if (activity == Activity.APP_SUBMITTED) {
       return "App request submitted."
     } else if (activity == Activity.APP_IN_PROGRESS) {

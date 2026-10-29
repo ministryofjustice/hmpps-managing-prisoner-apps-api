@@ -27,14 +27,14 @@ interface AppService {
 
   fun getHistoryAppsId(prisonerId: String, appId: UUID, staffId: String): List<HistoryResponse>
 
-  fun forwardAppToGroup(staffId: String, groupId: UUID, appId: UUID, commentRequestDto: CommentRequestDto?): AppResponseDto<Any, Any>
+  fun forwardAppToGroup(staffId: String, departmentSlug: String, appId: UUID, commentRequestDto: CommentRequestDto?): AppResponseDto<Any, Any>
 
   fun searchAppsByColumnsFilter(
     staffId: String,
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
     requestedBy: String?,
-    assignedGroups: Set<UUID>?,
+    assignedGroups: Set<String>?,
     firstNightCenter: Boolean?,
     pageNumber: Long,
     pageSize: Long,

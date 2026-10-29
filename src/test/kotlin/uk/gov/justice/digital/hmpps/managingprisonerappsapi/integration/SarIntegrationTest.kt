@@ -268,6 +268,8 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       id = APP_ID_1,
       reference = "019cd286-b576-7357-9e6c-b221b7d3e7d6",
       assignedGroup = BUSINESS_HUB_GROUP_ID,
+      departmentId = DEPARTMENT_ID_1,
+      departmentSlug = "business-hub",
       appType = AppType.PIN_PHONE_ADD_NEW_SOCIAL_CONTACT,
       applicationGroup = 1,
       applicationType = APPLICATION_TYPE_ID_1,
@@ -305,6 +307,8 @@ class SarIntegrationTest : SarIntegrationTestBase() {
       id = APP_ID_2,
       reference = "019a6e8d-12c9-785c-8d0c-b84cd97398ec",
       assignedGroup = OMU_GROUP_ID,
+      departmentId = DEPARTMENT_ID_1,
+      departmentSlug = "omu",
       appType = AppType.PIN_PHONE_EMERGENCY_CREDIT_TOP_UP,
       applicationGroup = 1,
       applicationType = APPLICATION_TYPE_ID_2,
@@ -422,6 +426,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           createdBy = "CHIEMNDEV",
           createdDate = LocalDateTime.of(2026, 3, 9, 12, 16, 9),
           reference = null,
+          departmentName = "Faith",
         ),
         // App 2 history
         History(
@@ -434,6 +439,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           createdBy = "SMJOHN_GEN",
           createdDate = LocalDateTime.of(2025, 11, 10, 16, 15, 30),
           reference = null,
+          departmentName = "Library",
         ),
         History(
           id = UUID.fromString("30000000-0000-0000-0000-000000000003"),
@@ -445,6 +451,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           createdBy = "SMJOHN_GEN",
           createdDate = LocalDateTime.of(2025, 12, 8, 12, 36, 34),
           reference = null,
+          departmentName = "OMU",
         ),
         History(
           id = UUID.fromString("30000000-0000-0000-0000-000000000004"),
@@ -456,6 +463,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
           createdBy = "SMJOHN_GEN",
           createdDate = LocalDateTime.of(2025, 12, 8, 12, 36, 34),
           reference = null,
+          departmentName = "PINs",
         ),
       ),
     )
@@ -477,6 +485,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
     private val RESPONSE_ID_1: UUID = UUID.fromString("60000000-0000-0000-0000-000000000001")
     private val RESPONSE_ID_2: UUID = UUID.fromString("60000000-0000-0000-0000-000000000002")
     private val RESPONSE_ID_3: UUID = UUID.fromString("60000000-0000-0000-0000-000000000003")
+    private val DEPARTMENT_ID_1: UUID = UUID.fromString("01a18812-259f-7692-b347-ab3fd5cda0c8")
 
     // URLs match what SarServiceImpl builds per AppFile. Currently using a dummy URL for all attachments.
     // When real document API is used, update to: "\${documentApiUrl}/documents/{documentId}/file"

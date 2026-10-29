@@ -9,7 +9,7 @@ data class AppsSearchQueryDto(
   val status: Set<AppStatus>,
   var applicationTypes: Set<Long>? = null,
   val requestedBy: String? = null,
-  var assignedGroups: Set<UUID>? = null,
+  var assignedGroups: Set<String>? = null,
   val firstNightCenter: Boolean? = null,
   val oldestAppFirst: Boolean? = null,
 )

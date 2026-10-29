@@ -41,6 +41,7 @@ class CommentServiceImpl(
   private val applicationTypeRepository: ApplicationTypeRepository,
   private val applicationGroupRepository: ApplicationGroupRepository,
   private val statsTelemetryService: StatsTelemetryService,
+  private val establishmentDepartmentService: EstablishmentDepartmentService,
 ) : CommentService {
 
   override fun saveComment(comment: Comment): Comment = commentRepository.save(comment)
@@ -74,7 +75,9 @@ class CommentServiceImpl(
     }
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
-    val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
+    // val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
+    val department = establishmentDepartmentService.findBySlugIgnoreCase(app.departmentSlug)
+    val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId)
 
     val comment = commentRepository.save(
       Comment(
@@ -99,12 +102,11 @@ class CommentServiceImpl(
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
-      group.name,
+      department.name,
       "",
     )
 
-    var establishmentName = group.establishment.name
-    val department = group.name
+    var establishmentName = establishmentDto.get().name
     val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
     val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
 
@@ -115,7 +117,7 @@ class CommentServiceImpl(
       appTypeName,
       app.applicationGroup!!,
       appGroupName,
-      department,
+      department.name,
     )
     statsTelemetryService.logMessageAdded(
       appStatsContext,
@@ -136,7 +138,10 @@ class CommentServiceImpl(
     val prisoner = validatePrisoner(prisonerId)
     val app = getAppById(appId)
     validatePrisonerByRequestedBy(prisonerId, app)
-    val group = groupService.getGroupById(app.assignedGroup, prisoner.establishmentId!!)
+    // val group = groupService.getGroupById(app.assignedGroup, prisoner.establishmentId!!)
+    val department = establishmentDepartmentService.findBySlugIgnoreCase(app.departmentSlug)
+    val establishmentDto = establishmentService.getEstablishmentById(app.establishmentId)
+
     val comment = commentRepository.save(
       Comment(
         Generators.timeBasedEpochGenerator().generate(),
@@ -159,12 +164,11 @@ class CommentServiceImpl(
       prisonerId,
       app.applicationType!!,
       app.applicationGroup!!,
-      group.name,
+      department.name,
       "",
     )
 
-    var establishmentName = group.establishment.name
-    val department = group.name
+    var establishmentName = establishmentDto.get().name
     val appTypeName = applicationTypeRepository.findById(app.applicationType!!).map { it.name }.orElse(null)
     val appGroupName = applicationGroupRepository.findById(app.applicationGroup!!).map { it.name }.orElse(null)
 
@@ -175,7 +179,7 @@ class CommentServiceImpl(
       appTypeName,
       app.applicationGroup!!,
       appGroupName,
-      department,
+      department.name,
     )
     statsTelemetryService.logMessageAdded(
       appStatsContext,
