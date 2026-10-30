@@ -40,7 +40,7 @@ hmpps:
       #
       # To regenerate expected snapshots:
       #   1. Set generate-actual: true
-      generate-actual: true
+      generate-actual: false
       expected-api-response-path: /sar/expected/sar-api-response.json
       expected-jpa-entity-schema-path: /sar/expected/jpa-entity-schema.json
       expected-render-result-path: /sar/expected/sar-report-output.html
