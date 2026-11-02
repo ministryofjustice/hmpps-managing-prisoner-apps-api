@@ -85,9 +85,11 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
       createdApp.id,
       "new reference 123",
       createdApp.assignedGroup,
+      createdApp.departmentId,
+      createdApp.departmentSlug,
       null,
-      applicationTypeOne,
       applicationGroupOne,
+      applicationTypeOne,
       requestedDate = createdApp.requestedDate,
       createdDate = createdApp.createdDate,
       createdBy = createdApp.createdBy,
@@ -127,8 +129,8 @@ class AppRepositoryTest(@Autowired val appRepository: AppRepository, @Autowired 
     val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
     val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
     val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
-    val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
-    val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
+    val assignedGroupFirst = "department-first"
+    val assignedGroupSecond = "department-second"
     val requestedByFirst = "A12345"
     val requestedByFirstMainName = "John"
     val requestedByFirstSurname = "Smith"

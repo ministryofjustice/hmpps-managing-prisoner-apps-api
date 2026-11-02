@@ -22,15 +22,17 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentDepartment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentDepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.Duration
@@ -40,7 +42,8 @@ import java.util.*
 
 class ResponseIntegrationTest(
   @Autowired private val appRepository: AppRepository,
-  @Autowired private val groupRepository: GroupRepository,
+  @Autowired private val departmentRepository: DepartmentRepository,
+  @Autowired private val establishmentDepartmentRepository: EstablishmentDepartmentRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val responseRepository: ResponseRepository,
   @Autowired private val applicationTypeRepository: ApplicationTypeRepository,
@@ -54,10 +57,8 @@ class ResponseIntegrationTest(
     val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
     val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
     val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
-    val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
-    val assignedGroupFirstName = "Business Hub"
-    val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
-    val assignedGroupSecondName = "OMU"
+    val departmentFirst = Department(Generators.timeBasedEpochGenerator().generate(), "business-hub", "Business Hub")
+    val departmentSecond = Department(Generators.timeBasedEpochGenerator().generate(), "omu", "OMU")
     val requestedByFirst = "A12345"
     val requestedByFirstMainName = "John"
     val requestedByFirstSurname = "Smith"
@@ -84,10 +85,11 @@ class ResponseIntegrationTest(
   @BeforeEach
   fun setup() {
     appRepository.deleteAll()
-    groupRepository.deleteAll()
+    establishmentDepartmentRepository.deleteAll()
     establishmentApplicationTypeRepository.deleteAll()
+    departmentRepository.deleteAll()
     populateEstablishments()
-    populateGroups()
+    populateDepartments()
     populateApps()
     populateApplicationGroupsAndTypes()
 
@@ -107,9 +109,10 @@ class ResponseIntegrationTest(
   fun teardown() {
     responseRepository.deleteAll()
     appRepository.deleteAll()
-    groupRepository.deleteAll()
+    establishmentDepartmentRepository.deleteAll()
     establishmentApplicationTypeRepository.deleteAll()
     establishmentRepository.deleteAll()
+    departmentRepository.deleteAll()
   }
 
   @Test
@@ -128,7 +131,7 @@ class ResponseIntegrationTest(
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedBySecondSurname,
-          null,
+          departmentFirst.id,
           listOf(),
         ),
       )
@@ -139,7 +142,7 @@ class ResponseIntegrationTest(
       .consumeWith(System.out::println)
       .returnResult()
       .responseBody as AppResponseDto<Any, Any>
-    val id = UUID.fromString(app.requests!!.get(0)["id"] as String)
+    val id = UUID.fromString(app.requests.get(0)["id"] as String)
     val appId = app.id
     var response = webTestClient.post()
       .uri("/v1/prisoners/$requestedByFirst/apps/$appId/responses")
@@ -162,7 +165,7 @@ class ResponseIntegrationTest(
 
     Assertions.assertEquals(app.id, response.appId)
     Assertions.assertEquals(requestedByFirst, response.prisonerId)
-    Assertions.assertEquals(UUID.fromString(app.requests!!.get(0)["id"] as String), response.appliesTo.get(0))
+    Assertions.assertEquals(UUID.fromString(app.requests.get(0)["id"] as String), response.appliesTo.get(0))
 
     response = webTestClient.get()
       .uri("/v1/prisoners/$requestedByFirst/apps/$appId/responses/${response.id}")
@@ -232,25 +235,14 @@ class ResponseIntegrationTest(
     )
   }
 
-  private fun populateGroups() {
-    groupRepository.save(
-      DataGenerator.generateGroups(
-        assignedGroupFirst,
-        establishmentIdFirst,
-        assignedGroupFirstName,
-        listOf(1L, 2L),
-        GroupType.WING,
-      ),
-    )
-    groupRepository.save(
-      DataGenerator.generateGroups(
-        assignedGroupSecond,
-        establishmentIdFirst,
-        assignedGroupSecondName,
-        listOf(1L, 2L),
-        GroupType.WING,
-      ),
-    )
+  private fun populateDepartments() {
+    departmentRepository.saveAll(listOf(departmentFirst, departmentSecond))
+    val establishment = establishmentRepository.findById(establishmentIdFirst).get()
+    listOf(departmentFirst, departmentSecond).forEach { department ->
+      establishmentDepartmentRepository.save(
+        EstablishmentDepartment(Generators.timeBasedEpochGenerator().generate(), establishment, department, true),
+      )
+    }
   }
 
   private fun populateApps() {
@@ -265,7 +257,7 @@ class ResponseIntegrationTest(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        assignedGroupFirst,
+        departmentFirst.slug,
         false,
       ),
     )

@@ -5,7 +5,7 @@ import java.util.UUID
 data class EstablishmentApplicationTypeResponseDto(
   val id: UUID,
   val establishmentId: String,
-  val departmentId: UUID?,
+  val departmentSlug: String?,
   val active: Boolean,
   val applicationGroupResponse: ApplicationGroupResponse,
 )

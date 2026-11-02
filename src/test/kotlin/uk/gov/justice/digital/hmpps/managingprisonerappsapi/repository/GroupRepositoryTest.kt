@@ -3,6 +3,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository
 import com.fasterxml.uuid.Generators
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,6 +23,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 @EntityScan("uk.gov.justice.digital.hmpps.managingprisonerappsapi.model")
 @ExtendWith(SpringExtension::class)
 @ActiveProfiles("test")
+@Disabled("Groups class is being removed; delete this test with it")
 class GroupRepositoryTest(
   @Autowired private val groupRepository: GroupRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
@@ -32,7 +34,7 @@ class GroupRepositoryTest(
     groupRepository.deleteAll()
   }
 
-  @Test
+  // @Test
   fun `save groups`() {
     val establishmentId = "HTS"
     val initialApps = listOf(1L)

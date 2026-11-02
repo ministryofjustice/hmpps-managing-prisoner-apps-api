@@ -18,7 +18,7 @@ data class AppResponseListDto(
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class GroupAppListViewDto(
-  val id: UUID,
+  val id: String,
   val name: String,
   val count: Long?,
 )

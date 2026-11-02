@@ -1,10 +1,8 @@
 package uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar
 
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.SarContent
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Activity
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.hmpps.kotlin.sar.HmppsPrisonSubjectAccessRequestService
-import java.util.UUID
 
 /**
  * Service for handling Subject Access Request (SAR) operations.
@@ -28,5 +26,5 @@ interface SarService : HmppsPrisonSubjectAccessRequestService {
    * @return Human-readable description of the activity
    * @throws uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException if activity is not found
    */
-  fun convertActivityToStatement(activity: Activity, entityId: UUID): String
+  // fun convertActivityToStatement(activity: Activity, entityId: UUID?): String
 }

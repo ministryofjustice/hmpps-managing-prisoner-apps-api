@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.AdditionalInformationMerge
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.HMPPSMergeDomainEvent
@@ -26,6 +28,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
+import java.util.UUID
 
 private const val OLD_NOMS_NUMBER = "A1234AA"
 private const val NEW_NOMS_NUMBER = "B1234BB"
@@ -36,6 +39,9 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
   lateinit var appRepository: AppRepository
 
   @Autowired
+  lateinit var departmentRepository: DepartmentRepository
+
+  @Autowired
   lateinit var historyRepository: HistoryRepository
 
   private val awaitAtMost30Secs
@@ -43,6 +49,7 @@ class PrisonerMergeIntegrationTest : SqsIntegrationTestBase() {
 
   @BeforeEach
   fun setUp() {
+    departmentRepository.save(Department(UUID.fromString("33333333-3333-3333-3333-333333333333"), "test-department", "Test Department"))
     // Clean up existing data
     historyRepository.deleteAll()
     appRepository.deleteAll()

@@ -8,14 +8,13 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppDecisionRequestDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
@@ -34,7 +33,7 @@ class ResponseServiceImplTest {
   private val establishmentId = "TE1"
   private val requestedBy = "A12345"
   private val staffId = "STAFF1"
-  private val assignedGroup = Generators.timeBasedEpochGenerator().generate()
+  private val department = Department(Generators.timeBasedEpochGenerator().generate(), "test-department", "Test Department")
 
   private lateinit var appService: AppService
   private lateinit var prisonerService: PrisonerService
@@ -44,7 +43,7 @@ class ResponseServiceImplTest {
   private lateinit var applicationGroupRepository: ApplicationGroupRepository
   private lateinit var establishmentService: EstablishmentService
   private lateinit var activityService: ActivityService
-  private lateinit var groupService: GroupService
+  private lateinit var establishmentDepartmentService: EstablishmentDepartmentService
   private lateinit var statsTelemetryService: StatsTelemetryService
 
   private lateinit var responseServiceImpl: ResponseServiceImpl
@@ -60,7 +59,8 @@ class ResponseServiceImplTest {
     applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
     establishmentService = Mockito.mock(EstablishmentService::class.java)
     activityService = Mockito.mock(ActivityService::class.java)
-    groupService = Mockito.mock(GroupService::class.java)
+    establishmentDepartmentService = Mockito.mock(EstablishmentDepartmentService::class.java)
+    Mockito.`when`(establishmentDepartmentService.findBySlugIgnoreCase(department.slug)).thenReturn(department)
     statsTelemetryService = Mockito.mock(StatsTelemetryService::class.java)
 
     responseServiceImpl = ResponseServiceImpl(
@@ -72,8 +72,8 @@ class ResponseServiceImplTest {
       applicationGroupRepository,
       establishmentService,
       activityService,
-      groupService,
       statsTelemetryService,
+      establishmentDepartmentService,
     )
 
     app = DataGenerator.generateApp(
@@ -86,7 +86,7 @@ class ResponseServiceImplTest {
       "Test",
       "Prisoner",
       AppStatus.NEW,
-      assignedGroup,
+      department.slug,
       false,
     )
   }
@@ -127,14 +127,8 @@ class ResponseServiceImplTest {
     Mockito.`when`(responseRepository.save(any())).thenReturn(responseEntity)
     Mockito.`when`(applicationTypeRepository.findById(1L)).thenReturn(Optional.of(ApplicationType(1, "Type", false, false, false)))
     Mockito.`when`(applicationGroupRepository.findById(1L)).thenReturn(Optional.of(ApplicationGroup(1, "Group", emptyList())))
-    Mockito.`when`(groupService.getGroupById(assignedGroup, establishmentId)).thenReturn(
-      AssignedGroupDto(
-        assignedGroup,
-        "Business Hub",
-        EstablishmentDto(establishmentId, "Test Establishment", false),
-        1,
-        GroupType.WING,
-      ),
+    Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
+      Optional.of(EstablishmentDto(establishmentId, "Test Establishment", false)),
     )
 
     responseServiceImpl.addResponse(requestedBy, app.id, staffId, decisionRequest)
@@ -180,14 +174,8 @@ class ResponseServiceImplTest {
     Mockito.`when`(responseRepository.save(any())).thenReturn(responseEntity)
     Mockito.`when`(applicationTypeRepository.findById(1L)).thenReturn(Optional.of(ApplicationType(1, "Type", false, false, false)))
     Mockito.`when`(applicationGroupRepository.findById(1L)).thenReturn(Optional.of(ApplicationGroup(1, "Group", emptyList())))
-    Mockito.`when`(groupService.getGroupById(assignedGroup, establishmentId)).thenReturn(
-      AssignedGroupDto(
-        assignedGroup,
-        "Business Hub",
-        EstablishmentDto(establishmentId, "Test Establishment", false),
-        1,
-        GroupType.WING,
-      ),
+    Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
+      Optional.of(EstablishmentDto(establishmentId, "Test Establishment", false)),
     )
 
     responseServiceImpl.addResponse(requestedBy, app.id, staffId, decisionRequest)

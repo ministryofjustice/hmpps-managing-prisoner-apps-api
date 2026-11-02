@@ -108,7 +108,7 @@ class EstablishmentApplicationTypeServiceImplTest {
   @Test
   fun `saveEstablishmentApplicationTypes updates active and department fields`() {
     val mappingId = UUID.randomUUID()
-    val departmentId = UUID.randomUUID()
+    val departmentSlug = "test-department"
     val staff = Staff(staffId, "user-id", "Test Staff", UserCategory.STAFF, establishmentId, "Officer", UUID.randomUUID())
     val establishment = Establishment(establishmentId, "Test", false)
     val appGroup = ApplicationGroup(99L, "Group")
@@ -118,7 +118,7 @@ class EstablishmentApplicationTypeServiceImplTest {
       establishment = establishment,
       applicationType = appType,
       active = true,
-      departmentId = null,
+      departmentSlug = null,
     )
 
     Mockito.`when`(staffService.getStaffById(staffId)).thenReturn(Optional.of(staff))
@@ -135,7 +135,7 @@ class EstablishmentApplicationTypeServiceImplTest {
           id = mappingId,
           applicationTypeId = 9L,
           establishmentId = establishmentId,
-          departmentId = departmentId,
+          departmentSlug = departmentSlug,
           active = false,
         ),
       ),
@@ -144,7 +144,7 @@ class EstablishmentApplicationTypeServiceImplTest {
     assertEquals(1, response.size)
     assertEquals(mappingId, response[0].id)
     assertEquals(false, response[0].active)
-    assertEquals(departmentId, response[0].departmentId)
+    assertEquals(departmentSlug, response[0].departmentSlug)
     assertNotNull(response[0].applicationGroupResponse.appTypes)
   }
 
@@ -168,7 +168,7 @@ class EstablishmentApplicationTypeServiceImplTest {
             id = mappingId,
             applicationTypeId = 9L,
             establishmentId = otherEstablishmentId,
-            departmentId = null,
+            departmentSlug = null,
             active = true,
           ),
         ),

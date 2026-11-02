@@ -14,14 +14,14 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppFile
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.sar.SarService
@@ -38,7 +38,7 @@ class SarServiceTest {
   private val prisonerNumber = "G5829VO"
   private val firstName = "Jane"
   private val lastName = "Doe"
-  private val assignedGroup = UUID.randomUUID()
+  private val department = Department(UUID.randomUUID(), "test-department", "Test Department")
   private val requestedDate = LocalDateTime.of(2026, 1, 10, 10, 30)
   private var lastModifiedDate = LocalDateTime.of(2026, 1, 15, 0, 0)
   private val typeId = 1L
@@ -52,7 +52,7 @@ class SarServiceTest {
   private lateinit var appFileRepository: AppFileRepository
   private lateinit var commentRepository: CommentRepository
   private lateinit var responseRepository: ResponseRepository
-  private lateinit var groupRepository: GroupRepository
+  private lateinit var departmentRepository: DepartmentRepository
   private lateinit var sarService: SarService
 
   @BeforeEach
@@ -63,7 +63,7 @@ class SarServiceTest {
     appFileRepository = Mockito.mock(AppFileRepository::class.java)
     commentRepository = Mockito.mock(CommentRepository::class.java)
     responseRepository = Mockito.mock(ResponseRepository::class.java)
-    groupRepository = Mockito.mock(GroupRepository::class.java)
+    departmentRepository = Mockito.mock(DepartmentRepository::class.java)
     appFileRepository = Mockito.mock(AppFileRepository::class.java)
 
     sarService = SarServiceImpl(
@@ -71,9 +71,9 @@ class SarServiceTest {
       applicationTypeRepository,
       historyRepository,
       appFileRepository,
-      groupRepository,
       commentRepository,
       responseRepository,
+      departmentRepository,
       documentApiUrl,
       serviceName,
       selfUrl,
@@ -99,7 +99,7 @@ class SarServiceTest {
       firstName,
       lastName,
       AppStatus.NEW,
-      assignedGroup,
+      department.slug,
       false,
     ).apply {
       lastModifiedDate = this@SarServiceTest.lastModifiedDate
@@ -121,7 +121,7 @@ class SarServiceTest {
       firstName,
       lastName,
       AppStatus.APPROVED,
-      UUID.randomUUID(),
+      "other-department",
       false,
     ).apply {
       lastModifiedDate = LocalDateTime.of(2026, 1, 16, 0, 0)
@@ -140,6 +140,7 @@ class SarServiceTest {
         "staff-1",
         LocalDateTime.of(2026, 1, 10, 11, 0),
         reference = null,
+        departmentName = null,
       ),
       History(
         UUID.randomUUID(),
@@ -151,6 +152,7 @@ class SarServiceTest {
         "staff-1",
         LocalDateTime.of(2026, 1, 11, 9, 15),
         reference = null,
+        departmentName = null,
       ),
       History(
         UUID.randomUUID(),
@@ -162,16 +164,16 @@ class SarServiceTest {
         "staff-2",
         LocalDateTime.of(2026, 1, 15, 0, 0),
         reference = null,
+        departmentName = null,
       ),
     )
     val appFile = AppFile(fileId, "60d08fcf-998b-49e1-97fa-cd10a54808d3", "application-photo[photo1].jpg", LocalDateTime.of(2026, 1, 11, 9, 0), "staff-1", "image/jpeg")
-    val group = DataGenerator.generateGroups(assignedGroup, establishmentId, "Test Group", emptyList(), GroupType.DEPARTMENT)
 
     Mockito.`when`(appRepository.findAppsByRequestedBy(prisonerNumber)).thenReturn(listOf(includedApp, excludedApp))
     Mockito.`when`(historyRepository.findByAppIdAndEstablishmentOrderByCreatedDate(includedApp.id, establishmentId)).thenReturn(histories)
     Mockito.`when`(applicationTypeRepository.findById(typeId)).thenReturn(Optional.of(applicationType))
     Mockito.`when`(appFileRepository.findById(fileId)).thenReturn(Optional.of(appFile))
-    Mockito.`when`(groupRepository.findById(assignedGroup)).thenReturn(Optional.of(group))
+    Mockito.`when`(departmentRepository.findBySlugIgnoreCase(department.slug)).thenReturn(department)
     Mockito.`when`(commentRepository.getCommentsByAppIdAndVisibilityOrderByCreatedDateDesc(includedApp.id, CommentVisibility.STAFF_AND_PRISONER)).thenReturn(emptyList())
     Mockito.`when`(responseRepository.findByApp(includedApp.id)).thenReturn(emptyList())
 

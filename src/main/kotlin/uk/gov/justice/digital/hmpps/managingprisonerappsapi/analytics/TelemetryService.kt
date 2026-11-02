@@ -18,7 +18,7 @@ class TelemetryService(private var telemetryClient: TelemetryClient) {
   }
 
   fun addTelemetryData(
-    entityId: UUID,
+    entityId: UUID?,
     entityType: EntityType,
     appId: UUID,
     activity: Activity,

@@ -9,7 +9,7 @@ import java.util.UUID
 data class HistoryResponse(
   val id: UUID,
   val appId: UUID,
-  val entityId: UUID,
+  val entityId: UUID?,
   val entityType: EntityType,
   var activityMessage: ActivityMessage,
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")

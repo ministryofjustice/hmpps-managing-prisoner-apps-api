@@ -24,10 +24,10 @@ import java.util.*
 class HistoryServiceImpl(
   private val historyRepository: HistoryRepository,
   private val staffService: StaffService,
-  private val groupService: GroupService,
   private val appRepository: AppRepository,
   private val commentRepository: CommentRepository,
   private val responseRepository: ResponseRepository,
+  private val establishmentDepartmentService: EstablishmentDepartmentService,
 ) : HistoryService {
   companion object {
     val logger = LoggerFactory.getLogger(this::class.java)
@@ -47,6 +47,7 @@ class HistoryServiceImpl(
     createdBy: String,
     createdDate: LocalDateTime,
     reference: String?,
+    departmentName: String?,
   ) {
     logger.info("Updating history for entity:$entityType, activity: $activity,  entityType: $entityType, appId: $appId")
     val history = historyRepository.save(
@@ -60,6 +61,7 @@ class HistoryServiceImpl(
         createdBy,
         createdDate,
         reference,
+        departmentName,
       ),
     )
   }
@@ -84,15 +86,19 @@ class HistoryServiceImpl(
 
       val response: HistoryResponse? = when (h.activity) {
         Activity.APP_SUBMITTED -> {
-          val groupName = groupService.getGroupById(h.entityId).name
-          toResponse(message("Application logged", "Assigned to $groupName"))
+          // val groupName = groupService.getGroupById(h.entityId).name
+          // val departmentName = departmentService.findDepartmentForGroup(h.entityId).name
+          val departmentName = h.departmentName
+          toResponse(message("Application logged", "Assigned to $departmentName"))
         }
         Activity.APP_IN_PROGRESS -> toResponse(message("Application set to In Progress"))
         Activity.PRISONER_ID_UPDATE -> toResponse(message("Prisoner Id merged with ${h.reference}"))
         Activity.APP_REQUEST_FORM_DATA_UPDATED -> toResponse(message("Form data updated"))
         Activity.APP_FORWARDED_TO_A_GROUP -> {
-          val groupName = groupService.getGroupById(h.entityId).name
-          toResponse(message("Application forwarded", "Forwarded to $groupName"))
+          // val groupName = groupService.getGroupById(h.entityId).name
+          // val departmentName = departmentService.findDepartmentForGroup(h.entityId).name
+          val departmentName = h.departmentName
+          toResponse(message("Application forwarded", "Forwarded to $departmentName"))
         }
         Activity.FORWARDING_COMMENT_ADDED, Activity.COMMENT_ADDED -> {
           if (h.entityType != EntityType.COMMENT) return@forEach

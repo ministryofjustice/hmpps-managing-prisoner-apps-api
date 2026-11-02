@@ -21,6 +21,7 @@ data class History(
   val createdBy: String,
   val createdDate: LocalDateTime,
   val reference: String?,
+  val departmentName: String?,
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

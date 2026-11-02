@@ -51,7 +51,7 @@ data class EstablishmentApplicationType(
   val lastModifiedDate: LocalDateTime? = null,
   val createdBy: String? = null,
   val lastModifiedBy: String? = null,
-  val departmentId: UUID? = null,
+  val departmentSlug: String? = null,
 ) {
 
   override fun equals(other: Any?): Boolean {

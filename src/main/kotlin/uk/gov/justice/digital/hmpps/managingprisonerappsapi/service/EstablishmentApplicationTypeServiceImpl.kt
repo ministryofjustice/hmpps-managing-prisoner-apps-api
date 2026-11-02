@@ -32,13 +32,13 @@ class EstablishmentApplicationTypeServiceImpl(
     establishmentRepository.findById(staff.establishmentId).orElseThrow {
       ApiException("Establishment: ${staff.establishmentId} not enabled", HttpStatus.FORBIDDEN)
     }
-    return getActiveApplicationTypesByEstablishmentId(staff.establishmentId)
+    return getActiveApplicationTypesByEstablishmentId(staff.establishmentId, false)
   }
 
   override fun getActiveApplicationTypesByPrisonerId(prisonerId: String): List<ApplicationGroupResponse> {
     val prisoner = validatePrisoner(prisonerId)
     validateEstablishment(prisoner.establishmentId!!)
-    return getActiveApplicationTypesByEstablishmentId(prisoner.establishmentId)
+    return getActiveApplicationTypesByEstablishmentId(prisoner.establishmentId, true)
   }
 
   override fun getAllApplicationTypesByEstablishment(staffId: String): List<EstablishmentApplicationTypeResponseDto> {
@@ -62,7 +62,12 @@ class EstablishmentApplicationTypeServiceImpl(
 
   override fun findApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationTypeView = establishmentApplicationTypeRepository.findApplicationTypeForEstablishment(establishmentId, applicationTypeId)
 
-  override fun saveEstablishmentApplicationTypes(staffId: String, establishmentApplicationTypeRequestDtoList: List<EstablishmentApplicationTypeRequestDto>): List<EstablishmentApplicationTypeResponseDto> {
+  override fun findDefaultApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationType = establishmentApplicationTypeRepository.findByEstablishmentIdAndApplicationTypeId(establishmentId, applicationTypeId)
+
+  override fun saveEstablishmentApplicationTypes(
+    staffId: String,
+    establishmentApplicationTypeRequestDtoList: List<EstablishmentApplicationTypeRequestDto>,
+  ): List<EstablishmentApplicationTypeResponseDto> {
     val staff = staffService.getStaffById(staffId).orElseThrow {
       ApiException("No staff with id", HttpStatus.FORBIDDEN)
     }
@@ -85,7 +90,7 @@ class EstablishmentApplicationTypeServiceImpl(
       val saved = establishmentApplicationTypeRepository.save(
         existing.copy(
           active = establishmentApplicationTypeRequestDto.active,
-          departmentId = establishmentApplicationTypeRequestDto.departmentId,
+          departmentSlug = establishmentApplicationTypeRequestDto.departmentSlug,
           lastModifiedBy = staffId,
           lastModifiedDate = java.time.LocalDateTime.now(),
         ),
@@ -103,7 +108,7 @@ class EstablishmentApplicationTypeServiceImpl(
     return EstablishmentApplicationTypeResponseDto(
       id = id!!,
       establishmentId = establishment.id,
-      departmentId = departmentId,
+      departmentSlug = departmentSlug,
       active = active,
       applicationGroupResponse = ApplicationGroupResponse(
         id = group.id,
@@ -117,13 +122,21 @@ class EstablishmentApplicationTypeServiceImpl(
     )
   }
 
-  private fun getActiveApplicationTypesByEstablishmentId(establishmentId: String): List<ApplicationGroupResponse> {
-    val configuredAppTypes = establishmentApplicationTypeRepository
-      .findByEstablishmentIdAndActive(
+  private fun getActiveApplicationTypesByEstablishmentId(establishmentId: String, forPrisoner: Boolean): List<ApplicationGroupResponse> {
+    var configuredAppTypes: List<EstablishmentApplicationType> = listOf()
+
+    if (forPrisoner) {
+      configuredAppTypes = establishmentApplicationTypeRepository.findActiveTypesWithDepartmentForEstablishment(
+        establishmentId,
+        Sort.by(Sort.Order.asc("applicationType.applicationGroup.id"), Sort.Order.asc("applicationType.name")),
+      )
+    } else {
+      configuredAppTypes = establishmentApplicationTypeRepository.findByEstablishmentIdAndActive(
         establishmentId,
         true,
         Sort.by(Sort.Order.asc("applicationType.applicationGroup.id"), Sort.Order.asc("applicationType.name")),
       )
+    }
 
     val typesByGroup = configuredAppTypes
       .mapNotNull { configuredType -> configuredType.applicationType.applicationGroup?.let { it to configuredType.applicationType } }

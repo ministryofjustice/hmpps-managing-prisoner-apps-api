@@ -50,6 +50,7 @@ import java.util.UUID
 class AppResourcePrisonerFacingIntegrationTest(
   @Autowired private val appRepository: AppRepository,
   @Autowired private val groupRepository: GroupRepository,
+  @Autowired private val departmentRepository: uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository,
   @Autowired private val commentRepository: CommentRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val applicationGroupRepository: ApplicationGroupRepository,
@@ -97,6 +98,14 @@ class AppResourcePrisonerFacingIntegrationTest(
     appFileRepository.deleteAll()
     commentRepository.deleteAll()
 
+    departmentRepository.deleteAll()
+    departmentRepository.save(
+      uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department(
+        java.util.UUID.fromString("44444444-4444-4444-4444-444444444444"),
+        "business-hub",
+        "Business Hub",
+      ),
+    )
     populateEstablishments()
     populateGroups()
     populateApps()
@@ -121,6 +130,7 @@ class AppResourcePrisonerFacingIntegrationTest(
     groupRepository.deleteAll()
     establishmentRepository.deleteAll()
     commentRepository.deleteAll()
+    departmentRepository.deleteAll()
   }
 
   @Test
@@ -225,9 +235,9 @@ class AppResourcePrisonerFacingIntegrationTest(
 
     establishmentApplicationTypeRepository.saveAll(
       listOf(
-        EstablishmentApplicationType(establishment = establishment, applicationType = typeOne, active = true),
-        EstablishmentApplicationType(establishment = establishment, applicationType = typeTwo, active = true),
-        EstablishmentApplicationType(establishment = establishment, applicationType = typeThree, active = false),
+        EstablishmentApplicationType(establishment = establishment, applicationType = typeOne, active = true, departmentSlug = "business-hub"),
+        EstablishmentApplicationType(establishment = establishment, applicationType = typeTwo, active = true, departmentSlug = "business-hub"),
+        EstablishmentApplicationType(establishment = establishment, applicationType = typeThree, active = false, departmentSlug = "business-hub"),
       ),
     )
   }
@@ -497,7 +507,7 @@ class AppResourcePrisonerFacingIntegrationTest(
         "Other",
         "Prisoner",
         AppStatus.NEW,
-        assignedGroupFirst,
+        "business-hub",
         false,
       ),
     )
@@ -614,7 +624,7 @@ class AppResourcePrisonerFacingIntegrationTest(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        assignedGroupFirst,
+        "business-hub",
         false,
       ),
     )

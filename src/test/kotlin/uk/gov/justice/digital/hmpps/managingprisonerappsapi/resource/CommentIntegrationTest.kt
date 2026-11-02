@@ -22,14 +22,16 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentDepartment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentDepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import java.time.Duration
 import java.time.LocalDateTime
@@ -37,7 +39,8 @@ import java.time.ZoneOffset
 
 class CommentIntegrationTest(
   @Autowired private val appRepository: AppRepository,
-  @Autowired private val groupRepository: GroupRepository,
+  @Autowired private val departmentRepository: DepartmentRepository,
+  @Autowired private val establishmentDepartmentRepository: EstablishmentDepartmentRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val commentRepository: CommentRepository,
   @Autowired private val applicationTypeRepository: ApplicationTypeRepository,
@@ -50,10 +53,8 @@ class CommentIntegrationTest(
     val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
     val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
     val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
-    val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
-    val assignedGroupFirstName = "Business Hub"
-    val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
-    val assignedGroupSecondName = "OMU"
+    val departmentFirst = Department(Generators.timeBasedEpochGenerator().generate(), "business-hub", "Business Hub")
+    val departmentSecond = Department(Generators.timeBasedEpochGenerator().generate(), "omu", "OMU")
     val requestedByFirst = "A12345"
     val requestedByFirstMainName = "John"
     val requestedByFirstSurname = "Smith"
@@ -79,11 +80,12 @@ class CommentIntegrationTest(
   @BeforeEach
   fun setup() {
     appRepository.deleteAll()
-    groupRepository.deleteAll()
+    establishmentDepartmentRepository.deleteAll()
     establishmentRepository.deleteAll()
+    departmentRepository.deleteAll()
     commentRepository.deleteAll()
     populateEstablishments()
-    populateGroups()
+    populateDepartments()
     populateApplicationGroupsAndTypes()
     populateApps()
 
@@ -102,8 +104,9 @@ class CommentIntegrationTest(
   @AfterEach
   fun teardown() {
     appRepository.deleteAll()
-    groupRepository.deleteAll()
+    establishmentDepartmentRepository.deleteAll()
     establishmentRepository.deleteAll()
+    departmentRepository.deleteAll()
     commentRepository.deleteAll()
     applicationTypeRepository.deleteAll()
     applicationGroupRepository.deleteAll()
@@ -257,25 +260,14 @@ class CommentIntegrationTest(
     )
   }
 
-  private fun populateGroups() {
-    groupRepository.save(
-      DataGenerator.generateGroups(
-        assignedGroupFirst,
-        establishmentIdFirst,
-        assignedGroupFirstName,
-        listOf(1L, 2L),
-        GroupType.WING,
-      ),
-    )
-    groupRepository.save(
-      DataGenerator.generateGroups(
-        assignedGroupSecond,
-        establishmentIdFirst,
-        assignedGroupSecondName,
-        listOf(1L, 2L),
-        GroupType.WING,
-      ),
-    )
+  private fun populateDepartments() {
+    departmentRepository.saveAll(listOf(departmentFirst, departmentSecond))
+    val establishment = establishmentRepository.findById(establishmentIdFirst).get()
+    listOf(departmentFirst, departmentSecond).forEach { department ->
+      establishmentDepartmentRepository.save(
+        EstablishmentDepartment(Generators.timeBasedEpochGenerator().generate(), establishment, department, true),
+      )
+    }
   }
 
   private fun populateApplicationGroupsAndTypes() {
@@ -305,7 +297,7 @@ class CommentIntegrationTest(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        assignedGroupFirst,
+        departmentFirst.slug,
         false,
       ),
     )
