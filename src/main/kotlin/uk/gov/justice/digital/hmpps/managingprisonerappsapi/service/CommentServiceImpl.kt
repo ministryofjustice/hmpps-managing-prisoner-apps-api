@@ -37,7 +37,6 @@ class CommentServiceImpl(
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
   private val prisonerService: PrisonerService,
-  private val groupService: GroupService,
   private val applicationTypeRepository: ApplicationTypeRepository,
   private val applicationGroupRepository: ApplicationGroupRepository,
   private val statsTelemetryService: StatsTelemetryService,
@@ -75,8 +74,9 @@ class CommentServiceImpl(
     }
     validateStaffPermission(staff, app)
     validatePrisonerByRequestedBy(prisonerId, app)
-    // val group = groupService.getGroupById(app.assignedGroup, staff.establishmentId)
+
     val department = establishmentDepartmentService.findBySlugIgnoreCase(app.departmentSlug)
+      ?: throw ApiException("Department ${app.departmentSlug} not found", HttpStatus.NOT_FOUND)
     val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId)
 
     val comment = commentRepository.save(
@@ -138,8 +138,10 @@ class CommentServiceImpl(
     val prisoner = validatePrisoner(prisonerId)
     val app = getAppById(appId)
     validatePrisonerByRequestedBy(prisonerId, app)
-    // val group = groupService.getGroupById(app.assignedGroup, prisoner.establishmentId!!)
+
     val department = establishmentDepartmentService.findBySlugIgnoreCase(app.departmentSlug)
+      ?: throw ApiException("Department ${app.departmentSlug} not found", HttpStatus.NOT_FOUND)
+
     val establishmentDto = establishmentService.getEstablishmentById(app.establishmentId)
 
     val comment = commentRepository.save(

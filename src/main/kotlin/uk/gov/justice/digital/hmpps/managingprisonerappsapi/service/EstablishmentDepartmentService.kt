@@ -10,7 +10,7 @@ interface EstablishmentDepartmentService {
 
   fun findActiveDepartmentsForEstablishment(loggedUserId: String): List<AssignedGroupDto>
 
-  fun findBySlugIgnoreCase(name: String?): Department
+  fun findBySlugIgnoreCase(departmentSlug: String?): Department?
 
   fun findDepartmentByDepartmentIdAndEstablishmentId(departmentId: UUID, establishmentId: String): Department
 

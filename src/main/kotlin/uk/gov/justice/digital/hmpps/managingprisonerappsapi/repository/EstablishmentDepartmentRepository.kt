@@ -10,7 +10,7 @@ interface EstablishmentDepartmentRepository : JpaRepository<EstablishmentDepartm
 
   fun findByEstablishmentId(establishmentId: String): List<EstablishmentDepartment>
 
-  fun findByEstablishmentIdAndDepartmentId(establishmentId: String, departmentId: UUID): EstablishmentDepartment
+  fun findByEstablishmentIdAndDepartmentId(establishmentId: String, departmentId: UUID): EstablishmentDepartment?
 
   fun findByEstablishmentIdAndActive(establishmentId: String, active: Boolean): List<EstablishmentDepartment>
 }

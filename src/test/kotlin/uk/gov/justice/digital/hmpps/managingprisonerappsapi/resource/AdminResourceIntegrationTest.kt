@@ -22,7 +22,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.Applicati
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
 import java.time.Duration
-import java.util.UUID
 
 class AdminResourceIntegrationTest(
   @Autowired private val establishmentRepository: EstablishmentRepository,
@@ -82,20 +81,20 @@ class AdminResourceIntegrationTest(
 
   @Test
   fun `patch updates department mappings for logged staff establishment`() {
-    val newDepartment = UUID.randomUUID()
+    val newDepartment = "new-department"
     val request = listOf(
       EstablishmentApplicationTypeRequestDto(
         id = mappingOne.id!!,
         applicationTypeId = mappingOne.applicationType.id,
         establishmentId = establishmentId,
-        departmentId = newDepartment,
+        departmentSlug = newDepartment,
         active = false,
       ),
       EstablishmentApplicationTypeRequestDto(
         id = mappingTwo.id!!,
         applicationTypeId = mappingTwo.applicationType.id,
         establishmentId = establishmentId,
-        departmentId = null,
+        departmentSlug = null,
         active = true,
       ),
     )
@@ -115,13 +114,13 @@ class AdminResourceIntegrationTest(
 
     assertEquals(2, response.size)
     assertEquals(false, response.first { it.id == mappingOne.id }.active)
-    assertEquals(newDepartment, response.first { it.id == mappingOne.id }.departmentId)
+    assertEquals(newDepartment, response.first { it.id == mappingOne.id }.departmentSlug)
     assertEquals(true, response.first { it.id == mappingTwo.id }.active)
 
     val updatedOne = establishmentApplicationTypeRepository.findById(mappingOne.id!!).get()
     val updatedTwo = establishmentApplicationTypeRepository.findById(mappingTwo.id!!).get()
     assertEquals(false, updatedOne.active)
-    assertEquals(newDepartment, updatedOne.departmentId)
+    assertEquals(newDepartment, updatedOne.departmentSlug)
     assertEquals(true, updatedTwo.active)
     assertNotNull(updatedOne.lastModifiedDate)
   }

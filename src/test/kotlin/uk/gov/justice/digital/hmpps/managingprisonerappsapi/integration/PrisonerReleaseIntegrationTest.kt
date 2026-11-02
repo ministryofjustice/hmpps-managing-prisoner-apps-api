@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.service.events.AdditionalInformation
@@ -39,6 +41,9 @@ class PrisonerReleaseIntegrationTest : SqsIntegrationTestBase() {
   lateinit var appRepository: AppRepository
 
   @Autowired
+  lateinit var departmentRepository: DepartmentRepository
+
+  @Autowired
   lateinit var historyRepository: HistoryRepository
 
   @Autowired
@@ -49,6 +54,7 @@ class PrisonerReleaseIntegrationTest : SqsIntegrationTestBase() {
 
   @BeforeEach
   fun setUp() {
+    departmentRepository.save(Department(UUID.fromString("33333333-3333-3333-3333-333333333333"), "test-department", "Test Department"))
     historyRepository.deleteAll()
     responseRepository.deleteAll()
     appRepository.deleteAll()

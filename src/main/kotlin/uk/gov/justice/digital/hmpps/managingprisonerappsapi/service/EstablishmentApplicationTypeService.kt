@@ -19,6 +19,4 @@ interface EstablishmentApplicationTypeService {
   fun findApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationTypeView
 
   fun findDefaultApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationType?
-
-  fun findByDepartmentSlugAndEstablishmentId(departmentSlug: String, establishmentId: String): EstablishmentApplicationType
 }

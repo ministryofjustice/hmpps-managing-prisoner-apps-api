@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.exceptions.ApiException
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.App
@@ -22,8 +21,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGro
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
@@ -32,7 +30,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.Applicati
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ESTABLISHMENT_ID_1
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.stats.StatsTelemetryService
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.CONTACT_NUMBER
@@ -48,7 +45,7 @@ class AppServiceImplTest {
   private val requestedByLastName = "Prisoner"
   private val createdBy = "Staff12345"
   private val staffFullName = "Test Staff"
-  private val groupId = Generators.timeBasedEpochGenerator().generate()
+  private val department = Department(Generators.timeBasedEpochGenerator().generate(), "test-department", "Test Department")
   private val forwardingComment = "Forwarding Comment"
 
   private lateinit var prisoner: Prisoner
@@ -57,7 +54,7 @@ class AppServiceImplTest {
   private lateinit var appRepository: AppRepository
   private lateinit var prisonerService: PrisonerService
   private lateinit var staffService: StaffService
-  private lateinit var groupService: GroupService
+  private lateinit var establishmentDepartmentService: EstablishmentDepartmentService
   private lateinit var commentRepository: CommentRepository
   private lateinit var activityService: ActivityService
   private lateinit var historyService: HistoryService
@@ -65,7 +62,6 @@ class AppServiceImplTest {
   private lateinit var applicationGroupRepository: ApplicationGroupRepository
   private lateinit var applicationTypeRepository: ApplicationTypeRepository
   private lateinit var statsTelemetryService: StatsTelemetryService
-  private lateinit var groupRepository: GroupRepository
   private lateinit var establishmentApplicationTypeService: EstablishmentApplicationTypeService
 
   private lateinit var appService: AppService
@@ -79,7 +75,8 @@ class AppServiceImplTest {
     appRepository = Mockito.mock(AppRepository::class.java)
     prisonerService = Mockito.mock(PrisonerService::class.java)
     staffService = Mockito.mock(StaffService::class.java)
-    groupService = Mockito.mock(GroupService::class.java)
+    establishmentDepartmentService = Mockito.mock(EstablishmentDepartmentService::class.java)
+    Mockito.`when`(establishmentDepartmentService.findBySlugIgnoreCase(department.slug)).thenReturn(department)
     commentRepository = Mockito.mock(CommentRepository::class.java)
     activityService = Mockito.mock(ActivityService::class.java)
     historyService = Mockito.mock(HistoryService::class.java)
@@ -87,7 +84,6 @@ class AppServiceImplTest {
     applicationTypeRepository = Mockito.mock(ApplicationTypeRepository::class.java)
     applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
     statsTelemetryService = Mockito.mock(StatsTelemetryService::class.java)
-    groupRepository = Mockito.mock(GroupRepository::class.java)
     establishmentApplicationTypeService = Mockito.mock(EstablishmentApplicationTypeService::class.java)
     val activeAppTypeView = Mockito.mock(uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationTypeView::class.java)
     Mockito.`when`(activeAppTypeView.active).thenReturn(true)
@@ -105,7 +101,7 @@ class AppServiceImplTest {
       requestedByFirstName,
       requestedByLastName,
       AppStatus.NEW,
-      groupId,
+      department.slug,
       false,
     )
 
@@ -151,7 +147,6 @@ class AppServiceImplTest {
       appRepository,
       prisonerService,
       staffService,
-      groupService,
       commentRepository,
       activityService,
       historyService,
@@ -159,6 +154,7 @@ class AppServiceImplTest {
       applicationGroupRepository,
       applicationTypeRepository,
       statsTelemetryService,
+      establishmentDepartmentService,
       establishmentApplicationTypeService,
     )
   }
@@ -194,7 +190,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
-          null,
+          department.id,
           listOf(),
         ),
       )
@@ -223,7 +219,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
-          null,
+          department.id,
           listOf(),
         ),
       )
@@ -252,7 +248,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
-          null,
+          department.id,
           listOf(),
         ),
       )
@@ -270,30 +266,8 @@ class AppServiceImplTest {
     )
     Mockito.`when`(establishmentService.getEstablishmentById(staff.establishmentId))
       .thenReturn(Optional.of(establishment))
-    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.applicationType!!)).thenReturn(
-      listOf(
-        Groups(
-          groupId,
-          "Test Group",
-          establishmentId,
-          listOf(1L),
-          GroupType.WING,
-        ),
-      ),
-    )
-    Mockito.`when`(groupService.getGroupById(groupId, staff.establishmentId)).thenReturn(
-      AssignedGroupDto(
-        groupId,
-        "Test Group",
-        EstablishmentDto(
-          establishmentId,
-          "Test Establishment",
-          false,
-        ),
-        1L,
-        GroupType.WING,
-      ),
-    )
+    Mockito.`when`(establishmentDepartmentService.findDepartmentByDepartmentIdAndEstablishmentId(department.id, staff.establishmentId))
+      .thenReturn(department)
     Mockito.`when`(appRepository.save(any())).thenReturn(app)
     Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
     Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
@@ -308,7 +282,7 @@ class AppServiceImplTest {
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstName,
         requestedByLastName,
-        null,
+        department.id,
         listOf(),
       ),
     )
@@ -322,30 +296,6 @@ class AppServiceImplTest {
     )
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy)).thenReturn(
       Optional.of(prisoner),
-    )
-    Mockito.`when`(groupService.getGroupByInitialAppType(establishmentId, app.applicationType!!)).thenReturn(
-      listOf(
-        Groups(
-          groupId,
-          "Test Group",
-          establishmentId,
-          listOf(1L),
-          GroupType.WING,
-        ),
-      ),
-    )
-    Mockito.`when`(groupService.getGroupById(groupId, null)).thenReturn(
-      AssignedGroupDto(
-        groupId,
-        "Test Group",
-        EstablishmentDto(
-          establishmentId,
-          "Test Establishment",
-          false,
-        ),
-        1L,
-        GroupType.WING,
-      ),
     )
     Mockito.`when`(applicationTypeRepository.findById(app.applicationType!!)).thenReturn(Optional.of(applicationType))
     Mockito.`when`(applicationGroupRepository.findById(app.applicationGroup!!))
@@ -364,7 +314,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(),
           false,
-          null,
+          department.id,
           listOf(),
         ),
       )
@@ -396,7 +346,7 @@ class AppServiceImplTest {
               },
           ),
           false,
-          null,
+          department.id,
           listOf(),
         ),
       )
@@ -412,19 +362,6 @@ class AppServiceImplTest {
     )
     Mockito.`when`(prisonerService.getPrisonerById(requestedBy)).thenReturn(
       Optional.of(prisoner),
-    )
-    Mockito.`when`(groupService.getGroupById(app.assignedGroup, staff.establishmentId)).thenReturn(
-      AssignedGroupDto(
-        groupId,
-        "Test Group",
-        EstablishmentDto(
-          establishmentId,
-          "Test Establishment",
-          false,
-        ),
-        1L,
-        GroupType.WING,
-      ),
     )
     Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
     Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
@@ -444,7 +381,7 @@ class AppServiceImplTest {
       true,
       true,
     )
-    assertInstanceOf(AssignedGroupDto::class.java, appResponse.assignedGroup)
+    assertInstanceOf(Department::class.java, appResponse.assignedGroup)
     assertInstanceOf(Prisoner::class.java, appResponse.requestedBy)
     assertApp(app, appResponse)
   }
@@ -473,7 +410,7 @@ class AppServiceImplTest {
     val exception = assertThrows(ApiException::class.java) {
       appService.forwardAppToGroup(
         createdBy,
-        UUID.randomUUID(),
+        "forward-department",
         UUID.randomUUID(),
         CommentRequestDto(
           forwardingComment,
@@ -486,37 +423,25 @@ class AppServiceImplTest {
 
   @Test
   fun `forward app to group`() {
-    val forwardGroupId = UUID.randomUUID()
+    val forwardDepartment = Department(UUID.randomUUID(), "forward-department", "Forward department")
     Mockito.`when`(establishmentService.getEstablishmentById(staff.establishmentId))
       .thenReturn(Optional.of(establishment))
     Mockito.`when`(staffService.getStaffById(createdBy)).thenReturn(Optional.of(staff))
     Mockito.`when`(appRepository.findById(app.id)).thenReturn(Optional.of(app))
-    Mockito.`when`(groupService.getGroupById(forwardGroupId, staff.establishmentId)).thenReturn(
-      AssignedGroupDto(
-        forwardGroupId,
-        "Forward group",
-        EstablishmentDto(
-          establishmentId,
-          "Test Establishment",
-          false,
-        ),
-        1L,
-        GroupType.WING,
-      ),
-    )
+    Mockito.`when`(establishmentDepartmentService.findBySlugIgnoreCase(forwardDepartment.slug)).thenReturn(forwardDepartment)
     Mockito.`when`(commentRepository.save(any())).thenReturn(comment)
     Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
     Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     val appResponse = appService.forwardAppToGroup(
       createdBy,
-      forwardGroupId,
+      forwardDepartment.slug,
       app.id,
       CommentRequestDto(
         forwardingComment,
         CommentVisibility.STAFF_ONLY,
       ),
     )
-    assertEquals(forwardGroupId, app.assignedGroup)
+    assertEquals(forwardDepartment.slug, app.departmentSlug)
     assertApp(app, appResponse)
   }
 
@@ -526,24 +451,11 @@ class AppServiceImplTest {
       status = AppStatus.IN_PROGRESS,
       comment = null,
     )
-    val group = AssignedGroupDto(
-      groupId,
-      "Test Group",
-      EstablishmentDto(
-        establishmentId,
-        "Test Establishment",
-        false,
-      ),
-      1L,
-      GroupType.WING,
-    )
-
     Mockito.`when`(appRepository.findAppsByIdAndRequestedBy(app.id, requestedBy)).thenReturn(Optional.of(app))
     Mockito.`when`(staffService.getStaffById(createdBy)).thenReturn(Optional.of(staff))
     Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
     Mockito.`when`(applicationTypeRepository.findById(1)).thenReturn(Optional.of(applicationType))
     Mockito.`when`(appRepository.save(any())).thenReturn(app)
-    Mockito.`when`(groupService.getGroupById(groupId, establishmentId)).thenReturn(group)
     Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(Optional.of(establishment))
 
     val appResponse = appService.updateAppStatusToInProgress(requestedBy, createdBy, app.id, appStatusUpdateDto)
@@ -597,7 +509,7 @@ class AppServiceImplTest {
       requestedByFirstName,
       requestedByLastName,
       AppStatus.IN_PROGRESS,
-      groupId,
+      department.slug,
       false,
     )
     val appStatusUpdateDto = uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppStatusUpdateDto(

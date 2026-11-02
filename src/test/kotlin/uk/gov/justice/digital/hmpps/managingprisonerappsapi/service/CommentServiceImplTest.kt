@@ -13,7 +13,6 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.CommentResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.PrisonerDto
@@ -25,7 +24,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGro
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.UserCategory
@@ -46,7 +45,7 @@ class CommentServiceImplTest {
   private val requestedByLastName = "Prisoner"
   private val createdBy = "Staff12345"
   private val staffFullName = "Test Staff"
-  private val groupId = Generators.timeBasedEpochGenerator().generate()
+  private val department = Department(Generators.timeBasedEpochGenerator().generate(), "test-department", "Test Department")
   private val message = "This is require more information from other department"
   private val createdDate = LocalDateTime.now(ZoneOffset.UTC)
 
@@ -62,7 +61,7 @@ class CommentServiceImplTest {
   private lateinit var app: App
   private lateinit var commentByStaff: Comment
   private lateinit var commentByPrisoner: Comment
-  private lateinit var groupService: GroupService
+  private lateinit var establishmentDepartmentService: EstablishmentDepartmentService
   private lateinit var applicationGroupRepository: ApplicationGroupRepository
   private lateinit var applicationTypeRepository: ApplicationTypeRepository
   private lateinit var statsTelemetryService: StatsTelemetryService
@@ -81,7 +80,7 @@ class CommentServiceImplTest {
       requestedByFirstName,
       requestedByLastName,
       AppStatus.NEW,
-      groupId,
+      department.slug,
       false,
     )
 
@@ -132,7 +131,8 @@ class CommentServiceImplTest {
     staffService = Mockito.mock(StaffService::class.java)
     prisonerService = Mockito.mock(PrisonerService::class.java)
     activityService = Mockito.mock(ActivityService::class.java)
-    groupService = Mockito.mock(GroupService::class.java)
+    establishmentDepartmentService = Mockito.mock(EstablishmentDepartmentService::class.java)
+    Mockito.`when`(establishmentDepartmentService.findBySlugIgnoreCase(department.slug)).thenReturn(department)
     applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
     applicationTypeRepository = Mockito.mock(ApplicationTypeRepository::class.java)
     statsTelemetryService = Mockito.mock(StatsTelemetryService::class.java)
@@ -146,10 +146,10 @@ class CommentServiceImplTest {
       establishmentService,
       activityService,
       prisonerService,
-      groupService,
       applicationTypeRepository,
       applicationGroupRepository,
       statsTelemetryService,
+      establishmentDepartmentService,
     )
   }
 
@@ -164,14 +164,8 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(applicationTypeRepository.findById(1L)).thenReturn(Optional.of<ApplicationType>(applicationType))
     Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
-    Mockito.`when`(groupService.getGroupById(app.assignedGroup, staff.establishmentId)).thenReturn(
-      AssignedGroupDto(
-        groupId,
-        "Test Group",
-        EstablishmentDto(establishmentId, "Test Establishment", false),
-        1L,
-        GroupType.WING,
-      ),
+    Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
+      Optional.of(EstablishmentDto(establishmentId, "Test Establishment", false)),
     )
     Mockito.`when`(commentRepository.save(any())).thenReturn(commentByStaff)
     val result = commentServiceImpl.addCommentByStaff(
@@ -190,14 +184,8 @@ class CommentServiceImplTest {
     Mockito.`when`(appService.getAppById(app.id)).thenReturn(Optional.of(app))
     Mockito.`when`(applicationTypeRepository.findById(1L)).thenReturn(Optional.of<ApplicationType>(applicationType))
     Mockito.`when`(applicationGroupRepository.findById(1)).thenReturn(Optional.of(applicationGroup))
-    Mockito.`when`(groupService.getGroupById(app.assignedGroup, prisoner.establishmentId!!)).thenReturn(
-      AssignedGroupDto(
-        groupId,
-        "Test Group",
-        EstablishmentDto(establishmentId, "Test Establishment", false),
-        1L,
-        GroupType.WING,
-      ),
+    Mockito.`when`(establishmentService.getEstablishmentById(establishmentId)).thenReturn(
+      Optional.of(EstablishmentDto(establishmentId, "Test Establishment", false)),
     )
     Mockito.`when`(commentRepository.save(any())).thenReturn(commentByPrisoner)
     val result = commentServiceImpl.addMessageByPrisoner(

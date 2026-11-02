@@ -14,7 +14,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppUpdat
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.AppsSearchQueryDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.request.CommentRequestDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResponseDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.IntegrationTestBase
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.integration.wiremock.ManageUsersApiExtension.Companion.manageUsersApi
@@ -23,17 +22,19 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.AppStatus
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationGroup
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Establishment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentDepartment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Prisoner
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationGroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentApplicationTypeRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentDepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.EstablishmentRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.utils.DataGenerator.Companion.CONTACT_NUMBER
 import java.time.Duration
@@ -45,7 +46,8 @@ import java.util.*
 
 class AppResourceIntegrationTestDefaultGroups(
   @Autowired private val appRepository: AppRepository,
-  @Autowired private val groupRepository: GroupRepository,
+  @Autowired private val departmentRepository: DepartmentRepository,
+  @Autowired private val establishmentDepartmentRepository: EstablishmentDepartmentRepository,
   @Autowired private val establishmentRepository: EstablishmentRepository,
   @Autowired private val commentRepository: CommentRepository,
   @Autowired private val applicationGroupRepository: ApplicationGroupRepository,
@@ -56,10 +58,8 @@ class AppResourceIntegrationTestDefaultGroups(
   private val establishmentIdFirst = "TEST_ESTABLISHMENT_FIRST"
   private val establishmentIdSecond = "TEST_ESTABLISHMENT_SECOND"
   private val establishmentIdThird = "TEST_ESTABLISHMENT_THIRD"
-  private val assignedGroupFirst = Generators.timeBasedEpochGenerator().generate()
-  private val assignedGroupFirstName = "Business Hub"
-  private val assignedGroupSecond = Generators.timeBasedEpochGenerator().generate()
-  private val assignedGroupSecondName = "OMU"
+  private val departmentFirst = Department(Generators.timeBasedEpochGenerator().generate(), "business-hub", "Business Hub")
+  private val departmentSecond = Department(Generators.timeBasedEpochGenerator().generate(), "omu", "OMU")
   private val requestedByFirst = "A12345"
   private val requestedByFirstMainName = "John"
   private val requestedByFirstSurname = "Smith"
@@ -88,12 +88,13 @@ class AppResourceIntegrationTestDefaultGroups(
   @BeforeEach
   fun setUp() {
     appRepository.deleteAll()
-    groupRepository.deleteAll()
+    establishmentDepartmentRepository.deleteAll()
     establishmentApplicationTypeRepository.deleteAll()
     establishmentRepository.deleteAll()
+    departmentRepository.deleteAll()
 
     populateEstablishments()
-    populateGroups()
+    populateDepartments()
     populateApps()
     populateApplicationGroupsAndTypes()
     populateEstablishmentApplicationTypes()
@@ -113,9 +114,10 @@ class AppResourceIntegrationTestDefaultGroups(
   @AfterEach
   fun tearOff() {
     appRepository.deleteAll()
-    groupRepository.deleteAll()
+    establishmentDepartmentRepository.deleteAll()
     establishmentApplicationTypeRepository.deleteAll()
     establishmentRepository.deleteAll()
+    departmentRepository.deleteAll()
     commentRepository.deleteAll()
   }
 
@@ -135,7 +137,7 @@ class AppResourceIntegrationTestDefaultGroups(
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
-          null,
+          departmentFirst.id,
           listOf(),
         ),
       )
@@ -212,20 +214,20 @@ class AppResourceIntegrationTestDefaultGroups(
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
-          assignedGroupFirst,
+          departmentFirst.id,
           listOf(),
         ),
       )
       .exchange()
       .expectStatus().isCreated
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<AppResponseDto<AssignedGroupDto, Any>>() {})
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Department, Any>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as AppResponseDto<AssignedGroupDto, Any>
+      .responseBody as AppResponseDto<Department, Any>
 
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
-    Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
+    Assertions.assertEquals(departmentFirst.id, response.assignedGroup.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.NEW, response.status)
     Assertions.assertEquals(false, response.firstNightCenter)
@@ -274,7 +276,7 @@ class AppResourceIntegrationTestDefaultGroups(
           },
       ),
       true,
-      null,
+      departmentFirst.id,
       listOf(),
     )
     var response = webTestClient.post()
@@ -318,7 +320,7 @@ class AppResourceIntegrationTestDefaultGroups(
           },
       ),
       false,
-      null,
+      departmentFirst.id,
       listOf(),
     )
     val response = webTestClient.post()
@@ -356,7 +358,7 @@ class AppResourceIntegrationTestDefaultGroups(
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstMainName,
       requestedBySecondSurname,
-      null,
+      departmentFirst.id,
       listOf(),
     )
     val response = webTestClient.post()
@@ -435,10 +437,9 @@ class AppResourceIntegrationTestDefaultGroups(
 
   @Test
   fun `forward app request to other group`() {
-    // groupRepository.findGroupsByEstablishmentIdAndInitialsAppsIsContaining(establishmentIdFirst)
-    val forwardingMessage = "Forwarding  to group $assignedGroupSecondName"
+    val forwardingMessage = "Forwarding  to group ${departmentSecond.name}"
     webTestClient.post()
-      .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupFirst")
+      .uri("/v1/apps/$appIdFirst/forward/groups/${departmentFirst.slug}")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -446,7 +447,7 @@ class AppResourceIntegrationTestDefaultGroups(
       .expectStatus().isBadRequest
 
     var response = webTestClient.post()
-      .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupSecond")
+      .uri("/v1/apps/$appIdFirst/forward/groups/${departmentSecond.slug}")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -454,17 +455,17 @@ class AppResourceIntegrationTestDefaultGroups(
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<AppResponseDto<AssignedGroupDto, String>>() {})
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Department, String>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as AppResponseDto<AssignedGroupDto, String>
+      .responseBody as AppResponseDto<Department, String>
 
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.NEW, response.status)
-    Assertions.assertEquals(1, response.requests?.size)
-    Assertions.assertEquals(assignedGroupSecond, response.assignedGroup.id)
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertEquals(departmentSecond.id, response.assignedGroup.id)
 
     webTestClient.get()
       .uri("/v1/prisoners/$requestedByFirst/apps/$appIdFirst/history")
@@ -482,24 +483,24 @@ class AppResourceIntegrationTestDefaultGroups(
     // forwarding without forwarding message
 
     response = webTestClient.post()
-      .uri("/v1/apps/$appIdFirst/forward/groups/$assignedGroupFirst")
+      .uri("/v1/apps/$appIdFirst/forward/groups/${departmentFirst.slug}")
       .headers(setAuthorisation(roles = listOf("ROLE_MANAGING_PRISONER_APPS")))
       .header("Content-Type", "application/json")
       .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
       .expectStatus().isOk
       .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
-      .expectBody(object : ParameterizedTypeReference<AppResponseDto<AssignedGroupDto, String>>() {})
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Department, String>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as AppResponseDto<AssignedGroupDto, String>
+      .responseBody as AppResponseDto<Department, String>
 
     Assertions.assertEquals(applicationTypeOne, response.applicationType.id)
     Assertions.assertEquals(appIdFirst, response.id)
     Assertions.assertEquals(requestedByFirst, response.requestedBy)
     Assertions.assertEquals(AppStatus.NEW, response.status)
-    Assertions.assertEquals(1, response.requests?.size)
-    Assertions.assertEquals(assignedGroupFirst, response.assignedGroup.id)
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertEquals(departmentFirst.id, response.assignedGroup.id)
 
     webTestClient.get()
       .uri("/v1/prisoners/$requestedByFirst/apps/$appIdFirst/history")
@@ -531,7 +532,7 @@ class AppResourceIntegrationTestDefaultGroups(
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedByFirstSurname,
-          null,
+          departmentFirst.id,
           listOf(),
         ),
       )
@@ -552,10 +553,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
-          "DEFAULT",
-          applicationTypeOne,
-        ).get(0).id,
+        departmentFirst.slug,
         false,
       ),
     )
@@ -566,17 +564,17 @@ class AppResourceIntegrationTestDefaultGroups(
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
       .expectStatus().isOk
-      .expectBody(object : ParameterizedTypeReference<AppResponseDto<String, String>>() {})
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Department, String>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as AppResponseDto<String, String>
+      .responseBody as AppResponseDto<Department, String>
 
     Assertions.assertEquals(app.appType, response.appType)
     Assertions.assertEquals(app.id, response.id)
     Assertions.assertEquals(app.requestedBy, response.requestedBy)
     Assertions.assertEquals(app.status, response.status)
-    Assertions.assertEquals(1, response.requests?.size)
-    Assertions.assertEquals(app.assignedGroup.toString(), response.assignedGroup.toString())
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertEquals(app.departmentSlug, response.assignedGroup.slug)
   }
 
   @Test
@@ -592,10 +590,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
-          "DEFAULT",
-          applicationTypeOne,
-        ).get(0).id,
+        departmentFirst.slug,
         false,
       ),
     )
@@ -607,19 +602,19 @@ class AppResourceIntegrationTestDefaultGroups(
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
       .expectStatus().isOk
-      .expectBody(object : ParameterizedTypeReference<AppResponseDto<String, Prisoner>>() {})
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Department, Prisoner>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as AppResponseDto<String, Prisoner>
-    val prisoner = response.requestedBy as Prisoner
+      .responseBody as AppResponseDto<Department, Prisoner>
+    val prisoner = response.requestedBy
     Assertions.assertEquals(app.appType, response.appType)
     Assertions.assertEquals(app.id, response.id)
     Assertions.assertEquals(app.status, response.status)
-    Assertions.assertEquals(1, response.requests?.size)
+    Assertions.assertEquals(1, response.requests.size)
     Assertions.assertEquals(app.requestedBy, prisoner.username)
     Assertions.assertNotNull(prisoner.firstName)
     Assertions.assertNotNull(prisoner.lastName)
-    Assertions.assertEquals(app.assignedGroup.toString(), response.assignedGroup)
+    Assertions.assertEquals(app.departmentSlug, response.assignedGroup.slug)
   }
 
   @Test
@@ -635,10 +630,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        groupRepository.findGroupsByEstablishmentIdAndInitialsApplicationTypesIsContaining(
-          "DEFAULT",
-          applicationTypeOne,
-        ).get(0).id,
+        departmentFirst.slug,
         false,
       ),
     )
@@ -650,17 +642,17 @@ class AppResourceIntegrationTestDefaultGroups(
       .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
       .exchange()
       .expectStatus().isOk
-      .expectBody(object : ParameterizedTypeReference<AppResponseDto<AssignedGroupDto, String>>() {})
+      .expectBody(object : ParameterizedTypeReference<AppResponseDto<Department, String>>() {})
       .consumeWith(System.out::println)
       .returnResult()
-      .responseBody as AppResponseDto<AssignedGroupDto, String>
+      .responseBody as AppResponseDto<Department, String>
     val assignedGroupDto = response.assignedGroup
     Assertions.assertEquals(app.appType, response.appType)
     Assertions.assertEquals(app.id, response.id)
     Assertions.assertEquals(app.requestedBy, response.requestedBy)
     Assertions.assertEquals(app.status, response.status)
-    Assertions.assertEquals(1, response.requests?.size)
-    Assertions.assertEquals(app.assignedGroup, assignedGroupDto.id)
+    Assertions.assertEquals(1, response.requests.size)
+    Assertions.assertEquals(app.departmentSlug, assignedGroupDto.slug)
     Assertions.assertNotNull(response.assignedGroup.name)
   }
 
@@ -688,25 +680,14 @@ class AppResourceIntegrationTestDefaultGroups(
     )
   }
 
-  private fun populateGroups() {
-    groupRepository.save(
-      DataGenerator.generateGroups(
-        assignedGroupFirst,
-        "DEFAULT",
-        assignedGroupFirstName,
-        listOf(1L, 3L),
-        GroupType.WING,
-      ),
-    )
-    groupRepository.save(
-      DataGenerator.generateGroups(
-        assignedGroupSecond,
-        "DEFAULT",
-        assignedGroupSecondName,
-        listOf(1L, 2L),
-        GroupType.WING,
-      ),
-    )
+  private fun populateDepartments() {
+    departmentRepository.saveAll(listOf(departmentFirst, departmentSecond))
+    val establishment = establishmentRepository.findById(establishmentIdFirst).get()
+    listOf(departmentFirst, departmentSecond).forEach { department ->
+      establishmentDepartmentRepository.save(
+        EstablishmentDepartment(UUID.randomUUID(), establishment, department, true),
+      )
+    }
   }
 
   private fun populateApplicationGroupsAndTypes() {
@@ -747,7 +728,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        assignedGroupFirst,
+        departmentFirst.slug,
         false,
       ),
     ).id
@@ -762,7 +743,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        assignedGroupFirst,
+        departmentFirst.slug,
         false,
       ),
     ).id
@@ -778,7 +759,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        assignedGroupFirst,
+        departmentFirst.slug,
         false,
       ),
     )
@@ -793,7 +774,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedBySecondMainName,
         requestedBySecondSurname,
         AppStatus.NEW,
-        assignedGroupFirst,
+        departmentFirst.slug,
         false,
       ),
     )
@@ -808,7 +789,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByFirstMainName,
         requestedByFirstSurname,
         AppStatus.NEW,
-        assignedGroupFirst,
+        departmentFirst.slug,
         false,
       ),
     )
@@ -823,7 +804,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByThirdMainName,
         requestedByThirdSurname,
         AppStatus.NEW,
-        assignedGroupSecond,
+        departmentSecond.slug,
         false,
       ),
     )
@@ -838,7 +819,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByThirdMainName,
         requestedByThirdSurname,
         AppStatus.NEW,
-        assignedGroupSecond,
+        departmentSecond.slug,
         false,
       ),
     )
@@ -853,7 +834,7 @@ class AppResourceIntegrationTestDefaultGroups(
         requestedByThirdMainName,
         requestedByThirdSurname,
         AppStatus.NEW,
-        assignedGroupSecond,
+        departmentSecond.slug,
         false,
       ),
     )

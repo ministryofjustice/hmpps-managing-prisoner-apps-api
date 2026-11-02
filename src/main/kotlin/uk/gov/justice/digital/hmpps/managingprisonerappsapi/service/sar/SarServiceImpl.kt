@@ -25,7 +25,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppReposi
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
 import uk.gov.justice.hmpps.kotlin.sar.HmppsSubjectAccessRequestContent
@@ -38,7 +37,6 @@ class SarServiceImpl(
   private val applicationTypeRepository: ApplicationTypeRepository,
   private val historyRepository: HistoryRepository,
   private val appFileRepository: AppFileRepository,
-  private val groupRepository: GroupRepository,
   private val commentRepository: CommentRepository,
   private val responseRepository: ResponseRepository,
   private val departmentRepository: DepartmentRepository,
@@ -148,8 +146,9 @@ class SarServiceImpl(
         }
       }
 
-      // val assignedGroup = groupRepository.findById(app.assignedGroup)
       val department = departmentRepository.findBySlugIgnoreCase(app.departmentSlug)
+        ?: throw ApiException("Department ${app.departmentSlug} not found", HttpStatus.NOT_FOUND)
+
       val appType = applicationTypeRepository.findById(app.applicationType!!)
 
       // Convert formData maps to FormDataItem list

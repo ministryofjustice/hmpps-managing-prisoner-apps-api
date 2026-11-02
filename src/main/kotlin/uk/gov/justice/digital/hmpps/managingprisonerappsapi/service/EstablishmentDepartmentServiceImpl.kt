@@ -38,9 +38,7 @@ class EstablishmentDepartmentServiceImpl(
     return convertDepartmentsToAssignedGroupsDto(establishmentDepartments)
   }
 
-  // override fun findDepartmentByGroupId(groupId: UUID): Department = departmentRepository.findDepartmentByGroupId(groupId)
-
-  override fun findBySlugIgnoreCase(name: String?): Department = departmentRepository.findBySlugIgnoreCase(name)
+  override fun findBySlugIgnoreCase(departmentSlug: String?): Department? = departmentRepository.findBySlugIgnoreCase(departmentSlug)
 
   override fun findDepartmentByDepartmentIdAndEstablishmentId(departmentId: UUID, establishmentId: String): Department {
     val establishmentDepartment =

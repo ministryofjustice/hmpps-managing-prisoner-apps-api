@@ -14,8 +14,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.History
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Response
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Staff
@@ -39,26 +37,26 @@ class HistoryServiceImplTest {
   private val requestedByLastName = "Doe"
   private val staffId = "Staff12345"
   private val staffFullName = "Jane Smith"
-  private val groupId: UUID = Generators.timeBasedEpochGenerator().generate()
+  private val departmentSlug = "test-department"
+  private val departmentName = "Test Department"
   private val appId: UUID = Generators.timeBasedEpochGenerator().generate()
   private val createdDate: LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)
 
   private lateinit var historyRepository: HistoryRepository
   private lateinit var staffService: StaffService
-  private lateinit var groupService: GroupService
+  private lateinit var establishmentDepartmentService: EstablishmentDepartmentService
   private lateinit var appRepository: AppRepository
   private lateinit var commentRepository: CommentRepository
   private lateinit var responseRepository: ResponseRepository
   private lateinit var historyServiceImpl: HistoryServiceImpl
 
   private lateinit var staff: Staff
-  private lateinit var group: Groups
 
   @BeforeEach
   fun setUp() {
     historyRepository = Mockito.mock(HistoryRepository::class.java)
     staffService = Mockito.mock(StaffService::class.java)
-    groupService = Mockito.mock(GroupService::class.java)
+    establishmentDepartmentService = Mockito.mock(EstablishmentDepartmentService::class.java)
     appRepository = Mockito.mock(AppRepository::class.java)
     commentRepository = Mockito.mock(CommentRepository::class.java)
     responseRepository = Mockito.mock(ResponseRepository::class.java)
@@ -66,10 +64,10 @@ class HistoryServiceImplTest {
     historyServiceImpl = HistoryServiceImpl(
       historyRepository,
       staffService,
-      groupService,
       appRepository,
       commentRepository,
       responseRepository,
+      establishmentDepartmentService,
     )
 
     staff = Staff(
@@ -80,14 +78,6 @@ class HistoryServiceImplTest {
       establishmentId,
       "Officer",
       UUID.randomUUID(),
-    )
-
-    group = Groups(
-      groupId,
-      "Test Group",
-      establishmentId,
-      emptyList(),
-      GroupType.WING,
     )
   }
 
@@ -101,7 +91,7 @@ class HistoryServiceImplTest {
     requestedByFirstName,
     requestedByLastName,
     AppStatus.NEW,
-    groupId,
+    departmentSlug,
     false,
   )
 
@@ -111,6 +101,7 @@ class HistoryServiceImplTest {
     entityId: UUID = Generators.timeBasedEpochGenerator().generate(),
     createdBy: String = staffId,
     reference: String? = null,
+    departmentName: String? = null,
   ) = History(
     Generators.timeBasedEpochGenerator().generate(),
     entityId,
@@ -121,6 +112,7 @@ class HistoryServiceImplTest {
     createdBy,
     createdDate,
     reference,
+    departmentName,
   )
 
   private fun setupHistoryAndApp(histories: List<History>, requestedBy: String = this.requestedBy) {
@@ -189,17 +181,16 @@ class HistoryServiceImplTest {
   }
 
   @Test
-  fun `APP_SUBMITTED produces header 'Application logged' with group assignment body`() {
-    val history = buildHistory(Activity.APP_SUBMITTED, EntityType.ASSIGNED_GROUP, entityId = groupId)
+  fun `APP_SUBMITTED produces header 'Application logged' with department assignment body`() {
+    val history = buildHistory(Activity.APP_SUBMITTED, EntityType.ASSIGNED_GROUP, departmentName = departmentName)
     setupHistoryAndApp(listOf(history))
     Mockito.`when`(staffService.getStaffById(staffId)).thenReturn(Optional.of(staff))
-    Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(group)
 
     val result = historyServiceImpl.getHistoryByAppId(appId, establishmentId)
 
     assertEquals(1, result.size)
     assertEquals("Application logged", result[0].activityMessage.header)
-    assertEquals("Assigned to ${group.name}", result[0].activityMessage.body)
+    assertEquals("Assigned to $departmentName", result[0].activityMessage.body)
   }
 
   @Test
@@ -240,17 +231,16 @@ class HistoryServiceImplTest {
   }
 
   @Test
-  fun `APP_FORWARDED_TO_A_GROUP produces header 'Application forwarded' with group name`() {
-    val history = buildHistory(Activity.APP_FORWARDED_TO_A_GROUP, EntityType.ASSIGNED_GROUP, entityId = groupId)
+  fun `APP_FORWARDED_TO_A_GROUP produces header 'Application forwarded' with department name`() {
+    val history = buildHistory(Activity.APP_FORWARDED_TO_A_GROUP, EntityType.ASSIGNED_GROUP, departmentName = departmentName)
     setupHistoryAndApp(listOf(history))
     Mockito.`when`(staffService.getStaffById(staffId)).thenReturn(Optional.of(staff))
-    Mockito.`when`(groupService.getGroupById(groupId)).thenReturn(group)
 
     val result = historyServiceImpl.getHistoryByAppId(appId, establishmentId)
 
     assertEquals(1, result.size)
     assertEquals("Application forwarded", result[0].activityMessage.header)
-    assertEquals("Forwarded to ${group.name}", result[0].activityMessage.body)
+    assertEquals("Forwarded to $departmentName", result[0].activityMessage.body)
   }
 
   @Test

@@ -48,6 +48,7 @@ class PrisonerEventsBatchProcessor(
         appRepository.save(app)
 
         department = departmentRepository.findBySlugIgnoreCase(app.departmentSlug)
+          ?: throw RuntimeException("Department ${app.departmentSlug} not found for app ${app.id}")
 
         // Create new history entry for this app
         val history = History(
@@ -93,6 +94,8 @@ class PrisonerEventsBatchProcessor(
       appsPage.content.forEach { app ->
 
         department = departmentRepository.findBySlugIgnoreCase(app.departmentSlug)
+          ?: throw RuntimeException("Department ${app.departmentSlug} not found for app ${app.id}")
+
         // Create a new Response
         val responseEntity = responseRepository.save(
           Response(

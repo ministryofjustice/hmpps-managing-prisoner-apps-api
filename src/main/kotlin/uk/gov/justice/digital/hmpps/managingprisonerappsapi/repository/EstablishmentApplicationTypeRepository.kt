@@ -17,6 +17,17 @@ interface EstablishmentApplicationTypeRepository : JpaRepository<EstablishmentAp
 
   @Query(
     """
+    SELECT eat FROM EstablishmentApplicationType eat
+    WHERE eat.establishment.id = :establishmentId
+      AND eat.active = true
+      AND eat.departmentSlug IS NOT NULL
+      AND trim(eat.departmentSlug) <> ''
+    """,
+  )
+  fun findActiveTypesWithDepartmentForEstablishment(establishmentId: String, sort: Sort): List<EstablishmentApplicationType>
+
+  @Query(
+    """
     SELECT at.id as applicationTypeId, ag.id as applicationGroupId, eat.active AS active
     FROM EstablishmentApplicationType eat
     JOIN eat.applicationType at
@@ -27,6 +38,4 @@ interface EstablishmentApplicationTypeRepository : JpaRepository<EstablishmentAp
   fun findApplicationTypeForEstablishment(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationTypeView
 
   fun findByEstablishmentIdAndApplicationTypeId(establishmentId: String, applicationTypeId: Long): EstablishmentApplicationType
-
-  fun findByDepartmentSlugAndEstablishmentId(departmentSlug: String, establishmentId: String): EstablishmentApplicationType
 }

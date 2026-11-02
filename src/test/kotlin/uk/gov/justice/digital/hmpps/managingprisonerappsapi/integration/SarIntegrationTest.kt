@@ -15,6 +15,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.ApplicationTyp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Comment
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.CommentVisibility
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Decision
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Department
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EntityType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.GroupType
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.Groups
@@ -26,6 +27,7 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppFileRe
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.AppRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ApplicationTypeRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.CommentRepository
+import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.DepartmentRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.GroupRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.HistoryRepository
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.repository.ResponseRepository
@@ -51,6 +53,9 @@ class SarIntegrationTest : SarIntegrationTestBase() {
 
   @Autowired
   private lateinit var groupRepository: GroupRepository
+
+  @Autowired
+  private lateinit var departmentRepository: DepartmentRepository
 
   @Autowired
   private lateinit var commentRepository: CommentRepository
@@ -242,6 +247,9 @@ class SarIntegrationTest : SarIntegrationTestBase() {
     applicationTypeRepository.save(ApplicationType(APPLICATION_TYPE_ID_1, "Make a general PIN phone enquiry", false, false, false))
     // App 2: Add emergency phone credit (PIN_PHONE_EMERGENCY_CREDIT_TOP_UP)
     applicationTypeRepository.save(ApplicationType(APPLICATION_TYPE_ID_2, "Add emergency phone credit", false, false, false))
+
+    departmentRepository.save(Department(DEPARTMENT_ID_1, "business-hub", "Business Hub"))
+    departmentRepository.save(Department(DEPARTMENT_ID_2, "omu", "OMU"))
 
     groupRepository.save(
       Groups(
@@ -486,6 +494,7 @@ class SarIntegrationTest : SarIntegrationTestBase() {
     private val RESPONSE_ID_2: UUID = UUID.fromString("60000000-0000-0000-0000-000000000002")
     private val RESPONSE_ID_3: UUID = UUID.fromString("60000000-0000-0000-0000-000000000003")
     private val DEPARTMENT_ID_1: UUID = UUID.fromString("01a18812-259f-7692-b347-ab3fd5cda0c8")
+    private val DEPARTMENT_ID_2: UUID = UUID.fromString("01a18812-259f-7692-b347-ab3fd5cda0c9")
 
     // URLs match what SarServiceImpl builds per AppFile. Currently using a dummy URL for all attachments.
     // When real document API is used, update to: "\${documentApiUrl}/documents/{documentId}/file"

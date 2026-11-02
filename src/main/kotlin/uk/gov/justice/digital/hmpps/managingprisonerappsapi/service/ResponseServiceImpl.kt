@@ -36,7 +36,6 @@ class ResponseServiceImpl(
   private val applicationGroupRepository: ApplicationGroupRepository,
   private val establishmentService: EstablishmentService,
   private val activityService: ActivityService,
-  private val groupService: GroupService,
   private val statsTelemetryService: StatsTelemetryService,
   private val establishmentDepartmentService: EstablishmentDepartmentService,
 ) : ResponseService {
@@ -70,7 +69,9 @@ class ResponseServiceImpl(
     var responseEntity: Response? = null
 
     val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId)
+
     val department = establishmentDepartmentService.findBySlugIgnoreCase(app.departmentSlug)
+      ?: throw ApiException("Department ${app.departmentSlug} not found", HttpStatus.NOT_FOUND)
 
     app.requests.forEach { request ->
       val req = request.toMutableMap()
