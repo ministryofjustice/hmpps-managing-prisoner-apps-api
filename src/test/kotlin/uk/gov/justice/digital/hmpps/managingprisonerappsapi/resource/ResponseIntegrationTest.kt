@@ -131,7 +131,7 @@ class ResponseIntegrationTest(
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedBySecondSurname,
-          departmentFirst.id,
+          departmentFirst.slug,
           listOf(),
         ),
       )

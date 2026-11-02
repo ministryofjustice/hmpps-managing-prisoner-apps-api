@@ -19,6 +19,6 @@ data class AppRequestDto(
     description = "Pass this value only for type PIN_PHONE_ADD_NEW_SOCIAL_CONTACT. No value passed is set as false. For other type this value is always false.",
   )
   val firstNightCenter: Boolean?,
-  val department: UUID?,
+  val department: String?,
   val fileRequestDtos: List<FileRequestDto>,
 )

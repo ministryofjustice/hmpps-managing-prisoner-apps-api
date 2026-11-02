@@ -180,7 +180,9 @@ class AppServiceImpl(
       ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
     }
 
-    val department = establishmentDepartmentService.findDepartmentByDepartmentIdAndEstablishmentId(appRequestDto.department!!, staff.establishmentId)
+    val department = establishmentDepartmentService.findBySlugIgnoreCase(appRequestDto.department)
+      ?: throw ApiException("Department with slug ${appRequestDto.department} not found", HttpStatus.NOT_FOUND)
+
     var app = convertAppRequestToAppEntity(prisoner, staff, department, appRequestDto)
 
     logger.info("Saving app request in db")

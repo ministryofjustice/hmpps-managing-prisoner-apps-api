@@ -140,7 +140,7 @@ open class AppResourceIntegrationTest(
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
-          departmentFirst.id,
+          departmentFirst.slug,
           listOf(FileRequestDto(UUID.randomUUID(), "Image file", "PDF")),
         ),
       )
@@ -220,7 +220,7 @@ open class AppResourceIntegrationTest(
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
-          departmentFirst.id,
+          departmentFirst.slug,
           listOf(),
         ),
       )
@@ -258,7 +258,7 @@ open class AppResourceIntegrationTest(
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
-          UUID.randomUUID(),
+          "faith",
           listOf(),
         ),
       )
@@ -282,7 +282,7 @@ open class AppResourceIntegrationTest(
           },
       ),
       true,
-      departmentFirst.id,
+      departmentFirst.slug,
       listOf(),
     )
     var response = webTestClient.post()
@@ -326,7 +326,7 @@ open class AppResourceIntegrationTest(
           },
       ),
       false,
-      departmentFirst.id,
+      departmentFirst.slug,
       listOf(),
     )
     val response = webTestClient.post()
@@ -364,7 +364,7 @@ open class AppResourceIntegrationTest(
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstMainName,
       requestedBySecondSurname,
-      departmentFirst.id,
+      departmentFirst.slug,
       listOf(),
     )
     val response = webTestClient.post()
@@ -548,7 +548,7 @@ open class AppResourceIntegrationTest(
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedByFirstSurname,
-          departmentFirst.id,
+          departmentFirst.slug,
           listOf(),
         ),
       )
