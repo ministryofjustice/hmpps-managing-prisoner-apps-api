@@ -153,7 +153,7 @@ class DataGenerator {
       requestedDate: LocalDateTime?,
       requestedByFirstName: String,
       requestedByLastName: String,
-      departmentId: UUID?,
+      departmentId: String?,
       files: List<FileRequestDto>,
     ): AppRequestDto = AppRequestDto(
       "Testing",

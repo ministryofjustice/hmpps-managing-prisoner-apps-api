@@ -190,7 +190,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
-          department.id,
+          department.slug,
           listOf(),
         ),
       )
@@ -219,7 +219,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
-          department.id,
+          department.slug,
           listOf(),
         ),
       )
@@ -248,7 +248,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstName,
           requestedByLastName,
-          department.id,
+          department.slug,
           listOf(),
         ),
       )
@@ -282,7 +282,7 @@ class AppServiceImplTest {
         LocalDateTime.now(ZoneOffset.UTC),
         requestedByFirstName,
         requestedByLastName,
-        department.id,
+        department.slug,
         listOf(),
       ),
     )
@@ -314,7 +314,7 @@ class AppServiceImplTest {
           LocalDateTime.now(ZoneOffset.UTC),
           listOf(),
           false,
-          department.id,
+          department.slug,
           listOf(),
         ),
       )
@@ -346,7 +346,7 @@ class AppServiceImplTest {
               },
           ),
           false,
-          department.id,
+          department.slug,
           listOf(),
         ),
       )

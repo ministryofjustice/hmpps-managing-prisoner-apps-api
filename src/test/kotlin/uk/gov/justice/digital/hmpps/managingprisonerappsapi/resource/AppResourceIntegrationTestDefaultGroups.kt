@@ -137,7 +137,7 @@ class AppResourceIntegrationTestDefaultGroups(
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
-          departmentFirst.id,
+          departmentFirst.slug,
           listOf(),
         ),
       )
@@ -214,7 +214,7 @@ class AppResourceIntegrationTestDefaultGroups(
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
-          departmentFirst.id,
+          departmentFirst.slug,
           listOf(),
         ),
       )
@@ -252,7 +252,7 @@ class AppResourceIntegrationTestDefaultGroups(
           null,
           requestedByFirstMainName,
           requestedBySecondSurname,
-          UUID.randomUUID(),
+          "faith",
           listOf(),
         ),
       )
@@ -276,7 +276,7 @@ class AppResourceIntegrationTestDefaultGroups(
           },
       ),
       true,
-      departmentFirst.id,
+      departmentFirst.slug,
       listOf(),
     )
     var response = webTestClient.post()
@@ -320,7 +320,7 @@ class AppResourceIntegrationTestDefaultGroups(
           },
       ),
       false,
-      departmentFirst.id,
+      departmentFirst.slug,
       listOf(),
     )
     val response = webTestClient.post()
@@ -358,7 +358,7 @@ class AppResourceIntegrationTestDefaultGroups(
       LocalDateTime.now(ZoneOffset.UTC),
       requestedByFirstMainName,
       requestedBySecondSurname,
-      departmentFirst.id,
+      departmentFirst.slug,
       listOf(),
     )
     val response = webTestClient.post()
@@ -532,7 +532,7 @@ class AppResourceIntegrationTestDefaultGroups(
           LocalDateTime.now(ZoneOffset.UTC),
           requestedByFirstMainName,
           requestedByFirstSurname,
-          departmentFirst.id,
+          departmentFirst.slug,
           listOf(),
         ),
       )
