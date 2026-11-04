@@ -31,4 +31,5 @@ data class AppResponseDto<X, Y>(
   val establishmentId: String,
   val firstNightCenter: Boolean,
   val files: List<FileResponseDto>,
+  val departmentSlug: String?,
 )

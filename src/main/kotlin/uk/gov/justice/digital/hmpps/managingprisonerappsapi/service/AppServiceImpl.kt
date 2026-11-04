@@ -20,7 +20,6 @@ import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AppResp
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationGroupResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.ApplicationTypeResponse
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.AssignedGroupDto
-import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.EstablishmentDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.FileResponseDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.GroupAppListViewDto
 import uk.gov.justice.digital.hmpps.managingprisonerappsapi.dto.response.HistoryResponse
@@ -176,7 +175,8 @@ class AppServiceImpl(
     if (appRequestDto.requests.size != 1) {
       throw ApiException("Only one requests in app is supported", HttpStatus.BAD_REQUEST)
     }
-    val establishment = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
+
+    establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
       ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
     }
 
@@ -448,11 +448,7 @@ class AppServiceImpl(
       }
     }
     val appsList = convertAppToAppListDto(pageResult.content, staff.establishmentId)
-    val departments = establishmentDepartmentService.findDepartmentsForEstablishment(staff.establishmentId)
-    val establishmentDto = establishmentService.getEstablishmentById(staff.establishmentId).orElseThrow {
-      ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
-    }
-    val assignedGroupDtoList = convertToAssignedGroupDtoList(departments, establishmentDto)
+    val assignedGroupDtoList = establishmentDepartmentService.findActiveDepartmentsForEstablishment(staffId)
 
     return AppResponseListDto(
       pageResult.pageable.pageNumber + 1,
@@ -598,14 +594,6 @@ class AppServiceImpl(
     )
   }
 
-  private fun convertToAssignedGroupDtoList(departments: List<Department>, establishmentDto: EstablishmentDto): List<AssignedGroupDto> {
-    val list = ArrayList<AssignedGroupDto>()
-    departments.forEach { department ->
-      list.add(AssignedGroupDto(department.slug, department.name, establishmentDto, null, null))
-    }
-    return list
-  }
-
   private fun convertRequestsToAppRequests(requests: List<Map<String, Any>>): List<MutableMap<String, Any>> {
     val appRequests = ArrayList<MutableMap<String, Any>>()
     requests.forEach { request ->
@@ -646,6 +634,7 @@ class AppServiceImpl(
     app.establishmentId,
     app.firstNightCenter,
     convertEntityFilesToFiles(app.appFiles),
+    app.departmentSlug,
   )
 
   /**

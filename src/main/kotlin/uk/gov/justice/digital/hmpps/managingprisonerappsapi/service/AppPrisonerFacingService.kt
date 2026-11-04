@@ -91,7 +91,7 @@ class AppPrisonerFacingService(
     validatePrisonerByRequestedBy(prisonerId, app)
 
     val departmentSlug = app.departmentSlug
-    if (departmentSlug == null) {
+    if (departmentSlug == "") {
       throw ApiException("DepartmentSlug not found app $appId", HttpStatus.NOT_FOUND)
     }
     val estApplicationType =
