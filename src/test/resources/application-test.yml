@@ -29,7 +29,7 @@ hmpps:
   sar:
     template:
       enabled: true
-      path: /sar/templates/sar_template.mustache
+      path: /sar/templates/dev_sar_template.mustache
     tests:
       # When generate-actual is true the SAR tests write the actual output to
       # src/test/resources/*.log scratch files AND the @AfterEach tearDown in

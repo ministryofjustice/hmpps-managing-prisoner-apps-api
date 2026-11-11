@@ -11,6 +11,11 @@ spring:
      locations: classpath:db/migration/dev
 
 hmpps:
+  sar:
+    additionalAccessRole: MANAGING_PRISONER_APPS
+    template:
+      path: /sar/templates/dev_sar_template.mustache
+      enabled: true
   self:
     url: https://managing-prisoner-apps-api-dev.hmpps.service.justice.gov.uk
   sqs:
@@ -33,8 +38,8 @@ hmpps:
     api:
       url: https://document-api-dev.hmpps.service.justice.gov.uk
       timeout: 10s
-  sar:
-    additionalAccessRole: MANAGING_PRISONER_APPS
+
+
 
 
 

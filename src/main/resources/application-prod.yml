@@ -4,6 +4,10 @@ example-api:
   url: https://managing-prisoner-apps-api.hmpps.service.justice.gov.uk
 
 hmpps:
+  sar:
+    template:
+      path: /sar/templates/live_sar_template.mustache
+      enabled: true
   self:
     url: https://managing-prisoner-apps-api.hmpps.service.justice.gov.uk
   sqs:

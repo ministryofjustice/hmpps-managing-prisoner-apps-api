@@ -7,6 +7,10 @@ example-api:
     secret: "example-api-client-secret"
 
 hmpps:
+  sar:
+    template:
+      path: /sar/templates/dev_sar_template.mustache
+      enabled: true
   self:
     url: https://managing-prisoner-apps-api-staging.hmpps.service.justice.gov.uk
   sqs:
