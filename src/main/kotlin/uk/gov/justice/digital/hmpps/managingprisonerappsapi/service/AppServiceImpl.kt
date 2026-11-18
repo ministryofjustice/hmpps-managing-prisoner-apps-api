@@ -65,6 +65,7 @@ class AppServiceImpl(
   private val statsTelemetryService: StatsTelemetryService,
   private val establishmentDepartmentService: EstablishmentDepartmentService,
   private val establishmentApplicationTypeService: EstablishmentApplicationTypeService,
+  private val locationService: LocationService,
 ) : AppService {
 
   companion object {
@@ -373,8 +374,9 @@ class AppServiceImpl(
     staffId: String,
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
-    requestedBy: String?,
+    requestedBy: Set<String>?,
     assignedGroups: Set<String>?,
+    locations: Set<String>?,
     firstNightCenter: Boolean?,
     pageNumber: Long,
     pageSize: Long,
@@ -387,6 +389,14 @@ class AppServiceImpl(
       ApiException("The establishment: $staff.establishmentId is not enabled", HttpStatus.FORBIDDEN)
     }
     val establishmentId = if (establishment.defaultDepartments) "DEFAULT" else staff.establishmentId
+
+    var fetchRequestedBy = requestedBy
+    if (!locations.isNullOrEmpty()) {
+      val prisonersAtLocations = locationService.getPrisonersAtLocations(locations)
+      fetchRequestedBy = requestedBy?.intersect(prisonersAtLocations) ?: prisonersAtLocations
+      logger.info("Fetched ${prisonersAtLocations.size} prisoners from ${locations.size} locations")
+    }
+
     var appTypeDto: List<AppByAppTypeCounts> = listOf()
     var assignedGroupTypesCounts: List<AppByAssignedGroupCounts> = listOf()
     var appByFirstNightCount: Int = 0
@@ -402,7 +412,7 @@ class AppServiceImpl(
           staff.establishmentId,
           status,
           appTypes,
-          requestedBy,
+          fetchRequestedBy,
           assignedGroups,
           firstNightCenter,
         )
@@ -412,7 +422,7 @@ class AppServiceImpl(
           staff.establishmentId,
           status,
           appTypes,
-          requestedBy,
+          fetchRequestedBy,
           assignedGroups,
           firstNightCenter,
         )
@@ -422,7 +432,7 @@ class AppServiceImpl(
           staff.establishmentId,
           status,
           appTypes,
-          requestedBy,
+          fetchRequestedBy,
           assignedGroups,
           true,
         ).getCount()
@@ -440,7 +450,7 @@ class AppServiceImpl(
           staff.establishmentId,
           status,
           appTypes,
-          requestedBy,
+          fetchRequestedBy,
           assignedGroups,
           firstNightCenter,
           pageRequest,

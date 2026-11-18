@@ -253,6 +253,7 @@ class AppResource(var appService: AppService) {
     authentication: Authentication,
   ): ResponseEntity<AppResponseListDto> {
     logger.info("Request received for to search apps")
+    logger.info("AppsSearchQueryDto received: locations=${appsSearchQueryDto.locations}, requestedBy=${appsSearchQueryDto.requestedBy}, status=${appsSearchQueryDto.status}")
     authentication as AuthAwareAuthenticationToken
     if (appsSearchQueryDto.applicationTypes != null && appsSearchQueryDto.applicationTypes!!.isEmpty()) {
       appsSearchQueryDto.applicationTypes = null
@@ -270,6 +271,7 @@ class AppResource(var appService: AppService) {
       appsSearchQueryDto.applicationTypes,
       appsSearchQueryDto.requestedBy,
       appsSearchQueryDto.assignedGroups,
+      appsSearchQueryDto.locations,
       appsSearchQueryDto.firstNightCenter,
       appsSearchQueryDto.page,
       appsSearchQueryDto.size,

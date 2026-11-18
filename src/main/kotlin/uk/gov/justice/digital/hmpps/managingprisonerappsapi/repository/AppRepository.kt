@@ -25,7 +25,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " WHERE a.establishmentId = :establishmentId " +
       " AND a.status IN (:status)" +
       " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
-      " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
+      " AND (:requestedBy IS NULL OR a.requestedBy IN (:requestedBy))" +
       " AND (:assignedGroups IS NULL OR a.departmentSlug IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
       " GROUP BY a.applicationType ORDER BY a.applicationType ASC",
@@ -35,7 +35,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     establishmentId: String,
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
-    requestedBy: String?,
+    requestedBy: Set<String>?,
     assignedGroups: Set<String>?,
     firstNightCenter: Boolean?,
   ): List<AppByAppTypeCounts>
@@ -45,7 +45,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " WHERE a.establishmentId = :establishmentId " +
       " AND a.status IN (:status)" +
       " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
-      " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
+      " AND (:requestedBy IS NULL OR a.requestedBy  IN (:requestedBy))" +
       " AND (:assignedGroups IS NULL OR a.departmentSlug IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)" +
       " GROUP BY a.departmentSlug",
@@ -55,7 +55,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     establishmentId: String,
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
-    requestedBy: String?,
+    requestedBy: Set<String>?,
     assignedGroups: Set<String>?,
     firstNightCenter: Boolean?,
   ): List<AppByAssignedGroupCounts>
@@ -65,7 +65,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " WHERE a.establishmentId = :establishmentId " +
       " AND a.status IN (:status)" +
       " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
-      " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
+      " AND (:requestedBy IS NULL OR a.requestedBy IN (:requestedBy))" +
       " AND (:assignedGroups IS NULL OR a.departmentSlug IN (:assignedGroups))" +
       " AND (a.firstNightCenter =:firstNightCenter)",
     nativeQuery = false,
@@ -74,7 +74,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     establishmentId: String,
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
-    requestedBy: String?,
+    requestedBy: Set<String>?,
     assignedGroups: Set<String>?,
     firstNightCenter: Boolean,
   ): AppByFirstNightCount
@@ -84,7 +84,7 @@ interface AppRepository : JpaRepository<App, UUID> {
       " WHERE a.establishmentId = :establishmentId" +
       " AND a.status IN (:status)" +
       " AND (:appTypes IS NULL OR a.applicationType IN (:appTypes))" +
-      " AND (:requestedBy IS NULL OR a.requestedBy = :requestedBy)" +
+      " AND (:requestedBy IS NULL OR a.requestedBy IN (:requestedBy))" +
       " AND (:assignedGroups IS NULL OR a.departmentSlug IN (:assignedGroups))" +
       " AND (:firstNightCenter IS NULL OR a.firstNightCenter =:firstNightCenter)", // +
     nativeQuery = false,
@@ -93,7 +93,7 @@ interface AppRepository : JpaRepository<App, UUID> {
     establishmentId: String,
     status: Set<AppStatus>,
     appTypes: Set<Long>?,
-    requestedBy: String?,
+    requestedBy: Set<String>?,
     assignedGroups: Set<String>?,
     firstNightCenter: Boolean?,
     pageable: Pageable,
