@@ -63,6 +63,7 @@ class AppServiceImplTest {
   private lateinit var applicationTypeRepository: ApplicationTypeRepository
   private lateinit var statsTelemetryService: StatsTelemetryService
   private lateinit var establishmentApplicationTypeService: EstablishmentApplicationTypeService
+  private lateinit var locationService: LocationService
 
   private lateinit var appService: AppService
   private lateinit var app: App
@@ -85,6 +86,7 @@ class AppServiceImplTest {
     applicationGroupRepository = Mockito.mock(ApplicationGroupRepository::class.java)
     statsTelemetryService = Mockito.mock(StatsTelemetryService::class.java)
     establishmentApplicationTypeService = Mockito.mock(EstablishmentApplicationTypeService::class.java)
+    locationService = Mockito.mock(LocationService::class.java)
     val activeAppTypeView = Mockito.mock(uk.gov.justice.digital.hmpps.managingprisonerappsapi.model.EstablishmentApplicationTypeView::class.java)
     Mockito.`when`(activeAppTypeView.active).thenReturn(true)
     Mockito.`when`(activeAppTypeView.applicationGroupId).thenReturn(1L)
@@ -156,6 +158,7 @@ class AppServiceImplTest {
       statsTelemetryService,
       establishmentDepartmentService,
       establishmentApplicationTypeService,
+      locationService,
     )
   }
 

@@ -25,4 +25,8 @@ hmpps:
     api:
       url: https://document-api-preprod.hmpps.service.justice.gov.uk
       timeout: 10s
+  locations-inside-prison:
+    api:
+      url: https://locations-inside-prison-api-preprod.hmpps.service.justice.gov.uk
+      timeout: 10s
 

@@ -8,8 +8,9 @@ data class AppsSearchQueryDto(
   val size: Long = 20,
   val status: Set<AppStatus>,
   var applicationTypes: Set<Long>? = null,
-  val requestedBy: String? = null,
+  val requestedBy: Set<String>? = null,
   var assignedGroups: Set<String>? = null,
+  val locations: Set<String>? = null,
   val firstNightCenter: Boolean? = null,
   val oldestAppFirst: Boolean? = null,
 )

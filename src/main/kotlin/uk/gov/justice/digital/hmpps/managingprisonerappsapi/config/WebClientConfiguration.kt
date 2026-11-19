@@ -24,11 +24,14 @@ class WebClientConfiguration(
   private val manageUsersApiBaseUrl: String,
   @Value("\${hmpps.document.api.url}")
   private val documentApiBaseUrl: String,
+  @Value("\${hmpps.locations-inside-prison.api.url}")
+  private val locationsInsidePrisonApiBaseUrl: String,
 ) {
   private enum class HmppsAuthClientRegistrationId(val clientRegistrationId: String) {
     PRISONER_SEARCH("other-hmpps-apis"),
     MANAGE_USERS_API_CLIENT("other-hmpps-apis"),
     DOCUMENT_API("other-hmpps-apis"),
+    LOCATIONS_INSIDE_PRISON_API("other-hmpps-apis"),
   }
 
   @Bean
@@ -46,6 +49,9 @@ class WebClientConfiguration(
 
   @Bean
   fun manageUsersApiWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = HmppsAuthClientRegistrationId.MANAGE_USERS_API_CLIENT.clientRegistrationId, url = manageUsersApiBaseUrl, apiTimeout)
+
+  @Bean
+  fun locationsInsidePrisonWebClient(authorizedClientManager: OAuth2AuthorizedClientManager, builder: WebClient.Builder): WebClient = builder.authorisedWebClient(authorizedClientManager, registrationId = HmppsAuthClientRegistrationId.LOCATIONS_INSIDE_PRISON_API.clientRegistrationId, url = locationsInsidePrisonApiBaseUrl, apiTimeout)
 
   // HMPPS Auth health ping is required if your service calls HMPPS Auth to get a token to call other services
   // TODO: Remove the health ping if no call outs to other services are made

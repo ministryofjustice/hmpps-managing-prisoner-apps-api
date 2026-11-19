@@ -393,7 +393,7 @@ class AppResourceIntegrationTestDefaultGroups(
       10,
       setOf(AppStatus.NEW),
       setOf(),
-      requestedByFirst,
+      setOf(requestedByFirst),
       setOf(),
       oldestAppFirst = false,
     )
