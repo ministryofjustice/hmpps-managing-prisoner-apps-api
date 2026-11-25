@@ -3,7 +3,7 @@ package uk.gov.justice.digital.hmpps.managingprisonerappsapi.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConfigurationProperties(prefix = "hmpps.sar.tests")
 data class SarTestConfig(
   var generateActual: Boolean = false,
