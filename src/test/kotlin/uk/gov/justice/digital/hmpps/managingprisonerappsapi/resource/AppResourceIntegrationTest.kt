@@ -470,7 +470,7 @@ open class AppResourceIntegrationTest(
       .returnResult()
       .responseBody as AppResponseDto<Department, String>
 
-    val comment = commentRepository.findAll().get(0)
+    val comment = commentRepository.findAll().single { it.appId == appIdFirst }
     Assertions.assertEquals(forwardingMessage, comment.message)
     Assertions.assertEquals(appIdFirst, comment.appId)
     Assertions.assertEquals(loggedUserId, comment.createdBy)
