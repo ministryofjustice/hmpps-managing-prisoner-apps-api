@@ -26,6 +26,9 @@ dependencies {
 
   implementation("org.flywaydb:flyway-database-postgresql")
 
+  implementation("org.apache.poi:poi:6.0.0")
+  implementation("org.apache.poi:poi-ooxml:6.0.0")
+
   // SQS/SNS dependencies
   implementation("uk.gov.justice.service.hmpps:hmpps-sqs-spring-boot-starter:7.6.0")
   testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
@@ -62,8 +65,42 @@ java {
   targetCompatibility = JavaVersion.VERSION_25
 }
 
+sourceSets {
+  create("tools") {
+    compileClasspath += sourceSets["main"].output + sourceSets["main"].compileClasspath
+    runtimeClasspath += output + compileClasspath + sourceSets["main"].runtimeClasspath
+  }
+}
+
+configurations {
+  named("toolsImplementation") {
+    extendsFrom(configurations["implementation"])
+  }
+  named("toolsRuntimeOnly") {
+    extendsFrom(configurations["runtimeOnly"])
+  }
+}
+
+springBoot {
+  mainClass.set("uk.gov.justice.digital.hmpps.managingprisonerappsapi.ManagingPrisonerAppsApiKt")
+}
+
 tasks {
   withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions.jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25
   }
+}
+
+tasks.register<JavaExec>("appTypeMapperSqlGenerator") {
+  group = "application"
+  description = "Run AppTypeDepartmentMapper SQL generator"
+  classpath = sourceSets["tools"].runtimeClasspath
+  mainClass.set("uk.gov.justice.digital.hmpps.managingprisonerappsapi.sqlgenerator.AppTypeDepartmentMapperKt")
+}
+
+tasks.register<JavaExec>("newEstablishmentSqlGenerator") {
+  group = "application"
+  description = "Run NewEstablishmentOnboarding SQL generator"
+  classpath = sourceSets["tools"].runtimeClasspath
+  mainClass.set("uk.gov.justice.digital.hmpps.managingprisonerappsapi.sqlgenerator.NewEstablishmentOnboardingKt")
 }
