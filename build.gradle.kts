@@ -12,7 +12,7 @@ dependencies {
   implementation("uk.gov.justice.service.hmpps:hmpps-kotlin-spring-boot-starter:3.1.0")
   implementation("org.springframework.boot:spring-boot-starter-webflux")
   implementation("org.springframework.boot:spring-boot-starter-webclient")
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.0")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.1")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("com.fasterxml.uuid:java-uuid-generator:5.2.0")
@@ -47,7 +47,7 @@ dependencies {
 
   // Localstack
   testImplementation("org.testcontainers:localstack:1.21.4")
-  testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
+  testImplementation("org.awaitility:awaitility-kotlin:4.4.0")
 }
 
 kotlin {
