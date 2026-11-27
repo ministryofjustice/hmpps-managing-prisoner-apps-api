@@ -77,4 +77,4 @@ sonar-project.properties
 
 # Sql Generator
 output/
-src/main/resources/dataconfig/
+

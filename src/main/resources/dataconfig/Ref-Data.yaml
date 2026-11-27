@@ -1,0 +1,21 @@
+NEW_ESTABLISHMENT_ID: "RNI"
+NEW_ESTABLISHMENT_NAME: "Ranby (HMP)"
+
+#Specify all the excluded application Groups from master list
+excludedApplicationGroups:
+  - "Diversity and inclusion"
+  - "Governers"
+  - "Healthcare"
+  - "IMB"
+  - "Kitchens"
+  - "Programmes, interventions, psychology"
+  - "Security"
+
+#Specify all the excluded application types that does not belong to any of the excluded application groups
+excludedApplicationTypes:
+  - 92
+
+#Specify all the excluded departments from master list
+excludedDepartments:
+  - "Digital Team"
+
