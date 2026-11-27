@@ -50,7 +50,7 @@ dependencies {
 
   // Localstack
   testImplementation("org.testcontainers:localstack:1.21.4")
-  testImplementation("org.awaitility:awaitility-kotlin:4.3.0")
+  testImplementation("org.awaitility:awaitility-kotlin:4.4.0")
 }
 
 kotlin {
